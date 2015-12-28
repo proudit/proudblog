@@ -11,15 +11,20 @@ h1
   - when 'year'
     = year
 hr
+
 - if paginate && num_pages > 1
-  p
+  p.paginate
     | Page 
     = page_number
     |  of 
     = num_pages
+    hr
   - if prev_page
-    p
+    p.paginate
+     i.fa.fa-mail-reply<
       = link_to 'Previous page', prev_page
+    hr
+
 ul
   - page_articles.each_with_index do |article, i|
     li
@@ -27,7 +32,10 @@ ul
       |  
       span
         = article.date.strftime('%b %e')
+
 - if paginate
   - if next_page
-    p
+    br
+    p.paginate
+     i.fa.fa-mail-forward<
       = link_to 'Next page', next_page

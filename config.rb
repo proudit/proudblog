@@ -25,10 +25,9 @@ activate :blog do |blog|
   blog.calendar_template = "calendar.html"
 
   # Enable pagination
-  # blog.paginate = true
-  # blog.per_page = 10
+  blog.paginate = true
+  blog.per_page = 10
   # blog.page_link = "page/{num}"
-
 
 end
 
@@ -85,7 +84,7 @@ activate :livereload
   end
 
   def author_path(author)
-    "/authors/#{author.keys.first}.html"
+    "/#{author.keys.first}.html"
   end
 
  end
@@ -145,18 +144,12 @@ Slim::Engine.disable_option_validator!
 
 set :fonts_dir,  "fonts"
 
-def articles_by_author(author)
-  sitemap.resources.select do |resource|
-  resource.data.author == author.name
-  end.sort_by { |resource| resource.data.date }
+ready do
+  sitemap.resources.group_by {|p| p.data["author"] }.each do |author, pages|
+    proxy "/#{author}.html", "author.html",
+      locals: { author_slug: author, pages: pages },
+      ignore: true
+  end
 end
 
-data.authors.collect {|author| author.keys.first }.each do |author_slug|
-  proxy "/authors/#{author_slug}.html",
-        '/authors/template.html',
-        locals: { author_slug: author_slug },
-        ignore: true
-end
-
-
-#activate :authors
+ignore "/.html"

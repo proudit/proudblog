@@ -3237,20 +3237,27 @@ header {
 /* line 1, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
 article {
   padding: 0 12px 0 12px; }
-  /* line 3, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  @media (max-width: 480px) {
+    /* line 4, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+    article .share-box div {
+      float: none;
+      clear: both;
+      display: block;
+      margin-bottom: 5px; } }
+  /* line 12, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article body {
     font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; }
-  /* line 9, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  /* line 18, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article h1 {
     margin: 30px 0 10px 0;
     font-size: x-large;
     font-weight: bold;
     color: #5f9ea0; }
-  /* line 16, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  /* line 25, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article .tag-labels {
     display: block;
     margin-bottom: 1.5; }
-    /* line 24, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+    /* line 33, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
     article .tag-labels .tag-label {
       background: #999;
       border-radius: 2em;
@@ -3261,21 +3268,40 @@ article {
       padding: .25em 1em;
       text-align: center;
       margin-right: .4em; }
-    /* line 36, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+    /* line 45, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
     article .tag-labels:last-child {
       margin-right: 0; }
-  /* line 41, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  /* line 50, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article .posted-date {
     padding-left: .5em; }
-  /* line 45, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  /* line 54, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  article p.paginate {
+    text-align: right;
+    font-weight: bold;
+    color: #9370db; }
+  /* line 60, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  article div#share {
+    position: relative;
+    overflow: hidden; }
+  /* line 65, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  article div#share ul {
+    float: left;
+    left: 50%;
+    position: relative; }
+  /* line 71, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  article div#share li {
+    float: left;
+    left: -50%;
+    position: relative; }
+  /* line 77, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article img {
     border: 1px solid rgba(0, 0, 0, 0.1); }
-  /* line 49, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  /* line 81, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article img.author {
     width: 30px;
     height: 30px;
     border: 0px; }
-  /* line 55, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  /* line 87, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article img.mauthor {
     border: 0px; }
   /* line 20, /Users/toguma/.rbenv/versions/2.1.2/lib/ruby/gems/2.1.0/gems/bourbon-4.2.6/app/assets/stylesheets/addons/_clearfix.scss */
@@ -3283,7 +3309,7 @@ article {
     clear: both;
     content: "";
     display: table; }
-  /* line 60, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  /* line 92, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article .read-more a {
     float: right; }
 
