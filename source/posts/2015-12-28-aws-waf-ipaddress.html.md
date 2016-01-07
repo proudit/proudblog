@@ -12,7 +12,7 @@ IP address、SQL injection、String matchingに関するアクセスの制御が
 
 今回はIP addressesの設定を行います。
 その他の設定については以下を参照ください。
-[「AWS WAF」を導入してみた。- SQL injection編](http://qiita.com/kooohei/items/8739c0ee023e0bb8b1e2)
+[「AWS WAF」を導入してみた。- SQL injection編](../../../2016/01/07/aws-waf-sqlinjection.html)
 [「AWS WAF」を導入してみた。- String matching編](http://qiita.com/kooohei/items/18b908a38a98528550e5)
 
 # 1.新規設定
@@ -78,6 +78,7 @@ Resourceの項目を適用したいCloudFrontに設定して「Review and create
 
 <br>  
 # 2.動作確認
+---
 まずはリクエストが無いことを確認します。
 ![aws-waf_2015120105.png](https://qiita-image-store.s3.amazonaws.com/0/82090/ec9359fe-028f-3c74-8f39-64f0b1973f2c.png)
 
