@@ -13,7 +13,7 @@ IP address、SQL injection、String matchingに関するアクセスの制御が
 今回はIP addressesの設定を行います。
 その他の設定については以下を参照ください。
 [「AWS WAF」を導入してみた。- SQL injection編](../../../2016/01/07/aws-waf-sqlinjection.html)
-[「AWS WAF」を導入してみた。- String matching編](http://qiita.com/kooohei/items/18b908a38a98528550e5)
+[「AWS WAF」を導入してみた。- String matching編](../../../2016/01/12/aws-waf-stringmatching.html)
 
 # 1.新規設定
 ---

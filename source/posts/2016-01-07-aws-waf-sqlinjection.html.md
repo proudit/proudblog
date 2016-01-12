@@ -15,7 +15,7 @@ AWS WAFはアプリケーション用のファイアウォールで、IP address
 今回は既に作成済みの「waf-test-acl」にSQL injectionの設定を追加してみます。
 その他の設定については以下参照ください。
 [「AWS WAF」を導入してみた。- IP addresses編](../../../2015/12/28/aws-waf-ipaddress.html)
-[「AWS WAF」を導入してみた。- String matching編](http://qiita.com/kooohei/items/18b908a38a98528550e5)
+[「AWS WAF」を導入してみた。- String matching編](../../../2016/01/12/aws-waf-stringmatching.html)
 
 
 # 1.設定
