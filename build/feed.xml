@@ -5,16 +5,221 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-01-12T09:00:00+09:00</updated>
+  <updated>2016-01-18T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Redmine 3.2をAmazon Linux(release 2015.09)にインストールしてみた。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/01/18/installed-redmine-on-amazonlinux.html"/>
+    <id>http://blog.url.com/2016/01/18/installed-redmine-on-amazonlinux.html</id>
+    <published>2016-01-18T09:00:00+09:00</published>
+    <updated>2016-01-18T16:57:02+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;今回はAmazon Linux(release 2015.09)にRedmine 3.2をインストールする手順をまとめてみました。&lt;/p&gt;
+
+&lt;p&gt;方針としてはシンプルにしたいので、できるだけyumやインストール済みのパッケージを利用していきます。&lt;/p&gt;
+
+&lt;h1 id="必要なパッケージ等の準備"&gt;必要なパッケージ等の準備&lt;/h1&gt;
+
+&lt;h4 id="1.開発ツールのインストール"&gt;1.開発ツールのインストール&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum groupinstall "Development Tools"
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="2.rubyのセットアップ"&gt;2.rubyのセットアップ&lt;/h4&gt;
+
+&lt;p&gt;Amazon Linuxではデフォルトでrubyがインストールされています。今回はインストール済みのを利用し、追加で必要なライブラリのみをインストールします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# ruby -v
+# gem -v
+# yum install ruby-devel
+# gem install io-console
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="3.bundlerのインストール"&gt;3.bundlerのインストール&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# gem install bundler --no-rdoc --no-ri
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id="データベースの準備"&gt;データベースの準備&lt;/h1&gt;
+
+&lt;h4 id="1.mysqlのインストール"&gt;1.MySQLのインストール&lt;/h4&gt;
+
+&lt;p&gt;今回のデータベースはRDSを利用するため、クライアントをインストールします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum install mysql mysql-devel
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="2.データベースとユーザーの作成"&gt;2.データベースとユーザーの作成&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# mysql -h &amp;lt;ホスト名&amp;gt; -u &amp;lt;ユーザー&amp;gt; -p &amp;lt;パスワード&amp;gt;
+mysql&amp;gt; create database db_redmine default character set utf8;
+mysql&amp;gt; grant all on db_redmine.* to user_redmine@localhost identified by '********';
+mysql&amp;gt; flush privileges;
+mysql&amp;gt; exit;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id="apacheのインストール"&gt;apacheのインストール&lt;/h1&gt;
+
+&lt;h4 id="1.apacheのインストール"&gt;1.apacheのインストール&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum install httpd httpd-devel
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="2.confファイルの修正---その１"&gt;2.confファイルの修正 - その１&lt;/h4&gt;
+
+&lt;p&gt;&amp;quot;/etc/httpd/conf/httpd.conf&amp;quot;の以下のコメントアウトを外します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# vim /etc/httpd/conf/httpd.conf
+修正前：# NameVirtualHost *:80 → 修正後：NameVirtualHost *:80
+
+# diff /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf_org
+991c991
+&amp;lt; NameVirtualHost *:80
+---
+&amp;gt; #NameVirtualHost *:80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="3.confファイルの修正---その２"&gt;3.confファイルの修正 - その２&lt;/h4&gt;
+
+&lt;p&gt;&amp;quot;/etc/httpd/conf.d/redmine.conf&amp;quot;を作成する。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# vim /etc/httpd/conf.d/redmine.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;confの内容は適宜修正してください。以下は例となります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName www.example.com
+
+    DocumentRoot /var/www/redmine/public
+
+    ErrorLog  "|/usr/sbin/rotatelogs /var/log/httpd/redmine/error_log.%Y%m%d 86400 540"
+    CustomLog "|/usr/sbin/rotatelogs /var/log/httpd/redmine/access_log.%Y%m%d 86400 540" combined
+
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id="redmineの設定"&gt;Redmineの設定&lt;/h1&gt;
+
+&lt;h4 id="1.必要なパッケージのインストール"&gt;1.必要なパッケージのインストール&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum -y install openssl-devel readline-devel zlib-devel curl-devel libyaml-devel libffi-devel
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="2.imagemagickと日本語フォントのインストール"&gt;2.ImageMagickと日本語フォントのインストール&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum install ImageMagick ImageMagick-devel ipa-pgothic-fonts
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="3.redmineのダウンロード"&gt;3.Redmineのダウンロード&lt;/h4&gt;
+
+&lt;p&gt;下記のURLからRedmine 3.2のtarball(.tar.gz)をダウンロードします。&lt;br&gt;
+&lt;a href="http://www.redmine.org/projects/redmine/wiki/Download"&gt;http://www.redmine.org/projects/redmine/wiki/Download&lt;/a&gt;&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# wget http://www.redmine.org/releases/redmine-3.2.0.tar.gz
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ダウンロードしたら展開・配置します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# tar zxvf redmine-3.2.0.tar.gz
+# mv redmine-3.2.0 /var/www/redmine
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;また、apacheからアクセスできるようにオーナーの変更をします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# chown -R apache.apache /var/www/redmine/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;配置したredmineディレクトリ配下のconfigディレクトリに&amp;quot;database.yml&amp;quot;と&amp;quot;configuration.yml&amp;quot;を作成します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;production:
+  adapter: mysql2
+  database: db_redmine
+  host: &amp;lt;RDSのエンドポイント名&amp;gt;
+  username: ユーザー
+  password: "パスワード"
+  encoding: utf8
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;production:
+  email_delivery:
+    delivery_method: :smtp
+    smtp_settings:
+      address: "127.0.0.1"
+      port: 25
+      domain: 'ドメイン'
+
+  rmagick_font_path: /usr/share/fonts/ipa-gothic/ipag.ttf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="4.redmine用gemパッケージの一括インストール"&gt;4.Redmine用Gemパッケージの一括インストール&lt;/h4&gt;
+
+&lt;p&gt;bandlerを使ってRedmineが使用するGemを一括でインストールします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# bundle install --without development test --path vendor/bundle
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="5.redmineの初期設定とデータベースのテーブル作成"&gt;5.Redmineの初期設定とデータベースのテーブル作成&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# bundle exec rake generate_secret_token
+# RAILS_ENV=production bundle exec rake db:migrate
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id="passengerインストール"&gt;passengerインストール&lt;/h1&gt;
+
+&lt;h4 id="1.passengerのインストール"&gt;1.passengerのインストール&lt;/h4&gt;
+
+&lt;p&gt;Railsアプリケーションを実行するためのApacheモジュールであるpassengerをインストールします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# gem install passenger --no-rdoc --no-ri
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="2.apache用モジュールのインストール"&gt;2.Apache用モジュールのインストール&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# passenger-install-apache2-module
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以下のコマンドを実行することで、apacheに組み込む設定が確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# passenger-install-apache2-module --snippet
+LoadModule passenger_module /usr/local/share/ruby/gems/2.0/gems/passenger-5.0.22/buildout/apache2/mod_passenger.so
+&amp;lt;IfModule mod_passenger.c&amp;gt;
+  PassengerRoot /usr/local/share/ruby/gems/2.0/gems/passenger-5.0.22
+  PassengerDefaultRuby /usr/bin/ruby2.0
+&amp;lt;/IfModule&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&amp;quot;/etc/httpd/conf.d/&amp;quot;にpassengerの設定ファイルを作成します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# vim /etc/httpd/conf.d/passenger.conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# Passengerの基本設定。
+# passenger-install-apache2-module --snippet を実行して表示される設定を使用。
+# 環境によって設定値が異なりますので以下の5行はそのまま転記しないでください。
+#
+LoadModule passenger_module /usr/local/share/ruby/gems/2.0/gems/passenger-5.0.22/buildout/apache2/mod_passenger.so
+&amp;lt;IfModule mod_passenger.c&amp;gt;
+  PassengerRoot /usr/local/share/ruby/gems/2.0/gems/passenger-5.0.22
+  PassengerDefaultRuby /usr/bin/ruby2.0
+&amp;lt;/IfModule&amp;gt;
+
+# Passengerが追加するHTTPヘッダを削除するための設定（任意）。
+#
+Header always unset "X-Powered-By"
+Header always unset "X-Rack-Cache"
+Header always unset "X-Content-Digest"
+Header always unset "X-Runtime"
+
+# 必要に応じてPassengerのチューニングのための設定を追加（任意）。
+# 詳しくはPhusion Passenger users guide(http://www.modrails.com/documentation/Users%20guide%20Apache.html)をご覧ください。
+PassengerMaxPoolSize 20
+PassengerMaxInstancesPerApp 4
+PassengerPoolIdleTime 3600
+PassengerHighPerformance on
+PassengerStatThrottleRate 10
+PassengerSpawnMethod smart
+RailsAppSpawnerIdleTime 86400
+PassengerMaxPreloaderIdleTime 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="3.apache起動"&gt;3.apache起動&lt;/h4&gt;
+
+&lt;p&gt;最後にapacheを起動します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# service httpd start
+# chkconfig httpd on
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上でRedmineのインストールが完了しました。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>「AWS WAF」を導入してみた。- String matching編</title>
     <link rel="alternate" href="http://blog.url.com/2016/01/12/aws-waf-stringmatching.html"/>
     <id>http://blog.url.com/2016/01/12/aws-waf-stringmatching.html</id>
     <published>2016-01-12T09:00:00+09:00</published>
-    <updated>2016-01-12T13:23:51+09:00</updated>
+    <updated>2016-01-14T18:30:56+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -115,7 +320,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/01/07/aws-waf-sqlinjection.html"/>
     <id>http://blog.url.com/2016/01/07/aws-waf-sqlinjection.html</id>
     <published>2016-01-07T09:00:00+09:00</published>
-    <updated>2016-01-12T13:21:41+09:00</updated>
+    <updated>2016-01-14T18:30:56+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -225,7 +430,7 @@
     <link rel="alternate" href="http://blog.url.com/2015/12/28/aws-waf-ipaddress.html"/>
     <id>http://blog.url.com/2015/12/28/aws-waf-ipaddress.html</id>
     <published>2015-12-28T09:00:00+09:00</published>
-    <updated>2016-01-12T13:22:18+09:00</updated>
+    <updated>2016-01-14T18:30:56+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
