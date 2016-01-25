@@ -5,14 +5,191 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-01-18T09:00:00+09:00</updated>
+  <updated>2016-01-25T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
+    <title>moCloudでHubotを動かそう</title>
+    <link rel="alternate" href="http://blog.url.com/2016/01/25/talk-to-hubot-on-mocloud.html"/>
+    <id>http://blog.url.com/2016/01/25/talk-to-hubot-on-mocloud.html</id>
+    <published>2016-01-25T09:00:00+09:00</published>
+    <updated>2016-01-25T12:09:47+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;先日、「Mobingi moCloud ハンズオン」に行ってきました。&lt;br&gt;
+&lt;a href="https://mobingi.doorkeeper.jp/events/37092"&gt;https://mobingi.doorkeeper.jp/events/37092&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;内容としては「moCloudの説明から実際にアプリケーションを作成する」を前半で行い、後半では「作成したアプリケーションを利用してサービスをデプロイする」を行いました。moCloudというのをまったく知らずに参加したこのハンズオンでしたが、とてもわかりやすかったです。&lt;/p&gt;
+
+&lt;p&gt;そこでMobingiの吉田真吾さんが「moCloudを使ってHubotを動かす」という内容のハンズオンをしてくださったのでその内容(手順)をまとめてみました。&lt;/p&gt;
+
+&lt;h1 id="概要"&gt;概要&lt;/h1&gt;
+
+&lt;p&gt;moCloud上のアプリケーションにHubotを動かすスクリプトをデプロイし、Slackと連携させてHubotと会話をする。&lt;br&gt;
+※Hubotを動かすスクリプトはあらかじめ用意されています。&lt;/p&gt;
+
+&lt;h1 id="0.事前準備"&gt;0.事前準備&lt;/h1&gt;
+
+&lt;p&gt;・&lt;a href="http://qiita.com/kooohei/items/361da3c9dbb6e0c7946b"&gt;GitHubアカウントの作成&lt;/a&gt;&lt;br&gt;
+・Slackのインストールとアカウント作成&lt;/p&gt;
+
+&lt;h1 id="1.-リポジトリのfork(github)"&gt;1. リポジトリのfork(GitHub)&lt;/h1&gt;
+
+&lt;h4 id="1-1.ログイン"&gt;1-1.ログイン&lt;/h4&gt;
+
+&lt;p&gt;GitHubにログインします。&lt;br&gt;
+&lt;a href="https://github.com"&gt;https://github.com&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id="1-2.リポジトリのfork"&gt;1-2.リポジトリのfork&lt;/h4&gt;
+
+&lt;p&gt;以下のリポジトリへアクセスし、forkします。&lt;br&gt;
+&lt;a href="https://github.com/yoshidashingo/hubot-mocloud"&gt;https://github.com/yoshidashingo/hubot-mocloud&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="20160124_github01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/88696f9e-d46a-c9a0-2091-0f7965637488.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;複数の組織に所属している場合は以下のように聞かれるので、forkするリポジトリを指定します。&lt;br&gt;
+&lt;img alt="20160124_github02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/dac20449-57ca-cbd3-0cd7-543a50096ef0.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;forkすると自分のリポジトリのリストに表示されます。&lt;br&gt;
+&lt;img alt="20160124_github03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6fc1b47e-3d2a-2b86-527d-3d62c0fddc7e.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="20160124_github04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/65f412e5-cb6d-33e0-31e9-405ee923d8ef.png" /&gt;&lt;/p&gt;
+
+&lt;h1 id="2.hubotのインストール(slack)"&gt;2.Hubotのインストール(Slack)&lt;/h1&gt;
+
+&lt;h4 id="2-1.ログイン"&gt;2-1.ログイン&lt;/h4&gt;
+
+&lt;p&gt;ブラウザからSlackにログインし、Hubotページにアクセスします。&lt;br&gt;
+&lt;a href="https://slack.com/apps/A0F7XDU93-hubot"&gt;https://slack.com/apps/A0F7XDU93-hubot&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id="2-2.hubotのインストール"&gt;2-2.Hubotのインストール&lt;/h4&gt;
+
+&lt;p&gt;「Install」をクリックします。&lt;br&gt;
+&lt;img alt="20160123_slack-hubot01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/c99fc360-55f8-d21d-b1f3-0886ec171cb4.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="2-3.usernameの設定"&gt;2-3.Usernameの設定&lt;/h4&gt;
+
+&lt;p&gt;「Username」を入力して「Add Hubot Integration」をクリックします。&lt;br&gt;
+ここで入力した「Username」がHubotの名前となりSlack上で表示されます。&lt;br&gt;
+&lt;img alt="20160123_slack-hubot02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1dace3c2-1129-9706-f2d6-0ff224293f49.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="2-4.環境変数の確認"&gt;2-4.環境変数の確認&lt;/h4&gt;
+
+&lt;p&gt;環境変数が表示されていることを確認して完了です。&lt;br&gt;
+&lt;img alt="20160123_slack-hubot03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a161860e-f033-844e-7270-0f3916df403a.png" /&gt;&lt;br&gt;
+※この環境変数は後で利用します。&lt;/p&gt;
+
+&lt;h1 id="3.アプリケーションの作成(mocloud)"&gt;3.アプリケーションの作成(moCloud)&lt;/h1&gt;
+
+&lt;h4 id="3-1.ログイン"&gt;3-1.ログイン&lt;/h4&gt;
+
+&lt;p&gt;moCloudにログインします。&lt;br&gt;
+&lt;a href="https://mocloud.io/"&gt;https://mocloud.io/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h4 id="3-2.アプリケーションの作成"&gt;3-2.アプリケーションの作成&lt;/h4&gt;
+
+&lt;p&gt;左サイドにある「+ アプリケーションの作成」をクリックします。&lt;br&gt;
+&lt;img alt="20160122_mobingi01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/989d2273-b9b0-5711-2722-4fe44668be07.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="3-3.アプリケーション情報の設定"&gt;3-3.アプリケーション情報の設定&lt;/h4&gt;
+
+&lt;p&gt;任意のアプリケーション名とドメインを入力し、利用するリージョンとインスタンスを選択します。&lt;br&gt;
+&lt;img alt="20160122_mobingi02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/72b79a30-d65b-a284-fcae-89f15eec38eb.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="3-4.イメージ設定①"&gt;3-4.イメージ設定①&lt;/h4&gt;
+
+&lt;p&gt;作成するアプリケーションのイメージを選択します。&lt;br&gt;
+今回は「PHP Stack Ubuntu 14.04, php 5.6, Apache」を選択します。&lt;br&gt;
+&lt;img alt="20160122_mobingi03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ae30c714-2084-7696-c45c-8482569aacc3.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="3-5.イメージ設定②"&gt;3-5.イメージ設定②&lt;/h4&gt;
+
+&lt;p&gt;「4.イメージの設定①」で選択したイメージをクリックすると「Extra PHP Configuration」の設定画面がポップアップされます。&lt;br&gt;
+今回はデフォルト設定のままで「実行」をクリックします。&lt;br&gt;
+&lt;img alt="20160122_mobingi04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7b7417d7-b002-d8c5-6450-0996ccaee629.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;すると、選択したイメージがブルーの色になります。&lt;br&gt;
+&lt;img alt="20160122_mobingi05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a85fb6b8-7012-2d79-42dc-f4f8f0a3484e.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="3-6.アプリケーションの作成"&gt;3-6.アプリケーションの作成&lt;/h4&gt;
+
+&lt;p&gt;以上の設定を行ったら「アプリケーションの作成」をクリックします。&lt;br&gt;
+&lt;img alt="20160122_mobingi06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/373a026e-93df-1fbc-4011-b7f64dc5cabe.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;すると、「既存アプリケーション」に画面が切り替わり、アプリケーションの作成が始まります。&lt;br&gt;
+&lt;img alt="20160122_mobingi07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/21903528-14c1-516d-77e8-6dcb95af02df.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ステータスが「初期化中」→「実行中」になったら作成完了です。&lt;br&gt;
+※ちなみに自分は実行中になるまで7分ほどかかりました。&lt;br&gt;
+&lt;img alt="20160122_mobingi09.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/491fa8c6-5a5f-2336-2027-13a6ac67754f.png" /&gt;&lt;/p&gt;
+
+&lt;h1 id="4.コードのデプロイ"&gt;4.コードのデプロイ&lt;/h1&gt;
+
+&lt;h4 id="4-1.アプリケーションの選択"&gt;4-1.アプリケーションの選択&lt;/h4&gt;
+
+&lt;p&gt;作成したアプリケーション名をクリックします。&lt;br&gt;
+&lt;img alt="20160122_mobingi10.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/07d72860-26f3-4ee4-15d2-4b812e59b285.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="4-2.リポジトリの選択"&gt;4-2.リポジトリの選択&lt;/h4&gt;
+
+&lt;p&gt;「コード」タブをクリックするとGitリポジトリ設定が表示されるので、そこで「GitHub」の「パブリックリポジトリ」を選択します。&lt;br&gt;
+&lt;img alt="20160122_mobingi11.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/e76dfb22-99ce-eeec-00ee-c666dfe117da.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="4-3.リポジトリとの接続"&gt;4-3.リポジトリとの接続&lt;/h4&gt;
+
+&lt;p&gt;フォークした「自分のリポジトリ/hubot-mocloud」の「master」リポジトリを選択し、「接続」をクリックします。&lt;/p&gt;
+
+&lt;p&gt;「成功」と出れば接続が完了です。&lt;br&gt;
+&lt;img alt="20160122_mobingi12.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/864c944e-125f-13a7-b70c-fdfe7aa0ce64.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="4-4.環境変数の設定①"&gt;4-4.環境変数の設定①&lt;/h4&gt;
+
+&lt;p&gt;「設定」タブをクリックします。&lt;br&gt;
+&lt;img alt="20160122_mobingi13.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3ad10dcb-4d6f-667b-22d0-2bf33d9a923b.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="4-5.環境変数の設定②"&gt;4-5.環境変数の設定②&lt;/h4&gt;
+
+&lt;p&gt;「Browse Apps &amp;gt; Hubot &amp;gt; Configurations on Proudit Inc &amp;gt; Edit configuration」に記載されている環境変数を入力して「+」で追加します。&lt;br&gt;
+&lt;img alt="20160123_slack-hubot03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/8debffbc-a0d8-62c0-d374-190b7e349af6.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="20160122_mobingi14.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/debfd4f9-b845-0c4a-926f-cf0bfa24ad7a.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="4-6.環境変数の設定③"&gt;4-6.環境変数の設定③&lt;/h4&gt;
+
+&lt;p&gt;変数が追加されたのを確認したら「変更を保存」をクリックして保存します。&lt;br&gt;
+&lt;img alt="20160122_mobingi15.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/41cb683a-aefe-c78d-40f3-02be06d84b86.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;緑でSuccessが表示されれば設定完了です。&lt;br&gt;
+&lt;img alt="20160122_mobingi16.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6fa27ffa-91c1-bbdc-08cc-5f957b530fd3.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;しばらく待つとslackに表示されているhubotのランプが緑になります。&lt;br&gt;
+&lt;img alt="20160122_mobingi17.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/d3d7a7a0-4799-4020-3f3d-d9b7d1532f28.png" /&gt;&lt;/p&gt;
+
+&lt;h1 id="5.let&amp;#39;s-hubot!!"&gt;5.Let&amp;#39;s Hubot!!&lt;/h1&gt;
+
+&lt;p&gt;以上で準備が整いました。それでは話しかけてみましょう。&lt;br&gt;
+「hello」と話しかけると「hello!」を返事をしてくれます。&lt;br&gt;
+&lt;img alt="20160122_mobingi18.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6f7d0594-7f9d-5011-8851-55b9b281463f.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ここではあらかじめ準備してくださったリポジトリをforkしてデプロイしています。&lt;br&gt;
+もし他にもいろいろ試したいということであれば、今回forkしたソースを編集してみてください。「hello」以外にも会話ができるようになります。&lt;/p&gt;
+
+&lt;h1 id="最後に"&gt;最後に&lt;/h1&gt;
+
+&lt;p&gt;今回はハンズオンの第一回だったみたいです。今回のハンズオンを通じてmoCloudというのを知り、とても興味深いサービスだと感じました。なので今後もハンズオンとかがあったら参加しようと思います。&lt;/p&gt;
+
+&lt;p&gt;/&amp;gt; Mobingi 吉田真吾さん&lt;br&gt;
+わかりやすいハンズオンありがとうございました。&lt;/p&gt;
+
+&lt;p&gt;また、より詳しく知りたい方は吉田さんが書いたブログ「&lt;a href="http://yoshidashingo.hatenablog.com/entry/2015/12/15/105841"&gt;moCloudでHubotを動かしてSlack上で遊ぼう&lt;/a&gt;」の記事を参照してみてください。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Redmine 3.2をAmazon Linux(release 2015.09)にインストールしてみた。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/01/18/installed-redmine-on-amazonlinux.html"/>
-    <id>http://blog.url.com/2016/01/18/installed-redmine-on-amazonlinux.html</id>
+    <link rel="alternate" href="http://blog.url.com/2016/01/18/installation-method-of-redmine.html"/>
+    <id>http://blog.url.com/2016/01/18/installation-method-of-redmine.html</id>
     <published>2016-01-18T09:00:00+09:00</published>
     <updated>2016-01-18T16:57:02+09:00</updated>
     <author>
@@ -1119,427 +1296,6 @@ deployment:
 
 &lt;p&gt;この3点を抑えることで、驚くほどデプロイサイクルが早まるのではないかと思う。&lt;br&gt;
 ぜひお試しあれ。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>静的HTML公開フローをサーバレスでDevOps！(Github,CircleCI,AWS S3)　前編</title>
-    <link rel="alternate" href="http://blog.url.com/2015/11/27/github-circleci-s3.html"/>
-    <id>http://blog.url.com/2015/11/27/github-circleci-s3.html</id>
-    <published>2015-11-27T09:00:00+09:00</published>
-    <updated>2016-01-04T23:49:03+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;コーポレートサイトなどの静的サイトを、Github+CircleCi+S3webhostingでサーバレスDevOpsを実現。&lt;/p&gt;
-
-&lt;p&gt;主な利点&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Github操作のみでデプロイを自動化。&lt;/li&gt;
-&lt;li&gt;サーバレスなのでサーバ運用不要。&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;ステージングサイトには閲覧制限(許可IP制）&lt;/strong&gt;を設けることで、外部会社との連携も安全。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1 id="構築内容"&gt;構築内容&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;ol&gt;
-&lt;li&gt;AWS S3 webhosting構築&lt;/li&gt;
-&lt;li&gt;Githubリポジトリ作成&lt;/li&gt;
-&lt;li&gt;静的ページを用意　HTML+CSS(bootstrap)&lt;/li&gt;
-&lt;li&gt;CircleCIでのオートデプロイ&lt;/li&gt;
-&lt;li&gt;オートデプロイテスト&lt;/li&gt;
-&lt;li&gt;+αでフォームサイトはlambda,cognitoで実装&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;6は後編で掲載予定。&lt;/p&gt;
-
-&lt;h1 id="想定フロー"&gt;想定フロー&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;ol&gt;
-&lt;li&gt;各自ローカル環境でHTML編集。Githubで管理。&lt;/li&gt;
-&lt;li&gt;stagingブランチへのgit pushでステージングサイトへ自動デプロイ 
-(ステージングサイトは自社サイトのみ閲覧可能）&lt;/li&gt;
-&lt;li&gt;pullreqし、レビュワーがステージングサイトをチェック&lt;/li&gt;
-&lt;li&gt;OKならmasterマージされ、本番サイトへ自動デプロイ&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;各フローをchatのbot機能＋chat配信機能を利用するとChatOpsにも対応可能！&lt;/p&gt;
-
-&lt;h1 id="必要アカウント"&gt;必要アカウント&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;ul&gt;
-&lt;li&gt;AWSアカウント &lt;/li&gt;
-&lt;li&gt;Githubアカウント &lt;/li&gt;
-&lt;li&gt;CircleCiアカウント &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a href="http://github.com"&gt;Github&lt;/a&gt;アカウントはpublic公開のみなら無償。&lt;br&gt;
-&lt;a href="https://circleci.com"&gt;CircleCI&lt;/a&gt;アカウントはgithubアカウントと連携するので個別に作成する必要はなし。かつ、本構成レベルの利用なら無料（正確には1コンテナまで無料）！&lt;/p&gt;
-
-&lt;h1 id="想定費用"&gt;想定費用&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;前述の通り、Github/CircleCiについては条件により無償枠で実現可能。&lt;/p&gt;
-
-&lt;p&gt;HTML分のAWS S3費用(保管費用、転送費用）一般的なサイトで&lt;strong&gt;$2~3&lt;/strong&gt;前後&lt;br&gt;
-+後編の問い合わせフォーム用のlambda+cognito費用$&lt;strong&gt;2~3&lt;/strong&gt;で実現可能。&lt;/p&gt;
-
-&lt;h1 id="サイト作成例"&gt;サイト作成例&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回のサイト例&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;s3site.proudit.jp&lt;/strong&gt;  -&amp;gt; 本番サイト&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;st.s4site.proudit.jp&lt;/strong&gt; -&amp;gt;　ステージングサイト&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;と定義して、構築例を進める。&lt;/p&gt;
-
-&lt;h1 id="iamユーザ「s3-deploy-user」の作成"&gt;IAMユーザ「s3-deploy-user」の作成&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;CircleCIからのデプロイユーザを作成。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;AWSコンソールより
-
-&lt;ul&gt;
-&lt;li&gt;IAM-&amp;gt;ユーザー-&amp;gt;新しいユーザの作成&lt;/li&gt;
-&lt;li&gt;ユーザ名　「s3-deploy-user」で作成&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;img width="375" alt="スクリーンショット 2015-11-25 10.00.08.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/4a642429-4238-bca0-6345-07dd1c44adb5.png"&gt;&lt;/p&gt;
-
-&lt;p&gt;　&lt;strong&gt;この時認証用のAccesskey/SeacretKeyを必ずダウンロードし控えておくこと！&lt;/strong&gt;&lt;br&gt;
-　&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;IAM-&amp;gt;ポリシー作成-&amp;gt;独自のポリシーを作成
-
-&lt;ul&gt;
-&lt;li&gt;ポリシー名 「s3-deploy」&lt;/li&gt;
-&lt;li&gt;ポリシードキュメント &lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;作成ポリシー例&lt;/p&gt;
-&lt;pre class="highlight json"&gt;&lt;code&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="nt"&gt;"Version"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"2012-10-17"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="nt"&gt;"Statement"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Effect"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"Allow"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Action"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="s2"&gt;"s3:GetObject"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="s2"&gt;"s3:PutObject"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="s2"&gt;"s3:DeleteObject"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="s2"&gt;"s3:ListBucket"&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Resource"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:s3:::s3site.proudit.jp"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:s3:::s3site.proudit.jp/*"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:s3:::st.s3site.proudit.jp"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:s3:::st.s3site.proudit.jp/*"&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;作成したユーザ「s3-deploy-user」に&lt;br&gt;
-ポリシー「s3-deploy」をアタッチする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img width="673" alt="スクリーンショット 2015-11-25 10.02.56.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/18479643-0cc2-4c6d-fe7f-8d03c6e993ae.png"&gt;&lt;/p&gt;
-
-&lt;h1 id="s3のwebhostingを準備"&gt;S3のwebhostingを準備&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;まずは器の構築。&lt;br&gt;
-ここは本題ではないので、さらっと要点のみ記載。詳細は以下参照。&lt;br&gt;
-&lt;a href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/WebsiteHosting.html"&gt;Amazon S3 での静的ウェブサイトのホスティング&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;今回のサイト例&lt;br&gt;
-&lt;strong&gt;s3site.proudit.jp&lt;/strong&gt;  -&amp;gt; 本番サイト&lt;br&gt;
-&lt;strong&gt;st.s3site.proudit.jp&lt;/strong&gt; -&amp;gt;　ステージングサイト&lt;br&gt;
-として、各バケットを静的ウェブサイトとして作成。&lt;/p&gt;
-
-&lt;p&gt;本番サイトの公開用bucketポリシーはすべて許可。&lt;/p&gt;
-&lt;pre class="highlight json"&gt;&lt;code&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-  &lt;/span&gt;&lt;span class="nt"&gt;"Version"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;"2012-10-17"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-  &lt;/span&gt;&lt;span class="nt"&gt;"Statement"&lt;/span&gt;&lt;span class="p"&gt;:[{&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="nt"&gt;"Sid"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;"AddPerm"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Effect"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;"Allow"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-      &lt;/span&gt;&lt;span class="nt"&gt;"Principal"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"*"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-      &lt;/span&gt;&lt;span class="nt"&gt;"Action"&lt;/span&gt;&lt;span class="p"&gt;:[&lt;/span&gt;&lt;span class="s2"&gt;"s3:GetObject"&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;&lt;span class="w"&gt;
-      &lt;/span&gt;&lt;span class="nt"&gt;"Resource"&lt;/span&gt;&lt;span class="p"&gt;:[&lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:s3:::s3site.proudit.jp/*"&lt;/span&gt;&lt;span class="w"&gt;
-      &lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-  &lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ステージングサイトの要件の１つ、自社からのアクセスIPからのみ閲覧許可とする、場合のポリシー例&lt;/p&gt;
-&lt;pre class="highlight json"&gt;&lt;code&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="nt"&gt;"Version"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"2008-10-17"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="nt"&gt;"Id"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"PolicyAccessCtrl"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="nt"&gt;"Statement"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Sid"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"StmtAccessCtrl"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Effect"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"Deny"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"NotPrincipal"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="nt"&gt;"AWS"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:iam::[AWSアカウントID]:user/s3-deploy-user"&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Action"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"s3:*"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Resource"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:s3:::st.s3site.proudit.jp/*"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Condition"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="nt"&gt;"NotIpAddress"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-                &lt;/span&gt;&lt;span class="nt"&gt;"aws:SourceIp"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"[許可IP]"&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Sid"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"StmtAccessCtrl"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Effect"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"Allow"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Principal"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="nt"&gt;"AWS"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"*"&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Action"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"s3:GetObject"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Resource"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:s3:::st.s3site.proudit.jp/*"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Condition"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="nt"&gt;"IpAddress"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-                &lt;/span&gt;&lt;span class="nt"&gt;"aws:SourceIp"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"[許可IP]"&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Sid"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"AllowBucketAndObjectsAccessFromCircleCI"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Effect"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"Allow"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Principal"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
-            &lt;/span&gt;&lt;span class="nt"&gt;"AWS"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:iam::[AWSアカウントID]:user/s3-deploy-user"&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Action"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"s3:*"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
-        &lt;/span&gt;&lt;span class="nt"&gt;"Resource"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"arn:aws:s3:::st.s3site.proudit.jp/*"&lt;/span&gt;&lt;span class="w"&gt;
-    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;[許可IP]&lt;br&gt;
-[AWSアカウントID]&lt;br&gt;
-は適宜代入のこと。&lt;br&gt;
-&lt;a href="https://aws.amazon.com/jp/how-to-find-accountid/"&gt;AWSアカウントID確認方法はこちら&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;なお、このままだと、&lt;br&gt;
-&lt;a href="http://s3site.proudit.jp.s3-website-ap-northeast-1.amazonaws.com"&gt;s3site.proudit.jp.s3-website-ap-northeast-1.amazonaws.com&lt;/a&gt;&lt;br&gt;
-と長いURLのままなので、Route53であればAlias設定、他ドメイン管理DNSであれば適宜cname連携しておくこと。&lt;/p&gt;
-
-&lt;p&gt;Route53での設定例&lt;br&gt;
-&lt;img width="431" alt="スクリーンショット 2015-11-25 10.09.41.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/e035c503-0be8-53c6-c28a-56e044411e20.png"&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img width="655" alt="スクリーンショット 2015-11-25 10.11.47.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/16e74849-53ce-e14f-03f4-6588d8bfd661.png"&gt;&lt;/p&gt;
-
-&lt;h1 id="githubレポジトリ準備"&gt;githubレポジトリ準備&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;事前にGithubには該当のリポジトリを作成しておく。&lt;br&gt;
-例ではpublic環境であるが、もちろんprivete環境(有料）でも可。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット 2015-11-24 15.49.59.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/cf64d802-f7b8-6503-5912-662f9dba47f2.png" /&gt;&lt;br&gt;
-　&lt;br&gt;
-　&lt;/p&gt;
-
-&lt;h1 id="静的サイト準備"&gt;静的サイト準備&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;既存サイトがあれば、それを利用。&lt;br&gt;
-今回は新規作成の例。&lt;br&gt;
-Bootstrapの無料テンプレート利用を利用する前提で進める。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;BootstrapとはWebサイトやWebアプリケーションを作成するフリーソフトウェアツール集である。 タイポグラフィ、フォーム、ボタン、ナビゲーション、その他構成要素やJavaScript用拡張などがHTML及びCSSベースのデザインテンプレートとして用意されている。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;参考URL&lt;br&gt;
-&lt;a href="http://gihyo.jp/design/serial/01/bootstrap3"&gt;BootstrapでレスポンシブなWebサイト制作&lt;/a&gt;&lt;br&gt;
-&lt;a href="http://designup.jp/bootstrap-free-template-354/"&gt;最近公開されたBootstrapの無料テンプレート 180本まとめ&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;いいテンプレートが見つかったら、ダウンロードして適宜自社サイト用に編集する。&lt;br&gt;
-（ここでは&lt;a href="https://www.xtendify.com/en/themes/bootstrap/landing-pages/103-colorful-flat"&gt;Colorful Flat&lt;/a&gt;というテンプレートを利用）&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;
-リポジトリ用のTopディレクトリにあらかじめダウンロードしたzipを置く。
-$ cd (repo-top)/
-$ unzip colorfulflat-new-v2.zip
-$ rm -rf colorfulflat-new-v2.zip
-$ rm -rf __MACOSX/
-$ mv colorfulflat-new-v3 html
- ※html配下をコンテンツデータとする。
-
-Git初期化
-$ git init
-$ echo "#my campany site example" &amp;gt;&amp;gt; README.md
-$ git add .
-$ git commit -m "first commit"$ git remote add origin git@github.com:toguma/mycorpsite.git
-$ git push origin master
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id="デプロイをcircleciで自動化"&gt;デプロイをCircleCiで自動化&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;ここまででようやくデプロイ準備が整ったので、&lt;br&gt;
-&lt;a href="https://circleci.com"&gt;CircleCi&lt;/a&gt;にアクセスし、CircleCIアカウントを作成する。&lt;br&gt;
-(githubアカウント連動）&lt;/p&gt;
-
-&lt;p&gt;初回、Githubアカウントとのアクセス可否を求められるので、許可しておく。&lt;br&gt;
-その後はCircleCi管理画面からGithubリポジトリが見える状態となる。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット 2015-11-24 18.51.32.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/85cebcdb-ad78-a67d-4a32-1fc5a61cc7cf.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;　&lt;/p&gt;
-
-&lt;p&gt;[Add Project]から、該当リポジトリが表示されることを確認後、&lt;br&gt;
-[BuildProject]をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット 2015-11-24 18.51.44.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/dbf9b4f3-f220-bde4-e195-3cba1826f0ce.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;　&lt;/p&gt;
-
-&lt;p&gt;BuildProject開始した後、自動でビルドが始まるが、&lt;br&gt;
-このタイミングではデプロイ制御ファイル(circle.yml)がない為、デプロイ失敗(Field)となるが正しい挙動なので、気にしない。&lt;br&gt;
-　&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;AWSアクセスキーを設定&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;CircleCiにはデフォルトでAWSキーの設置箇所がある。&lt;br&gt;
-　&lt;br&gt;
-該当projectの[Project Setting]より&lt;br&gt;
-&lt;img width="979" alt="スクリーンショット 2015-11-25 10.15.13.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/e8e1f748-9369-d469-64a7-0bd0431ba852.png"&gt;&lt;/p&gt;
-
-&lt;p&gt;[Parmissions]-&amp;gt;[AWS Parmissions]&lt;br&gt;
-&lt;img alt="スクリーンショット 2015-11-24 18.52.53.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/20f5992d-e42d-7a85-9f60-f8701f39fbe3.png" /&gt;&lt;br&gt;
-　&lt;/p&gt;
-
-&lt;p&gt;IAMユーザ=s3-deploy-user作成時にダウンロードした[AccessKey][SeacretKey]を設置する。  &lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット 2015-11-24 18.53.16.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/a98aab29-4fa3-8ef6-275f-fded398d6ebd.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;　&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;デプロイ制御ファイルの設置 &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;GitリポジトリのTop階層に、&lt;br&gt;
- circle.ymlというyaml形式のCirclrCI用のデプロイ内容を記述&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;machine:
-  timezone:
-    Asia/Tokyo
-
-dependencies:
-    override:
-        - sudo pip install awscli
-    post:
-        - aws configure set region ap-northeast-1
-
-test:
-  override:
-    - echo "Nothing to do here"
-
-deployment:
-  production: # just a label; label names are completely up to you
-    branch: master
-    commands:
-      - aws s3 sync html/ s3://s3site.proudit.jp/ --delete
-  staging:
-    branch: staging
-    commands:
-      - aws s3 sync html/ s3://st.s3site.proudit.jp/ --delete
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;内容を補足。&lt;br&gt;
-　リージョンはS3 bucket、IAMユーザ作成した場所と同じリージョンに指定。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Ci用マシンにAWS CLIをインストール&lt;/li&gt;
-&lt;li&gt;stagingブランチなら、ステージングサイトにデプロイ&lt;/li&gt;
-&lt;li&gt;masterブランチなら、公開サイトにデプロイ&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;という単純な動作を実現。&lt;br&gt;
-2,3のデプロイ先は適宜S3 bucket名と入れ替えのこと。&lt;br&gt;
-(またtest自体はダミーテストの為、実際にテストはしていない。&lt;br&gt;
-本当にコードテストを実施したい場合は適宜テストツールを導入して、コードチェックの自動化も可能。)&lt;/p&gt;
-
-&lt;h1 id="git-pushによるコンテンツデプロイ"&gt;git pushによるコンテンツデプロイ&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;以上で準備は完了。&lt;br&gt;
-まずはステージングサイトへコンテンツをアップ。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;staging用のブランチ作成
-$ git checkout -b staging
-
-適宜コンテンツ編集
-
-$ git add .
-$ git commit -m "staging site up"
-$ git push origin staging
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;git pushに反応して、CircleCI側で自動でstagingブランチのビルド＝Deployが始まる。&lt;/p&gt;
-
-&lt;p&gt;Statusが[Success]or[Fixed]となれば、デプロイ成功。&lt;/p&gt;
-
-&lt;p&gt;&lt;img width="673" alt="スクリーンショット 2015-11-25 10.42.52.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/33071631-3ea1-39f2-c2e3-b027ed0093c7.png"&gt;&lt;/p&gt;
-
-&lt;p&gt;S3 webhostingの閲覧用URLからアクセス可能なことを確認。&lt;br&gt;
-&lt;a href="http://st.s3site.proudit.jp/"&gt;http://st.s3site.proudit.jp/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;指定したアクセス制御がうまく行っていれば、&lt;br&gt;
-ステージングサイトはURLにて閲覧可能と成っているはずだ。&lt;br&gt;
-許可IP以外からのアクセスは拒否しているので下記「403 Forbiddn」が表示される。&lt;/p&gt;
-
-&lt;p&gt;&lt;img width="411" alt="スクリーンショット 2015-11-25 10.58.02.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/f96a8796-bec9-a4d1-3697-ed607dfa12e9.png"&gt;&lt;/p&gt;
-
-&lt;p&gt;何度かステージングサイトへの修正,Pullrequestレビューを行って、公開に問題なしとなったら、masterブランチへマージ。&lt;br&gt;
-masterへマージされたタイミングで自動的に本番サイトへコンテンツアップされることを確認する。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://s3site.proudit.jp/"&gt;http://s3site.proudit.jp/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img width="1061" alt="スクリーンショット 2015-11-25 11.01.02.png" src="https://qiita-image-store.s3.amazonaws.com/0/89940/088bba80-c004-abc9-9458-9e55f1fee651.png"&gt;&lt;/p&gt;
-
-&lt;h1 id="雑感"&gt;雑感&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回は&lt;br&gt;
-master = 本番サイト&lt;br&gt;
-staging = ステージングサイト&lt;br&gt;
-と定義してが、もちろんdevelopブランチ、develop用サイトを同手順で作成してもいいし、&lt;br&gt;
-releaseブランチで本番サイト公開、というデプロイルールとしてもいい。&lt;br&gt;
-この辺りは既存のGithub運用に合わせて調整すればいいと思う。&lt;/p&gt;
-
-&lt;p&gt;まだ、問い合わせフォームなどの動的ツールが未適用なので、&lt;br&gt;
-別途cognito＋lambdaを利用して実装すると、よりサーバレスな構成を実現できる。&lt;br&gt;
-が、それは後編で。&lt;/p&gt;
-
-&lt;p&gt;今日は一旦ここまで。&lt;/p&gt;
 </content>
   </entry>
 </feed>
