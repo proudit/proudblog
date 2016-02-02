@@ -18,7 +18,7 @@ moCloud上のアプリケーションにHubotを動かすスクリプトをデ�
 ※Hubotを動かすスクリプトはあらかじめ用意されています。
 
 # 0.事前準備
-・[GitHubアカウントの作成](http://qiita.com/kooohei/items/361da3c9dbb6e0c7946b)
+・[GitHubアカウントの作成](../../../2016/02/01/regist-gihub.html)
 ・Slackのインストールとアカウント作成
 
 
