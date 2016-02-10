@@ -5,16 +5,80 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-02-01T09:00:00+09:00</updated>
+  <updated>2016-02-09T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>GitHubとCircleCIを連携させる</title>
+    <link rel="alternate" href="http://blog.url.com/2016/02/09/connect-github-to-circleci.html"/>
+    <id>http://blog.url.com/2016/02/09/connect-github-to-circleci.html</id>
+    <published>2016-02-09T09:00:00+09:00</published>
+    <updated>2016-02-09T17:00:06+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;CircleCIは継続的インテグレーション(Continuous Integration)を行うためのWebサービスです。&lt;br&gt;
+指定したGitHubリポジトリをウォッチし、更新があると自動でビルド〜デプロイを行える仕組みを作れます。&lt;br&gt;
+とりあえず今回は初めのGitHubとCircleCIを連携させるところを行います。&lt;/p&gt;
+
+&lt;h1 id="事前準備"&gt;事前準備&lt;/h1&gt;
+
+&lt;p&gt;・&lt;a href="../../../2016/02/01/regist-gihub.html"&gt;GitHubアカウントの取得&lt;/a&gt;&lt;br&gt;
+CircleCIを利用するにはGitHubアカウントが必要となります。&lt;/p&gt;
+
+&lt;h1 id="連携設定"&gt;連携設定&lt;/h1&gt;
+
+&lt;h4 id="1.ログイン"&gt;1.ログイン&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href="https://circleci.com/"&gt;Circleci&lt;/a&gt;へアクセスし「Sign in」をクリックします。&lt;br&gt;
+&lt;img alt="20160125_circleci01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7dfec881-aa24-9e8c-05d0-1102f5e1fe38.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="2.githubログイン"&gt;2.GitHubログイン&lt;/h4&gt;
+
+&lt;p&gt;ログイン画面が表示されるので事前に準備したGitHubアカウントへログインします。&lt;br&gt;
+&lt;img alt="20160125_circleci02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f592d016-db70-bb23-13cd-ff4fa87dc3f7.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="3.認証"&gt;3.認証&lt;/h4&gt;
+
+&lt;p&gt;認証画面が表示されるため、「Authorize application」をクリックします。&lt;br&gt;
+&lt;img alt="20160125_circleci03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/e216dafa-2cdb-ed89-37c3-e959ce58a43e.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="4.アカウントの選択"&gt;4.アカウントの選択&lt;/h4&gt;
+
+&lt;p&gt;CircleCIと連携するGitHubアカウントを指定します。&lt;br&gt;
+&lt;img alt="20160125_circleci04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/26c3a9d3-a7c8-8260-d2fe-407f3c8ef8ed.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="5.リポジトリの選択"&gt;5.リポジトリの選択&lt;/h4&gt;
+
+&lt;p&gt;アカウントを指定すると、リポジトリがリストされるので連携したいリポジトリの「Build project」をクリックします。&lt;br&gt;
+&lt;img alt="20160125_circleci05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/73519472-6b06-00d4-10f5-9154aa2a8836.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="6.プランの選択"&gt;6.プランの選択&lt;/h4&gt;
+
+&lt;p&gt;利用するプランを指定します。&lt;br&gt;
+&lt;img alt="20160125_circleci07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b7b01720-8410-392c-1a1c-5ccdd2f992af.png" /&gt;&lt;/p&gt;
+
+&lt;h4 id="7.完了"&gt;7.完了&lt;/h4&gt;
+
+&lt;p&gt;以上で連携が完了です。&lt;br&gt;
+&lt;img alt="20160125_circleci08.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/bcd9bede-56ab-605d-7a93-8ba705802215.png" /&gt;&lt;/p&gt;
+
+&lt;h1 id="最後に"&gt;最後に&lt;/h1&gt;
+
+&lt;p&gt;以上、今回はGitHubとCircleCIを連携させる部分だけ行いました。&lt;br&gt;
+実際にデプロイまで行うには&lt;em&gt;circle.yml&lt;/em&gt;というファイルを使って管理する必要があります。&lt;br&gt;
+そこについては、また時間があるときに書ければと思います。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>GitHubアカウント作成とリポジトリの作成手順</title>
     <link rel="alternate" href="http://blog.url.com/2016/02/01/regist-gihub.html"/>
     <id>http://blog.url.com/2016/02/01/regist-gihub.html</id>
     <published>2016-02-01T09:00:00+09:00</published>
-    <updated>2016-02-01T15:22:47+09:00</updated>
+    <updated>2016-02-02T10:51:14+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -76,7 +140,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/01/25/talk-with-hubot-on-mocloud.html"/>
     <id>http://blog.url.com/2016/01/25/talk-with-hubot-on-mocloud.html</id>
     <published>2016-01-25T09:00:00+09:00</published>
-    <updated>2016-02-01T15:27:19+09:00</updated>
+    <updated>2016-02-02T10:51:14+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -660,109 +724,6 @@ PassengerMaxPreloaderIdleTime 0
 &lt;p&gt;&lt;img alt="aws-waf_sql-injection_2015120417-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/68bfd374-a6d0-6bfc-930b-9fbcb01c201a.png" /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img alt="aws-waf_sql-injection_2015120418-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/14cd9731-1cd5-6e62-a8cf-17551086c621.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上で設定完了です。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>「AWS WAF」を導入してみた。- IP addresses編</title>
-    <link rel="alternate" href="http://blog.url.com/2015/12/28/aws-waf-ipaddress.html"/>
-    <id>http://blog.url.com/2015/12/28/aws-waf-ipaddress.html</id>
-    <published>2015-12-28T09:00:00+09:00</published>
-    <updated>2016-01-14T18:30:56+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;WS WAFはアプリケーション用のファイアウォールで、&lt;br&gt;
-IP address、SQL injection、String matchingに関するアクセスの制御ができます。&lt;/p&gt;
-
-&lt;p&gt;ただ、このサービスを利用するにはCloudFront経由でのアクセスにしか対応していないため、ELBやEC2にWAFを導入する場合はCloudFrontを配置する必要があります。&lt;/p&gt;
-
-&lt;p&gt;今回はIP addressesの設定を行います。&lt;br&gt;
-その他の設定については以下を参照ください。&lt;br&gt;
-&lt;a href="../../../2016/01/07/aws-waf-sqlinjection.html"&gt;「AWS WAF」を導入してみた。- SQL injection編&lt;/a&gt;&lt;br&gt;
-&lt;a href="../../../2016/01/12/aws-waf-stringmatching.html"&gt;「AWS WAF」を導入してみた。- String matching編&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1 id="1.新規設定"&gt;1.新規設定&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回は新規で特定IPアドレスからのアクセスをブロックする設定をします。&lt;br&gt;
-まずはじめに画面中央にある「Get started」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_2015120101.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/efb26a7f-2d80-b239-4084-90c86b13aa3a.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Concepts overview画面が表示されますが右下の「Next」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_2015120102.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/c511e13b-9596-060d-c4d7-347ec52b1708.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;  &lt;/p&gt;
-
-&lt;h2 id="step-1:-name-web-acl"&gt;Step 1: Name web ACL&lt;/h2&gt;
-
-&lt;p&gt;作成するWeb ACLの名前を入力します。これはWAFで設定する複数のルールをまとめるためのグループ名となるので、導入するサービス名などをつけるのが良いと思います。&lt;br&gt;
-今回は「waf-test-acl」にします。&lt;br&gt;
-&lt;img alt="aws-waf_2015120103-step1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/0df8bfbf-ce26-698e-1dca-84a86b45bca3.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;  &lt;/p&gt;
-
-&lt;h2 id="step-2:-create-conditions"&gt;Step 2: Create conditions&lt;/h2&gt;
-
-&lt;p&gt;今回はIPアドレスのアクセスコントロール設定をするので「IP match conditions」の「Create IP match condition」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_2015120103-step2-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/13711371-ecf1-204e-0553-0df570b452ba.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;するとIPアドレスを設定する画面がポップアップされるためIPアドレス名とIPアドレス(レンジ指定可)を入力して「Create」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_2015120103-step2-2-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/fc4bafd9-8cea-10f6-c6d4-15861caeb638.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;作成が完了したら「Next」をクリックします。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;  &lt;/p&gt;
-
-&lt;h2 id="step-3:-create-rules"&gt;Step 3: Create rules&lt;/h2&gt;
-
-&lt;p&gt;「Create rule」をクリックするとルールを設定する画面がポップアップされます。&lt;br&gt;
-&lt;img alt="aws-waf_2015120103-step3-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7613d6a2-a2c3-d688-300c-161756d26620.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;今回の場合は「リクストが該当IP(waf-test-ip)からのアクセスからの場合」というルールを設定しています。&lt;br&gt;
-&lt;img alt="aws-waf_2015120103-step3-2-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7562a015-1416-658a-7d1a-af63e248c329.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;設定が完了したら「Create」をクリックします。&lt;br&gt;
-作成したらそのルールにマッチした際のアクション(Allow, Block, Count)と、マッチしない場合のデフォルトアクション(Allow, Block)を設定し「Next」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_2015120103-step3-3.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/12b1af6d-c5e2-4a34-09ca-fcfb30c31fd6.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;今回はデフォルトアクションをAllowとし、該当IP(ip-deny-rule)からのリクエストはBlockを設定します。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;  &lt;/p&gt;
-
-&lt;h2 id="step-4:-choose-aws-resource"&gt;Step 4: Choose AWS resource&lt;/h2&gt;
-
-&lt;p&gt;Resourceの項目を適用したいCloudFrontに設定して「Review and create」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_2015120103-step4-1-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/da06dd26-46f8-7fd9-a3e7-72ee273f4862.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;  &lt;/p&gt;
-
-&lt;h2 id="step-5:-review-and-create"&gt;Step 5: Review and create&lt;/h2&gt;
-
-&lt;p&gt;最後に今までのStepで設定した内容が表示されるのでOKであることを確認して「Confirm and distribution」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_2015120103-step5-1-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b35d35f3-58ca-47f0-90cd-72af62ada0b1.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;作成が完了した後「Requests」タブをクリックするとリクエストログが確認できます。&lt;br&gt;
-&lt;img alt="aws-waf_2015120104-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/cd7286f2-75a5-a5e5-3656-0e1e449f28d9.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;  &lt;/p&gt;
-
-&lt;h1 id="2.動作確認"&gt;2.動作確認&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;まずはリクエストが無いことを確認します。&lt;br&gt;
-&lt;img alt="aws-waf_2015120105.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ec9359fe-028f-3c74-8f39-64f0b1973f2c.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;CloudFront経由でサーバへブラウザアクセスすると以下の画面が表示されます。&lt;br&gt;
-&lt;img alt="aws-waf_2015120106-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f073bee1-f30f-ffea-5b07-39a871f75d4d.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;再度リクエストログのMatches ruleを確認すると「ip-deny-rule(Block)」というログが出ているのが確認でます。&lt;/p&gt;
-
-&lt;p&gt;今回ブロック対象としたIPからのみブロックできているのが確認できました。&lt;br&gt;
-&lt;img alt="aws-waf_2015120107-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/c9a7a629-e448-fb6d-6430-86837b409f72.png" /&gt;&lt;/p&gt;
 
 &lt;p&gt;以上で設定完了です。&lt;/p&gt;
 </content>
