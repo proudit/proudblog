@@ -5,16 +5,62 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-02-09T09:00:00+09:00</updated>
+  <updated>2016-02-14T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
-    <title>GitHubとCircleCIを連携させる</title>
+    <title>Jawsdays2016 ハンズオンブースのスピーカーやります！</title>
+    <link rel="alternate" href="http://blog.url.com/2016/02/14/jawsdays2016-workshop-speker.html"/>
+    <id>http://blog.url.com/2016/02/14/jawsdays2016-workshop-speker.html</id>
+    <published>2016-02-14T09:00:00+09:00</published>
+    <updated>2016-02-14T16:33:35+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;来たる、2016/3/12(土)に今年も&lt;a href="http://jawsdays2016.jaws-ug.jp/"&gt;JawsDays2016&lt;/a&gt;が開催されます。&lt;/p&gt;
+
+&lt;p&gt;AWSの成長とともに、年々参加者、規模も大きくなっているJawsdays、毎年1ユーザとして楽しみに参加させて頂いておりまししたが、今年はなんと、私小熊がスピーカーの一人として参加する機会を頂きました！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="jawsdays2016" src="/images/jawsdays2016-bg.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;以下、私のセッションの紹介ページ抜粋です。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h3 id="11時10分--静的html公開フローをサーバレスでdevops！"&gt;11時10分- 静的HTML公開フローをサーバレスでDevOps！&lt;/h3&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;株式会社プラウディットの小熊さんがお届けする「静的HTML公開フローをサーバレスでDevOps！」は、ほぼ絶対落ちないコーポレートサイトを、Github + CircleCi + AWSのS3というストレージサービスを利用して、サーバレスで構築するハンズオンです。 このセッションに参加すれば、あなたのサイトも簡単にYahoo砲に耐えられるようになります！&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://jawsdays2016.jaws-ug.jp/speaker/259"&gt;スピーカー紹介ページ&lt;/a&gt;&lt;br&gt;
+&lt;img alt="スピーカー" src="/images/speaker01.png" /&gt;&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;セッションブースは「workshop」＝いわゆるハンズオンブースの１コマとなります。&lt;/p&gt;
+
+&lt;p&gt;もちろん、元ネタは同Blogの同名記事&lt;a href="http://blog.proudit.jp/2015/11/27/github-circleci-s3.html"&gt;静的HTML公開フローをサーバレスでDevOps！&lt;/a&gt;がベースとなっておりますが、ハンズオン用にブラッシュアップしましたので、この記事ではよく分からなかった、うまく行かなかった、などの方にも分かりやすく、試しやすい形となっております。&lt;/p&gt;
+
+&lt;p&gt;1コマ=50分の短いセッションですが、AWS S3と各種SaaSを連携したDevOpsの要素満載のセッションとなります。&lt;/p&gt;
+
+&lt;p&gt;みなさまお誘い合わせの上、受講頂ければと思います！&lt;/p&gt;
+
+&lt;p&gt;まだチケット間に合いますよーw&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://jaws-days.doorkeeper.jp/events/36835"&gt;JawsDaysチケット販売ページ&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>GitHubとCircleCIを連携させよう！！</title>
     <link rel="alternate" href="http://blog.url.com/2016/02/09/connect-github-to-circleci.html"/>
     <id>http://blog.url.com/2016/02/09/connect-github-to-circleci.html</id>
     <published>2016-02-09T09:00:00+09:00</published>
-    <updated>2016-02-09T17:00:06+09:00</updated>
+    <updated>2016-02-14T15:51:32+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -78,7 +124,7 @@ CircleCIを利用するにはGitHubアカウントが必要となります。&lt
     <link rel="alternate" href="http://blog.url.com/2016/02/01/regist-gihub.html"/>
     <id>http://blog.url.com/2016/02/01/regist-gihub.html</id>
     <published>2016-02-01T09:00:00+09:00</published>
-    <updated>2016-02-02T10:51:14+09:00</updated>
+    <updated>2016-02-14T15:51:32+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -140,7 +186,7 @@ CircleCIを利用するにはGitHubアカウントが必要となります。&lt
     <link rel="alternate" href="http://blog.url.com/2016/01/25/talk-with-hubot-on-mocloud.html"/>
     <id>http://blog.url.com/2016/01/25/talk-with-hubot-on-mocloud.html</id>
     <published>2016-01-25T09:00:00+09:00</published>
-    <updated>2016-02-02T10:51:14+09:00</updated>
+    <updated>2016-02-14T15:51:32+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -317,7 +363,7 @@ CircleCIを利用するにはGitHubアカウントが必要となります。&lt
     <link rel="alternate" href="http://blog.url.com/2016/01/18/installation-method-of-redmine.html"/>
     <id>http://blog.url.com/2016/01/18/installation-method-of-redmine.html</id>
     <published>2016-01-18T09:00:00+09:00</published>
-    <updated>2016-01-25T12:17:29+09:00</updated>
+    <updated>2016-02-14T15:51:32+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -522,7 +568,7 @@ PassengerMaxPreloaderIdleTime 0
     <link rel="alternate" href="http://blog.url.com/2016/01/12/aws-waf-stringmatching.html"/>
     <id>http://blog.url.com/2016/01/12/aws-waf-stringmatching.html</id>
     <published>2016-01-12T09:00:00+09:00</published>
-    <updated>2016-01-14T18:30:56+09:00</updated>
+    <updated>2016-02-14T15:51:32+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -616,116 +662,6 @@ PassengerMaxPreloaderIdleTime 0
 　確認したいリクエストやルールにチェックを入れるとそれについてグラフ化されます。もともとCloudWatchで確認できましたが、一つ一つ選択して確認しないといけなかったのと、CloudWatchの画面に移動しないといけなかったので、見やすくなってよかったかなと思います。&lt;br&gt;
 　また、「Sampled requests」もルールごとに表示されるように変わりました。これについてはルールごとに表示は見やすくて良いのですが「ALL」みたいな全てを表示する項目があった方がより使いやすいなと感じました。また、以前は記載されていたルールに対しての処理(BlockしたのかAllowしたのか)が無くなってしまったので、そこも直感的に分かりづらくなって残念です。&lt;br&gt;
 　ただWAFはリリースしたてというのもあり、今後もどんどん変化していくと思います。よりサービスの充実とともに使いやすくなることにも期待です。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>「AWS WAF」を導入してみた。- SQL injection編</title>
-    <link rel="alternate" href="http://blog.url.com/2016/01/07/aws-waf-sqlinjection.html"/>
-    <id>http://blog.url.com/2016/01/07/aws-waf-sqlinjection.html</id>
-    <published>2016-01-07T09:00:00+09:00</published>
-    <updated>2016-01-14T18:30:56+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;2015年のre:Inventで「AWS WAF」が発表されました。&lt;/p&gt;
-
-&lt;p&gt;AWS WAFはアプリケーション用のファイアウォールで、IP address、SQL injection、String matchingに関するアクセスの制御ができます。&lt;br&gt;
-ただ、このサービスを利用するにはCloudFront経由でのアクセスにしか対応していないため、ELBやEC2にWAFを導入する場合はCloudFrontを配置する必要があります。&lt;/p&gt;
-
-&lt;p&gt;今回は既に作成済みの「waf-test-acl」にSQL injectionの設定を追加してみます。&lt;br&gt;
-その他の設定については以下参照ください。&lt;br&gt;
-&lt;a href="../../../2015/12/28/aws-waf-ipaddress.html"&gt;「AWS WAF」を導入してみた。- IP addresses編&lt;/a&gt;&lt;br&gt;
-&lt;a href="../../../2016/01/12/aws-waf-stringmatching.html"&gt;「AWS WAF」を導入してみた。- String matching編&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1 id="1.設定"&gt;1.設定&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;h2 id="①-conditionの作成"&gt;① Conditionの作成&lt;/h2&gt;
-
-&lt;p&gt;まず、SQL injectionをクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120401.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3c0e488c-ab1e-ed97-73ef-5f8b66a183ef.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;「Create condition」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120402.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a8744128-6c9f-e323-dc85-8ca16f70d176.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;「Name」には任意のコンディション名を入力します。&lt;br&gt;
-また、Filter settingsの「Part of the request to filter on」でチェックしたいWeb要求、「Transformation」でAWS WAFがリクエストをチェックする前に行う変換方式を指定し、OKであれば「Add another filter」をクリックして条件に追加します。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120403.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/31948ec2-c58c-a4d7-0b26-19504d9f84dd.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Filters in this SQL injection match conditionへの追加が確認できたら「Create」をクリックして作成します。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120404.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/54e80d2d-720f-349a-96a5-04f6a25697ca.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="②-ruleの作成"&gt;② Ruleの作成&lt;/h2&gt;
-
-&lt;p&gt;conditionを作成したら、次に「Rules」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120405.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/e91e32cb-55dd-1018-0b0a-838d546e070c.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Rules設定画面が表示されたら「Create rule」をクリックしルールの作成を行います。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120406.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/2c386f4c-78bb-07ae-377c-dd1112e035f6.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;先ほどConditionsのSQL injectionで作成したルールを設定し、完了したら「Create」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120407.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/4e5abd0b-ec03-3f5b-8b8c-72fc924cb72e.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ルールの作成が完了したら「Web ACLs」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120408.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f8f07011-cc24-5d48-9b06-b47db0383cee.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="③-access-control-listへの追加"&gt;③ Access Control Listへの追加&lt;/h2&gt;
-
-&lt;p&gt;今回ルールを追加する対象のACL名をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120409.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/8340e1bf-1517-1eac-f827-0d4435bbedb5.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;タブ「Rules」をクリックして「Edit web ACL」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120410-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a4139ba3-e738-78b4-3ac2-3fca43ebe0a1.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;「Rules」のプルダウンで今回作成したルールを選択し、「Add rule to web ACL」をクリックすると下の”If a request matches all the conditions in a rule, take the corresponding action”に追加されます。そうしたら今回はブロックをしたいため「Block」にチェックし、「Update」をクリックします。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120411.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/32de316d-d008-4001-a91c-527d05e48b79.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ルールが追加されました。「Requests」タブをクリックするとリクエストログが確認できます。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120412-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/14c360d3-19cc-0783-51aa-c583b61cc2f6.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;  &lt;/p&gt;
-
-&lt;h1 id="2.動作確認"&gt;2.動作確認&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;h2 id="①-現状確認"&gt;① 現状確認&lt;/h2&gt;
-
-&lt;p&gt;まずは現状を確認します。リクエストがない状態です。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120414.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/4fa2ba96-395b-c49d-6a48-694f3e98cbcc.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="②-ツールの実行"&gt;② ツールの実行&lt;/h2&gt;
-
-&lt;p&gt;次にsqlmapを実行します。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120419-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/2edf7173-9eef-ea55-316f-d33268c8ff1e.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="③-リクエスト確認"&gt;③ リクエスト確認&lt;/h2&gt;
-
-&lt;p&gt;それでは再度、リクエストを確認してみます。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120415-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3e5b73ce-86ff-f935-760e-1f1a4f8f48ed.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;先ほど設定したルール&amp;quot;sql-injection-rule&amp;quot;によってリクエストが「Block」されているのが確認できます。&lt;br&gt;
-さらに今回はUser-Agentに対して設定したので、Request headersのUser-Agentを確認するとどういったリクエストを防いだかがわかります。&lt;br&gt;
-&lt;img alt="aws-waf_sql-injection_2015120416-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9c7297be-2382-0036-f87a-96050f749dfe.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="aws-waf_sql-injection_2015120417-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/68bfd374-a6d0-6bfc-930b-9fbcb01c201a.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="aws-waf_sql-injection_2015120418-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/14cd9731-1cd5-6e62-a8cf-17551086c621.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上で設定完了です。&lt;/p&gt;
 </content>
   </entry>
 </feed>
