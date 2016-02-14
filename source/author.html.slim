@@ -1,7 +1,18 @@
 img.mauthor src = find_author(author_slug).photo
- i.fa.fa-pencil<
- = find_author(author_slug).name
+
+i.fa.fa-pencil<
+= find_author(author_slug).name
+br
+br
+
+div.profile
+ i.fa.fa-user<
+ | プロフィール
+ br
+ = find_author(author_slug).profile
+
 hr
+br
 
 h2
   i.fa.fa-book<
@@ -13,12 +24,12 @@ h2
     i.fa.fa-clock-o<
      = article.date.strftime('%Y/%m/%d')
 
-  h1
-     = link_to article.title, article
+  div.box1
+   h1
+      = link_to article.title, article
 
-  .tag-labels
-    - article.tags.each do |tag|
-      small.tag-label
-        = tag
-  hr
-
+   .tag-labels
+     - article.tags.each do |tag|
+       small.tag-label
+         = tag
+  br

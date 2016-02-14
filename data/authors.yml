@@ -1,6 +1,13 @@
 - toguma:
-  name: Takeshi Oguma
+  name: Takeshi Oguma (小熊 健)
   photo: /images/authors/toguma.png
+  profile: "1978/08/14生まれ。<br>
+  株式会社プラウディット CTO兼CEO<br>
+  <li>AWS認定ソリューションアーキテクト(アソシエイツ)<br>
+  <li>AWS認定SysOps(アソシエイツ）<br>
+  <li>アウトドア好き。キャンピングカー旅好き。パラグライダー好き。<br>
+  <li>２児のパパ。"
+
 - kohei:
   name: Kohei Yamada
   photo: /images/authors/kohei.png

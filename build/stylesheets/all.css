@@ -3249,7 +3249,7 @@ article {
     font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; }
   /* line 18, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article h1 {
-    margin: 30px 0 10px 0;
+    margin: 15px 0 10px 0;
     font-size: x-large;
     font-weight: bold;
     color: #5f9ea0; }
@@ -3304,20 +3304,25 @@ article {
   /* line 87, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article div.box1 {
     background-color: #fbfbfb;
-    padding: 1px 10px 10px 20px;
+    padding: 5px 10px 10px 20px;
     border: 1px dotted #bbb;
     border-radius: 1px;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 0 2px rgba(255, 255, 255, 0.3) inset, 0 0 10px rgba(0, 0, 0, 0.1) inset, 0 1px 20px rgba(0, 0, 0, 0.1);
     margin: 10px 10px; }
   /* line 99, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  article div.profile {
+    padding: 5px 10px 10px 20px; }
+  /* line 104, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article img.mauthor {
-    border: 0px; }
+    border: 0px;
+    width: 100px;
+    height: 100px; }
   /* line 20, /Users/toguma/.rbenv/versions/2.1.2/lib/ruby/gems/2.1.0/gems/bourbon-4.2.6/app/assets/stylesheets/addons/_clearfix.scss */
   article .read-more::after {
     clear: both;
     content: "";
     display: table; }
-  /* line 104, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
+  /* line 111, /Users/toguma/github/proudblog/source/stylesheets/partials/_article.scss */
   article .read-more a {
     float: right; }
 

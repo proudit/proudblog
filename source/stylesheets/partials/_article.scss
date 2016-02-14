@@ -16,7 +16,7 @@ body {
   padding: 0 12px 0 12px;
 
   h1 {
-    margin: 30px 0 10px 0;
+    margin: 15px 0 10px 0;
     font-size: x-large;
     font-weight: bold;
     color: #5f9ea0;
@@ -86,7 +86,7 @@ div#share li {
 
  div.box1 {
   background-color: #fbfbfb;
-  padding:1px 10px 10px 20px;
+  padding:5px 10px 10px 20px;
   border:1px dotted #bbb;
   border-radius: 1px;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset,
@@ -96,8 +96,15 @@ div#share li {
   margin: 10px 10px;
 }
 
+ div.profile {
+  padding:5px 10px 10px 20px;
+}
+  
+
  img.mauthor {
-  border: 0px
+  border: 0px;
+  width: 100px;
+  height: 100px;
 }
   .read-more {
     @include clearfix;
