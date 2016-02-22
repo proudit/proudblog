@@ -5,16 +5,117 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-02-15T09:00:00+09:00</updated>
+  <updated>2016-02-22T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>lsofを使ってプロセスが利用しているポートを確認する。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/02/22/how-to-use-lsof.html"/>
+    <id>http://blog.url.com/2016/02/22/how-to-use-lsof.html</id>
+    <published>2016-02-22T09:00:00+09:00</published>
+    <updated>2016-02-22T15:56:57+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;&lt;code&gt;lsof&lt;/code&gt;を使ってプロセスが利用しているポートを確認します。&lt;/p&gt;
+
+&lt;p&gt;利用シーンとして、自分はzabbixなどでポートやプロセスの監視設定をするときの確認で使ったりします。&lt;/p&gt;
+
+&lt;h1 id="利用されているポートを表示する"&gt;利用されているポートを表示する&lt;/h1&gt;
+
+&lt;p&gt;まずは、現在利用されているポートの一覧を表示します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -i
+COMMAND    PID     USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+dhclient  1254     root    5u  IPv4    6837      0t0  UDP *:bootpc
+sshd      1440     root    3u  IPv4    7378      0t0  TCP *:ssh (LISTEN)
+sshd      1440     root    4u  IPv6    7380      0t0  TCP *:ssh (LISTEN)
+mysqld    2055    mysql   17u  IPv4    8001      0t0  TCP *:mysql (LISTEN)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このコマンドにパイプ( | )でgrep LISTENなどを付け加えてあげると&lt;br&gt;
+LISTENしているプロセスのみが表示させることができます。&lt;/p&gt;
+
+&lt;h1 id="あるポートを利用しているプロセスを調べる"&gt;あるポートを利用しているプロセスを調べる&lt;/h1&gt;
+
+&lt;p&gt;オプション&lt;code&gt;-i:ポート番号&lt;/code&gt;でそのポートを利用しているプロセスを調べることができます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -i:80
+COMMAND   PID  USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+nginx   27576  root   10u  IPv4 3025923      0t0  TCP *:http (LISTEN)
+nginx   27578 nginx   10u  IPv4 3025923      0t0  TCP *:http (LISTEN)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここでは&lt;em&gt;80&lt;/em&gt;番ポートはnginxが利用しているというのがわかります。&lt;/p&gt;
+
+&lt;p&gt;カンマ区切りで番号をしていると、複数ポートを同時に調べることもできます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -i:22,80
+COMMAND   PID     USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+sshd     1440     root    3u  IPv4    7378      0t0  TCP *:ssh (LISTEN)
+sshd     1440     root    4u  IPv6    7380      0t0  TCP *:ssh (LISTEN)
+sshd    27402     root    3u  IPv4 3024720      0t0  TCP 10.0.0.229:ssh-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:50596 (ESTABLISHED)
+sshd    27404 ec2-user    3u  IPv4 3024720      0t0  TCP 10.0.0.229:ssh-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:50596 (ESTABLISHED)
+nginx   27576     root   10u  IPv4 3025923      0t0  TCP *:http (LISTEN)
+nginx   27578    nginx   10u  IPv4 3025923      0t0  TCP *:http (LISTEN)
+nginx   27578    nginx   15u  IPv4 3058872      0t0  TCP 10.0.0.229:http-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:54589 (ESTABLISHED)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;さらに&lt;code&gt;-iTCP&lt;/code&gt;や&lt;code&gt;-iUDP&lt;/code&gt;でTCPやUDPの指定をすることも可能です。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -iTCP:22
+COMMAND   PID     USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+sshd     1440     root    3u  IPv4    7378      0t0  TCP *:ssh (LISTEN)
+sshd     1440     root    4u  IPv6    7380      0t0  TCP *:ssh (LISTEN)
+sshd    27402     root    3u  IPv4 3024720      0t0  TCP 10.0.0.229:ssh-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:50596 (ESTABLISHED)
+sshd    27404 ec2-user    3u  IPv4 3024720      0t0  TCP 10.0.0.229:ssh-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:50596 (ESTABLISHED)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;【項目について】&lt;br&gt;
+COMMAND : 実行プログラム&lt;br&gt;
+PID : プロセスID&lt;br&gt;
+USER : 実行ユーザ&lt;br&gt;
+NODE : プロトコル&lt;br&gt;
+NAME : ポート&lt;br&gt;
+(LISTEN) : 待ち受け状態&lt;/p&gt;
+
+&lt;p&gt;今回はポートを利用しているプロセスの表示ですが、せっかくなので他の用途も載せておきます。&lt;/p&gt;
+
+&lt;h1 id="特定のpidを持つプロセスが開いているファイルを表示"&gt;特定のPIDを持つプロセスが開いているファイルを表示&lt;/h1&gt;
+
+&lt;p&gt;&lt;code&gt;-p&lt;/code&gt;オプションはプロセスIDを元に、そのプロセスが利用しているファイルなどを表示します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -p 1440
+COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+sshd    1440 root  cwd    DIR  202,1     4096    2 /
+sshd    1440 root  rtd    DIR  202,1     4096    2 /
+sshd    1440 root  txt    REG  202,1   617128 7432 /usr/sbin/sshd
+sshd    1440 root  mem    REG  202,1    62864 3764 /lib64/libnss_files-2.17.so
+sshd    1440 root  mem    REG  202,1    44224 3776 /lib64/librt-2.17.so
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id="特定のプロセスが開いているファイルを表示"&gt;特定のプロセスが開いているファイルを表示&lt;/h1&gt;
+
+&lt;p&gt;&lt;code&gt;-c&lt;/code&gt;オプションは特定のプロセスが利用しているファイルなどを表示します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -c nginx
+COMMAND   PID  USER   FD   TYPE             DEVICE SIZE/OFF    NODE NAME
+nginx   27576  root  cwd    DIR              202,1     4096  272412 /etc/nginx/conf.d
+nginx   27576  root  rtd    DIR              202,1     4096       2 /
+nginx   27576  root  txt    REG              202,1   964976   18099 /usr/sbin/nginx
+nginx   27576  root  DEL    REG                0,4          3025922 /dev/zero
+nginx   27576  root  mem    REG              202,1    22096  272808　/usr/lib64/perl5/vendor_perl/auto/nginx/nginx.so
+nginx   27576  root  mem    REG              202,1    62864    3764 /lib64/libnss_files-2.17.so
+nginx   27576  root  mem    REG              202,1    10856    6562 /usr/lib64/libXau.so.6.0.0
+nginx   27576  root  mem    REG              202,1   126288    3886 /usr/lib64/libselinux.so.1
+nginx   27576  root  mem    REG              202,1   165264    4092 /lib64/libexpat.so.1.5.2
+nginx   27576  root  mem    REG              202,1   122312    6606 /usr/lib64/libxcb.so.1.1.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>Redmineのバージョンを確認する。</title>
     <link rel="alternate" href="http://blog.url.com/2016/02/15/comfirm-a-version-of-redmine.html"/>
     <id>http://blog.url.com/2016/02/15/comfirm-a-version-of-redmine.html</id>
     <published>2016-02-15T09:00:00+09:00</published>
-    <updated>2016-02-15T12:10:43+09:00</updated>
+    <updated>2016-02-15T17:31:59+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -441,211 +542,6 @@ CircleCIを利用するにはGitHubアカウントが必要となります。&lt
 わかりやすいハンズオンありがとうございました。&lt;/p&gt;
 
 &lt;p&gt;また、より詳しく知りたい方は吉田さんが書いたブログ「&lt;a href="http://yoshidashingo.hatenablog.com/entry/2015/12/15/105841"&gt;moCloudでHubotを動かしてSlack上で遊ぼう&lt;/a&gt;」の記事を参照してみてください。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Redmine 3.2をAmazon Linux(release 2015.09)にインストールしてみた。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/01/18/installation-method-of-redmine.html"/>
-    <id>http://blog.url.com/2016/01/18/installation-method-of-redmine.html</id>
-    <published>2016-01-18T09:00:00+09:00</published>
-    <updated>2016-01-25T12:17:29+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;今回はAmazon Linux(release 2015.09)にRedmine 3.2をインストールする手順をまとめてみました。&lt;/p&gt;
-
-&lt;p&gt;方針としてはシンプルにしたいので、できるだけyumやインストール済みのパッケージを利用していきます。&lt;/p&gt;
-
-&lt;h1 id="必要なパッケージ等の準備"&gt;必要なパッケージ等の準備&lt;/h1&gt;
-
-&lt;h4 id="1.開発ツールのインストール"&gt;1.開発ツールのインストール&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum groupinstall "Development Tools"
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="2.rubyのセットアップ"&gt;2.rubyのセットアップ&lt;/h4&gt;
-
-&lt;p&gt;Amazon Linuxではデフォルトでrubyがインストールされています。今回はインストール済みのを利用し、追加で必要なライブラリのみをインストールします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# ruby -v
-# gem -v
-# yum install ruby-devel
-# gem install io-console
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="3.bundlerのインストール"&gt;3.bundlerのインストール&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# gem install bundler --no-rdoc --no-ri
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id="データベースの準備"&gt;データベースの準備&lt;/h1&gt;
-
-&lt;h4 id="1.mysqlのインストール"&gt;1.MySQLのインストール&lt;/h4&gt;
-
-&lt;p&gt;今回のデータベースはRDSを利用するため、クライアントをインストールします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum install mysql mysql-devel
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="2.データベースとユーザーの作成"&gt;2.データベースとユーザーの作成&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# mysql -h &amp;lt;ホスト名&amp;gt; -u &amp;lt;ユーザー&amp;gt; -p &amp;lt;パスワード&amp;gt;
-mysql&amp;gt; create database db_redmine default character set utf8;
-mysql&amp;gt; grant all on db_redmine.* to user_redmine@localhost identified by '********';
-mysql&amp;gt; flush privileges;
-mysql&amp;gt; exit;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id="apacheのインストール"&gt;apacheのインストール&lt;/h1&gt;
-
-&lt;h4 id="1.apacheのインストール"&gt;1.apacheのインストール&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum install httpd httpd-devel
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="2.confファイルの修正---その１"&gt;2.confファイルの修正 - その１&lt;/h4&gt;
-
-&lt;p&gt;&amp;quot;/etc/httpd/conf/httpd.conf&amp;quot;の以下のコメントアウトを外します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# vim /etc/httpd/conf/httpd.conf
-修正前：# NameVirtualHost *:80 → 修正後：NameVirtualHost *:80
-
-# diff /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf_org
-991c991
-&amp;lt; NameVirtualHost *:80
----
-&amp;gt; #NameVirtualHost *:80
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="3.confファイルの修正---その２"&gt;3.confファイルの修正 - その２&lt;/h4&gt;
-
-&lt;p&gt;&amp;quot;/etc/httpd/conf.d/redmine.conf&amp;quot;を作成する。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# vim /etc/httpd/conf.d/redmine.conf
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;confの内容は適宜修正してください。以下は例となります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;&amp;lt;VirtualHost *:80&amp;gt;
-    ServerName www.example.com
-
-    DocumentRoot /var/www/redmine/public
-
-    ErrorLog  "|/usr/sbin/rotatelogs /var/log/httpd/redmine/error_log.%Y%m%d 86400 540"
-    CustomLog "|/usr/sbin/rotatelogs /var/log/httpd/redmine/access_log.%Y%m%d 86400 540" combined
-
-&amp;lt;/VirtualHost&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id="redmineの設定"&gt;Redmineの設定&lt;/h1&gt;
-
-&lt;h4 id="1.必要なパッケージのインストール"&gt;1.必要なパッケージのインストール&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum -y install openssl-devel readline-devel zlib-devel curl-devel libyaml-devel libffi-devel
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="2.imagemagickと日本語フォントのインストール"&gt;2.ImageMagickと日本語フォントのインストール&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# yum install ImageMagick ImageMagick-devel ipa-pgothic-fonts
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="3.redmineのダウンロード"&gt;3.Redmineのダウンロード&lt;/h4&gt;
-
-&lt;p&gt;下記のURLからRedmine 3.2のtarball(.tar.gz)をダウンロードします。&lt;br&gt;
-&lt;a href="http://www.redmine.org/projects/redmine/wiki/Download"&gt;http://www.redmine.org/projects/redmine/wiki/Download&lt;/a&gt;&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# wget http://www.redmine.org/releases/redmine-3.2.0.tar.gz
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ダウンロードしたら展開・配置します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# tar zxvf redmine-3.2.0.tar.gz
-# mv redmine-3.2.0 /var/www/redmine
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;また、apacheからアクセスできるようにオーナーの変更をします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# chown -R apache.apache /var/www/redmine/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;配置したredmineディレクトリ配下のconfigディレクトリに&amp;quot;database.yml&amp;quot;と&amp;quot;configuration.yml&amp;quot;を作成します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;production:
-  adapter: mysql2
-  database: db_redmine
-  host: &amp;lt;RDSのエンドポイント名&amp;gt;
-  username: ユーザー
-  password: "パスワード"
-  encoding: utf8
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;production:
-  email_delivery:
-    delivery_method: :smtp
-    smtp_settings:
-      address: "127.0.0.1"
-      port: 25
-      domain: 'ドメイン'
-
-  rmagick_font_path: /usr/share/fonts/ipa-gothic/ipag.ttf
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="4.redmine用gemパッケージの一括インストール"&gt;4.Redmine用Gemパッケージの一括インストール&lt;/h4&gt;
-
-&lt;p&gt;bandlerを使ってRedmineが使用するGemを一括でインストールします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# bundle install --without development test --path vendor/bundle
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="5.redmineの初期設定とデータベースのテーブル作成"&gt;5.Redmineの初期設定とデータベースのテーブル作成&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# bundle exec rake generate_secret_token
-# RAILS_ENV=production bundle exec rake db:migrate
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id="passengerインストール"&gt;passengerインストール&lt;/h1&gt;
-
-&lt;h4 id="1.passengerのインストール"&gt;1.passengerのインストール&lt;/h4&gt;
-
-&lt;p&gt;Railsアプリケーションを実行するためのApacheモジュールであるpassengerをインストールします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# gem install passenger --no-rdoc --no-ri
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="2.apache用モジュールのインストール"&gt;2.Apache用モジュールのインストール&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# passenger-install-apache2-module
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以下のコマンドを実行することで、apacheに組み込む設定が確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# passenger-install-apache2-module --snippet
-LoadModule passenger_module /usr/local/share/ruby/gems/2.0/gems/passenger-5.0.22/buildout/apache2/mod_passenger.so
-&amp;lt;IfModule mod_passenger.c&amp;gt;
-  PassengerRoot /usr/local/share/ruby/gems/2.0/gems/passenger-5.0.22
-  PassengerDefaultRuby /usr/bin/ruby2.0
-&amp;lt;/IfModule&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&amp;quot;/etc/httpd/conf.d/&amp;quot;にpassengerの設定ファイルを作成します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# vim /etc/httpd/conf.d/passenger.conf
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# Passengerの基本設定。
-# passenger-install-apache2-module --snippet を実行して表示される設定を使用。
-# 環境によって設定値が異なりますので以下の5行はそのまま転記しないでください。
-#
-LoadModule passenger_module /usr/local/share/ruby/gems/2.0/gems/passenger-5.0.22/buildout/apache2/mod_passenger.so
-&amp;lt;IfModule mod_passenger.c&amp;gt;
-  PassengerRoot /usr/local/share/ruby/gems/2.0/gems/passenger-5.0.22
-  PassengerDefaultRuby /usr/bin/ruby2.0
-&amp;lt;/IfModule&amp;gt;
-
-# Passengerが追加するHTTPヘッダを削除するための設定（任意）。
-#
-Header always unset "X-Powered-By"
-Header always unset "X-Rack-Cache"
-Header always unset "X-Content-Digest"
-Header always unset "X-Runtime"
-
-# 必要に応じてPassengerのチューニングのための設定を追加（任意）。
-# 詳しくはPhusion Passenger users guide(http://www.modrails.com/documentation/Users%20guide%20Apache.html)をご覧ください。
-PassengerMaxPoolSize 20
-PassengerMaxInstancesPerApp 4
-PassengerPoolIdleTime 3600
-PassengerHighPerformance on
-PassengerStatThrottleRate 10
-PassengerSpawnMethod smart
-RailsAppSpawnerIdleTime 86400
-PassengerMaxPreloaderIdleTime 0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="3.apache起動"&gt;3.apache起動&lt;/h4&gt;
-
-&lt;p&gt;最後にapacheを起動します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# service httpd start
-# chkconfig httpd on
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上でRedmineのインストールが完了しました。&lt;/p&gt;
 </content>
   </entry>
 </feed>
