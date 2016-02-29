@@ -1,7 +1,7 @@
 ---
 title: Jawsdays2016 ハンズオンブースのスピーカーやります！
 date: 2016-02-14
-tags: AWS,GitHub,CircleCI,s3,jawsdays2016
+tags: AWS,GitHub,CircleCI,S3,jawsdays2016
 author: toguma
 ---
 

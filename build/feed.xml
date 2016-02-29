@@ -5,16 +5,178 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-02-22T09:00:00+09:00</updated>
+  <updated>2016-02-29T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>S3の特定バケットへのアクセスを特定のCloudFrontからのみ許可する。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/02/29/a-s3bucket-is-allowed-access-only-from-cloudfront.html"/>
+    <id>http://blog.url.com/2016/02/29/a-s3bucket-is-allowed-access-only-from-cloudfront.html</id>
+    <published>2016-02-29T09:00:00+09:00</published>
+    <updated>2016-02-29T11:54:18+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;S3内のコンテンツをCloudFrontを使って配信する際に、直接外部からS3へアクセスすることは制限しつつ、CloudFrontを通してはアクセスができるという設定をしてみました。&lt;br&gt;
+&lt;img alt="cloudfront.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/fe714aba-8e94-9770-a027-363c8df5c887.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は拡張子が「.png」のアクセスがあった場合にS3へ振り分ける設定を入れ、さらにCloudFrontからのみしかそのバケットへはアクセスできないようにします。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="設定"&gt;設定&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;h1 id="1.s3の設定"&gt;1.S3の設定&lt;/h1&gt;
+
+&lt;h2 id="1-1.バケットを作成しコンテンツをアップロードします。"&gt;1-1.バケットを作成しコンテンツをアップロードします。&lt;/h2&gt;
+
+&lt;p&gt;今回はバケット名を「from-cloudfront-to-s3-test」とし、コンテンツには「&lt;a href="https://qiita-image-store.s3.amazonaws.com/0/82090/a5df31b8-3ffc-c3f6-1c0a-cc8f417d5595.png"&gt;test.png&lt;/a&gt;&lt;br&gt;
+」を利用します。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="1-2.アップロードしたコンテンツへブラウザからアクセスし、閲覧できないことを確認します。"&gt;1-2.アップロードしたコンテンツへブラウザからアクセスし、閲覧できないことを確認します。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_S3_Object-2-URL.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/824af88a-474f-ca3c-3ae5-04dbbe844822.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;それでは設定をしてみます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="2.サービス画面の表示"&gt;2.サービス画面の表示&lt;/h1&gt;
+
+&lt;h2 id="2-1.コントロールパネルの「services」から「cloudfront」を選択します。"&gt;2-1.コントロールパネルの「Services」から「CloudFront」を選択します。&lt;/h2&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="3.originの作成"&gt;3.Originの作成&lt;/h1&gt;
+
+&lt;h2 id="3-1.対象の「distribution」にチェックをし「distribution-settings」を選択します。"&gt;3-1.対象の「Distribution」にチェックをし「Distribution Settings」を選択します。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-1-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/74d6f3e6-470a-dacc-ab61-f3de4cda5167.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;または対象のIDをクリックでもOKです。&lt;br&gt;
+&lt;img alt="20151127_CloudFront_Distributions-1-2.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ff0c0667-2658-a7b7-1e70-0197841330d0.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="3-2.タブ「origins」を選択し「create-origin」をクリックします。"&gt;3-2.タブ「Origins」を選択し「Create Origin」をクリックします。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-2-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6123ef8c-4733-c858-8af3-96de868854de.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="3-3.「origin-domain-name」を今回準備したs3バケット(from-cloudfront-to-s3-test)に設定します。"&gt;3-3.「Origin Domain Name」を今回準備したS3バケット(from-cloudfront-to-s3-test)に設定します。&lt;/h2&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="3-4.「restrict-bucket-access」を[yes]を選択します。"&gt;3-4.「Restrict Bucket Access」を[Yes]を選択します。&lt;/h2&gt;
+
+&lt;p&gt;　すると「Origin Access Identity」、「Comment」、「Grant Read Permission on Bucket」の項目が現れます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="3-5.現れた項目に対し以下の内容を選択または入力します。"&gt;3-5.現れた項目に対し以下の内容を選択または入力します。&lt;/h2&gt;
+
+&lt;p&gt;　・「Origin Access Identity」→「Create a New Identity」を選択。&lt;br&gt;
+　・「Comment」→「access-idenntity-s3-access-test」と入力。&lt;br&gt;
+　・「Grant Read Permission on Bucket」→「Yes,Update Bucket Policy」を選択。&lt;br&gt;
+&lt;img alt="20151127_CloudFront_Distributions-2.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/08f33b7c-2600-3119-a6d5-7ed4d9451479.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="3-6.「create」をクリックすると一覧に作成した「origin」がリストされます。"&gt;3-6.「Create」をクリックすると一覧に作成した「Origin」がリストされます。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-3.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3dce78d7-147c-4c21-47fc-def1d8221c22.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="4.behaviorの作成"&gt;4.Behaviorの作成&lt;/h1&gt;
+
+&lt;h2 id="4-1.タブ「behaviors」を選択し、「create-behavior」をクリックします。"&gt;4-1.タブ「Behaviors」を選択し、「Create Behavior」をクリックします。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-4.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9ba8b1d0-2272-8910-46ef-1f48b4dd416a.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="4-2.「path-pattern」を「/*.png」と入力し、「origin」は「s3-from-cloudfront-to-s3-test」を選択します。(今回はその他はデフォルトのままにします。)"&gt;4-2.「Path Pattern」を「/*.png」と入力し、「Origin」は「S3-from-cloudfront-to-s3-test」を選択します。(今回はその他はデフォルトのままにします。)&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-5.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1acb3e83-61e7-f08a-ccbe-8e63c649ba63.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="4-3.「create」をクリックすると一覧に「behavior」がリストされます。"&gt;4-3.「Create」をクリックすると一覧に「Behavior」がリストされます。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-6.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/35529fce-f03e-79f4-3934-7f7ceeee8a61.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="5.反映確認"&gt;5.反映確認&lt;/h1&gt;
+
+&lt;h2 id="5-1.左サイドばーの「distributions」または中央画面上部の「cloudfront-distributions」をクリックします。"&gt;5-1.左サイドばーの「Distributions」または中央画面上部の「CloudFront Distributions」をクリックします。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-8.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/cd0f808c-7707-81bf-5c6b-7dbe57b02344.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="5-2.「status」項目が「in-progress」となっているのが確認できます。"&gt;5-2.「Status」項目が「In Progress」となっているのが確認できます。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-7.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a49a403e-f9dd-24e7-dc9d-90ba733f40f7.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="5-3.しばらく時間が経つと「status」項目が「deployed」となったら反映完了です。"&gt;5-3.しばらく時間が経つと「Status」項目が「Deployed」となったら反映完了です。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-9.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/44969d00-4da2-7b18-8b37-5b5af8ad623a.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="5-4.cloudfront経由で「/test.png」へアクセスするとs3にアップ画像が表示されます。"&gt;5-4.CloudFront経由で「/test.png」へアクセスするとS3にアップ画像が表示されます。&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="20151127_CloudFront_Distributions-10.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/8e699ee8-3d5e-a60a-2b78-5969d5db10bc.png" /&gt;&lt;br&gt;
+「CloudFront Distribution」画面からタブ「General」をクリックすると「Domain Name」が確認できるので、今回の場合はそれに続けて「/test.png」を入力してあげればOKです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おまけ"&gt;おまけ&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;念のため、アップした際のS3の「Link」をアクセスすると「AccessDenied」の画面が表示されます。&lt;br&gt;
+&lt;img alt="20151127_S3_AccessDenied.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f4bea7a8-eac1-b675-5aba-113a087cd7ad.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;また、バケットのPermissionについても確認してみます。&lt;br&gt;
+&lt;img alt="20151127_S3_Object-3.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6a189140-e7dc-f8cd-eb53-df868a4fc5fc.png" /&gt;&lt;br&gt;
+「Edit bucket policy」をクリック。&lt;br&gt;
+&lt;img alt="20151127_S3_Object-4.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/76320baf-0338-33c5-cb50-3149af4f5b5b.png" /&gt;&lt;br&gt;
+CloudFrontの「from-cloudfront-to-s3-test」からアクセスができる設定が入っているのを確認できます。この設定はCloudFrontの「Origin」作成時に、「Grant Read Permission on Bucket」を[Yes]にすると追加されます。&lt;/p&gt;
+
+&lt;p&gt;また、「from-cloudfront-to-s3-test」はCloudFrontの「Origin Access Identity」で確認できます。&lt;br&gt;
+&lt;img alt="20151127_CloudFront_AccessIdentity-5.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ed3ccb5d-d4f6-9a9a-0ab9-a9b318dc8e30.png" /&gt;&lt;br&gt;
+これもCloudFrontの「Origin」作成時に「Origin Access Identity」を[Create a New Identity]にすることで今回は新規に作成しています。&lt;/p&gt;
+
+&lt;p&gt;ということでアクセス許可設定が完了しました。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>lsofを使ってプロセスが利用しているポートを確認する。</title>
     <link rel="alternate" href="http://blog.url.com/2016/02/22/how-to-use-lsof.html"/>
     <id>http://blog.url.com/2016/02/22/how-to-use-lsof.html</id>
     <published>2016-02-22T09:00:00+09:00</published>
-    <updated>2016-02-22T15:56:57+09:00</updated>
+    <updated>2016-02-23T13:17:38+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -200,7 +362,7 @@ module Redmine
     <link rel="alternate" href="http://blog.url.com/2016/02/14/jawsdays2016-workshop-speker.html"/>
     <id>http://blog.url.com/2016/02/14/jawsdays2016-workshop-speker.html</id>
     <published>2016-02-14T09:00:00+09:00</published>
-    <updated>2016-02-15T11:47:09+09:00</updated>
+    <updated>2016-02-29T11:57:18+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -365,183 +527,6 @@ CircleCIを利用するにはGitHubアカウントが必要となります。&lt
 &lt;img alt="20160122_github-regist06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b123c18b-7f76-73a8-8769-c88f38f6c26b.png" /&gt;&lt;/p&gt;
 
 &lt;p&gt;以上でGitHubのアカウントとリポジトリの作成が完了です。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>moCloudでHubotを動かそう！！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/01/25/talk-with-hubot-on-mocloud.html"/>
-    <id>http://blog.url.com/2016/01/25/talk-with-hubot-on-mocloud.html</id>
-    <published>2016-01-25T09:00:00+09:00</published>
-    <updated>2016-02-02T10:51:14+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;先日、「Mobingi moCloud ハンズオン」に行ってきました。&lt;br&gt;
-&lt;a href="https://mobingi.doorkeeper.jp/events/37092"&gt;https://mobingi.doorkeeper.jp/events/37092&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;内容としては「moCloudの説明から実際にアプリケーションを作成する」を前半で行い、後半では「作成したアプリケーションを利用してサービスをデプロイする」を行いました。moCloudというのをまったく知らずに参加したこのハンズオンでしたが、とてもわかりやすかったです。&lt;/p&gt;
-
-&lt;p&gt;そこでMobingiの吉田真吾さんが「moCloudを使ってHubotを動かす」という内容のハンズオンをしてくださったのでその内容(手順)をまとめてみました。&lt;/p&gt;
-
-&lt;h1 id="概要"&gt;概要&lt;/h1&gt;
-
-&lt;p&gt;moCloud上のアプリケーションにHubotを動かすスクリプトをデプロイし、Slackと連携させてHubotと会話をする。&lt;br&gt;
-※Hubotを動かすスクリプトはあらかじめ用意されています。&lt;/p&gt;
-
-&lt;h1 id="0.事前準備"&gt;0.事前準備&lt;/h1&gt;
-
-&lt;p&gt;・&lt;a href="../../../2016/02/01/regist-gihub.html"&gt;GitHubアカウントの作成&lt;/a&gt;&lt;br&gt;
-・Slackのインストールとアカウント作成&lt;/p&gt;
-
-&lt;h1 id="1.-リポジトリのfork(github)"&gt;1. リポジトリのfork(GitHub)&lt;/h1&gt;
-
-&lt;h4 id="1-1.ログイン"&gt;1-1.ログイン&lt;/h4&gt;
-
-&lt;p&gt;GitHubにログインします。&lt;br&gt;
-&lt;a href="https://github.com"&gt;https://github.com&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id="1-2.リポジトリのfork"&gt;1-2.リポジトリのfork&lt;/h4&gt;
-
-&lt;p&gt;以下のリポジトリへアクセスし、forkします。&lt;br&gt;
-&lt;a href="https://github.com/yoshidashingo/hubot-mocloud"&gt;https://github.com/yoshidashingo/hubot-mocloud&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="20160124_github01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/88696f9e-d46a-c9a0-2091-0f7965637488.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;複数の組織に所属している場合は以下のように聞かれるので、forkするリポジトリを指定します。&lt;br&gt;
-&lt;img alt="20160124_github02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/dac20449-57ca-cbd3-0cd7-543a50096ef0.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;forkすると自分のリポジトリのリストに表示されます。&lt;br&gt;
-&lt;img alt="20160124_github03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6fc1b47e-3d2a-2b86-527d-3d62c0fddc7e.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="20160124_github04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/65f412e5-cb6d-33e0-31e9-405ee923d8ef.png" /&gt;&lt;/p&gt;
-
-&lt;h1 id="2.hubotのインストール(slack)"&gt;2.Hubotのインストール(Slack)&lt;/h1&gt;
-
-&lt;h4 id="2-1.ログイン"&gt;2-1.ログイン&lt;/h4&gt;
-
-&lt;p&gt;ブラウザからSlackにログインし、Hubotページにアクセスします。&lt;br&gt;
-&lt;a href="https://slack.com/apps/A0F7XDU93-hubot"&gt;https://slack.com/apps/A0F7XDU93-hubot&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id="2-2.hubotのインストール"&gt;2-2.Hubotのインストール&lt;/h4&gt;
-
-&lt;p&gt;「Install」をクリックします。&lt;br&gt;
-&lt;img alt="20160123_slack-hubot01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/c99fc360-55f8-d21d-b1f3-0886ec171cb4.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="2-3.usernameの設定"&gt;2-3.Usernameの設定&lt;/h4&gt;
-
-&lt;p&gt;「Username」を入力して「Add Hubot Integration」をクリックします。&lt;br&gt;
-ここで入力した「Username」がHubotの名前となりSlack上で表示されます。&lt;br&gt;
-&lt;img alt="20160123_slack-hubot02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1dace3c2-1129-9706-f2d6-0ff224293f49.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="2-4.環境変数の確認"&gt;2-4.環境変数の確認&lt;/h4&gt;
-
-&lt;p&gt;環境変数が表示されていることを確認して完了です。&lt;br&gt;
-&lt;img alt="20160123_slack-hubot03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a161860e-f033-844e-7270-0f3916df403a.png" /&gt;&lt;br&gt;
-※この環境変数は後で利用します。&lt;/p&gt;
-
-&lt;h1 id="3.アプリケーションの作成(mocloud)"&gt;3.アプリケーションの作成(moCloud)&lt;/h1&gt;
-
-&lt;h4 id="3-1.ログイン"&gt;3-1.ログイン&lt;/h4&gt;
-
-&lt;p&gt;moCloudにログインします。&lt;br&gt;
-&lt;a href="https://mocloud.io/"&gt;https://mocloud.io/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h4 id="3-2.アプリケーションの作成"&gt;3-2.アプリケーションの作成&lt;/h4&gt;
-
-&lt;p&gt;左サイドにある「+ アプリケーションの作成」をクリックします。&lt;br&gt;
-&lt;img alt="20160122_mobingi01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/989d2273-b9b0-5711-2722-4fe44668be07.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="3-3.アプリケーション情報の設定"&gt;3-3.アプリケーション情報の設定&lt;/h4&gt;
-
-&lt;p&gt;任意のアプリケーション名とドメインを入力し、利用するリージョンとインスタンスを選択します。&lt;br&gt;
-&lt;img alt="20160122_mobingi02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/72b79a30-d65b-a284-fcae-89f15eec38eb.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="3-4.イメージ設定①"&gt;3-4.イメージ設定①&lt;/h4&gt;
-
-&lt;p&gt;作成するアプリケーションのイメージを選択します。&lt;br&gt;
-今回は「PHP Stack Ubuntu 14.04, php 5.6, Apache」を選択します。&lt;br&gt;
-&lt;img alt="20160122_mobingi03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ae30c714-2084-7696-c45c-8482569aacc3.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="3-5.イメージ設定②"&gt;3-5.イメージ設定②&lt;/h4&gt;
-
-&lt;p&gt;「4.イメージの設定①」で選択したイメージをクリックすると「Extra PHP Configuration」の設定画面がポップアップされます。&lt;br&gt;
-今回はデフォルト設定のままで「実行」をクリックします。&lt;br&gt;
-&lt;img alt="20160122_mobingi04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7b7417d7-b002-d8c5-6450-0996ccaee629.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;すると、選択したイメージがブルーの色になります。&lt;br&gt;
-&lt;img alt="20160122_mobingi05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a85fb6b8-7012-2d79-42dc-f4f8f0a3484e.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="3-6.アプリケーションの作成"&gt;3-6.アプリケーションの作成&lt;/h4&gt;
-
-&lt;p&gt;以上の設定を行ったら「アプリケーションの作成」をクリックします。&lt;br&gt;
-&lt;img alt="20160122_mobingi06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/373a026e-93df-1fbc-4011-b7f64dc5cabe.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;すると、「既存アプリケーション」に画面が切り替わり、アプリケーションの作成が始まります。&lt;br&gt;
-&lt;img alt="20160122_mobingi07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/21903528-14c1-516d-77e8-6dcb95af02df.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ステータスが「初期化中」→「実行中」になったら作成完了です。&lt;br&gt;
-※ちなみに自分は実行中になるまで7分ほどかかりました。&lt;br&gt;
-&lt;img alt="20160122_mobingi09.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/491fa8c6-5a5f-2336-2027-13a6ac67754f.png" /&gt;&lt;/p&gt;
-
-&lt;h1 id="4.コードのデプロイ"&gt;4.コードのデプロイ&lt;/h1&gt;
-
-&lt;h4 id="4-1.アプリケーションの選択"&gt;4-1.アプリケーションの選択&lt;/h4&gt;
-
-&lt;p&gt;作成したアプリケーション名をクリックします。&lt;br&gt;
-&lt;img alt="20160122_mobingi10.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/07d72860-26f3-4ee4-15d2-4b812e59b285.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="4-2.リポジトリの選択"&gt;4-2.リポジトリの選択&lt;/h4&gt;
-
-&lt;p&gt;「コード」タブをクリックするとGitリポジトリ設定が表示されるので、そこで「GitHub」の「パブリックリポジトリ」を選択します。&lt;br&gt;
-&lt;img alt="20160122_mobingi11.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/e76dfb22-99ce-eeec-00ee-c666dfe117da.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="4-3.リポジトリとの接続"&gt;4-3.リポジトリとの接続&lt;/h4&gt;
-
-&lt;p&gt;フォークした「自分のリポジトリ/hubot-mocloud」の「master」リポジトリを選択し、「接続」をクリックします。&lt;/p&gt;
-
-&lt;p&gt;「成功」と出れば接続が完了です。&lt;br&gt;
-&lt;img alt="20160122_mobingi12.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/864c944e-125f-13a7-b70c-fdfe7aa0ce64.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="4-4.環境変数の設定①"&gt;4-4.環境変数の設定①&lt;/h4&gt;
-
-&lt;p&gt;「設定」タブをクリックします。&lt;br&gt;
-&lt;img alt="20160122_mobingi13.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3ad10dcb-4d6f-667b-22d0-2bf33d9a923b.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="4-5.環境変数の設定②"&gt;4-5.環境変数の設定②&lt;/h4&gt;
-
-&lt;p&gt;「Browse Apps &amp;gt; Hubot &amp;gt; Configurations on Proudit Inc &amp;gt; Edit configuration」に記載されている環境変数を入力して「+」で追加します。&lt;br&gt;
-&lt;img alt="20160123_slack-hubot03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/8debffbc-a0d8-62c0-d374-190b7e349af6.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="20160122_mobingi14.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/debfd4f9-b845-0c4a-926f-cf0bfa24ad7a.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="4-6.環境変数の設定③"&gt;4-6.環境変数の設定③&lt;/h4&gt;
-
-&lt;p&gt;変数が追加されたのを確認したら「変更を保存」をクリックして保存します。&lt;br&gt;
-&lt;img alt="20160122_mobingi15.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/41cb683a-aefe-c78d-40f3-02be06d84b86.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;緑でSuccessが表示されれば設定完了です。&lt;br&gt;
-&lt;img alt="20160122_mobingi16.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6fa27ffa-91c1-bbdc-08cc-5f957b530fd3.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;しばらく待つとslackに表示されているhubotのランプが緑になります。&lt;br&gt;
-&lt;img alt="20160122_mobingi17.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/d3d7a7a0-4799-4020-3f3d-d9b7d1532f28.png" /&gt;&lt;/p&gt;
-
-&lt;h1 id="5.let&amp;#39;s-hubot!!"&gt;5.Let&amp;#39;s Hubot!!&lt;/h1&gt;
-
-&lt;p&gt;以上で準備が整いました。それでは話しかけてみましょう。&lt;br&gt;
-「hello」と話しかけると「hello!」を返事をしてくれます。&lt;br&gt;
-&lt;img alt="20160122_mobingi18.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6f7d0594-7f9d-5011-8851-55b9b281463f.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ここではあらかじめ準備してくださったリポジトリをforkしてデプロイしています。&lt;br&gt;
-もし他にもいろいろ試したいということであれば、今回forkしたソースを編集してみてください。「hello」以外にも会話ができるようになります。&lt;/p&gt;
-
-&lt;h1 id="最後に"&gt;最後に&lt;/h1&gt;
-
-&lt;p&gt;今回はハンズオンの第一回だったみたいです。今回のハンズオンを通じてmoCloudというのを知り、とても興味深いサービスだと感じました。なので今後もハンズオンとかがあったら参加しようと思います。&lt;/p&gt;
-
-&lt;p&gt;/&amp;gt; Mobingi 吉田真吾さん&lt;br&gt;
-わかりやすいハンズオンありがとうございました。&lt;/p&gt;
-
-&lt;p&gt;また、より詳しく知りたい方は吉田さんが書いたブログ「&lt;a href="http://yoshidashingo.hatenablog.com/entry/2015/12/15/105841"&gt;moCloudでHubotを動かしてSlack上で遊ぼう&lt;/a&gt;」の記事を参照してみてください。&lt;/p&gt;
 </content>
   </entry>
 </feed>
