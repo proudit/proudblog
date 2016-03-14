@@ -5,16 +5,110 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-03-08T09:00:00+09:00</updated>
+  <updated>2016-03-14T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>JAWSDAYS2016に参加してきました！</title>
+    <link rel="alternate" href="http://blog.url.com/2016/03/14/jawsdays2016.html"/>
+    <id>http://blog.url.com/2016/03/14/jawsdays2016.html</id>
+    <published>2016-03-14T09:00:00+09:00</published>
+    <updated>2016-03-14T17:03:12+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;div style="text-align:center"&gt;
+&lt;img src="../../../images/2016/0314_jawsdays/20160314_jawsdays2016.png"&gt;
+&lt;/div&gt;
+
+&lt;p&gt;先日行われた「&lt;a href="http://jawsdays2016.jaws-ug.jp" target="_blank"&gt;JAWSDAYS2016&lt;/a&gt;」で、代表の小熊がスピーカーとして登壇させていただきましたー！&lt;br&gt;
+&lt;div style="text-align:center"&gt;&lt;br&gt;
+&lt;font size="2"&gt;&lt;br&gt;
+&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_01.jpg" /&gt;&lt;br&gt;
+会場には顔ハメも用意♪&lt;br&gt;
+&lt;/font&gt;&lt;br&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;今回担当させていただいたのは「Workshop」ブースの１コマで「静的HTML公開フローをサーバレスでDevOps！」という内容で、簡単に言うと「HTMLやCSSなどで作成された静的サイトをサーバを利用しないで動かしちゃいましょう」という内容です。&lt;br&gt;
+&lt;div style="text-align:center"&gt;&lt;br&gt;
+&lt;font size="2"&gt;&lt;br&gt;
+&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_02.jpg" /&gt;&lt;br&gt;
+なんと出番はトップバッター!&lt;br&gt;
+&lt;/font&gt;&lt;br&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;今まで登壇することがなかったのに、初めての場所が「JAWSDAYS2016」という参加者1,000人越えのビックイベント！！！どきどきですね。。。&lt;br&gt;
+&lt;div style="text-align:center"&gt;&lt;br&gt;
+&lt;font size="2"&gt;&lt;br&gt;
+&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_04.jpg" /&gt;&lt;br&gt;
+土曜の朝からこの数。。。しかも9割ほど初参加だそうです。&lt;br&gt;
+&lt;/font&gt;&lt;br&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;そしていざ、開始ということだったのですが、、、、ネットワークが繋がらない！？&lt;br&gt;
+&lt;div style="text-align:center"&gt;&lt;br&gt;
+&lt;font size="2"&gt;&lt;br&gt;
+&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_03.jpg" /&gt;&lt;br&gt;
+さっきまで繋がってたのに。。。トップバッターならではの障害ですね。。。&lt;br&gt;
+&lt;/font&gt;&lt;br&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;Workshop参加者用に用意していたネットワークがあったのですが、みんなが一斉に繋いだせいか回線がダウン。。。すぐに復旧しそうもないのでハンズオン形式は仕方なく諦めて、小熊さん実演を見てもらう形式に急遽変更。&lt;br&gt;
+&lt;div style="text-align:center"&gt;&lt;br&gt;
+&lt;font size="2"&gt;&lt;br&gt;
+&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_05.jpg" /&gt;&lt;br&gt;
+&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_06.jpg" /&gt;&lt;br&gt;
+それでもすぐに気持ちを切り替えて対応！&lt;br&gt;
+&lt;/font&gt;&lt;br&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;初っ端のトラブルはありつつも、なんとか時間通り無事終了。参加してくださった方々もみんな真剣に最後まで聴いてくれていました。つくづくハンズオンできなくてすみません。。。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="最後に"&gt;最後に&lt;/h1&gt;
+
+&lt;p&gt;今回イベントに参加してくださった皆様、登壇の機会を与えてくださった西島さん、Workshopを手伝ってくださった神さん、多田さん及び運営スタッフの皆様。&lt;br&gt;
+本当にありがとうございました！これからもどんどん参加して行こうと思いますので、これからも宜しくお願い致します!!&lt;br&gt;
+&lt;div style="text-align:center"&gt;&lt;br&gt;
+&lt;font size="2"&gt;&lt;br&gt;
+&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_07.jpg" /&gt;&lt;br&gt;
+左からサーバーワークス多田さんGENOVA神さん、プラウディット小熊、プラウディット山田&lt;br&gt;
+&lt;/font&gt;&lt;br&gt;
+&lt;/div&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>移転しました！</title>
+    <link rel="alternate" href="http://blog.url.com/2016/03/11/itenosirase.html"/>
+    <id>http://blog.url.com/2016/03/11/itenosirase.html</id>
+    <published>2016-03-11T09:00:00+09:00</published>
+    <updated>2016-03-14T17:05:05+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;3月よりオフィスを渋谷から新宿へ移転致しました。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;〒160-0022
+東京都新宿区新宿6-7-22
+エルプリメント新宿158号室
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href="https://www.directorz.co.jp/" target="_blank"&gt;ディレクターズ様&lt;/a&gt;から移転のお祝いを頂きました。&lt;br&gt;
+執務机です！！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="机" src="/images/./2016/0311_iten/shitumudesk.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;素敵な贈り物、ありがとうございました。&lt;br&gt;
+大切に使わせて頂きます！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>vnstatで手軽にtrafiicをモニタリング</title>
     <link rel="alternate" href="http://blog.url.com/2016/03/08/to-monitor-the-traffic-using-the-vnstat.html"/>
     <id>http://blog.url.com/2016/03/08/to-monitor-the-traffic-using-the-vnstat.html</id>
     <published>2016-03-08T09:00:00+09:00</published>
-    <updated>2016-03-08T11:45:50+09:00</updated>
+    <updated>2016-03-08T12:49:19+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -564,116 +658,6 @@ module Redmine
 管理権限付きのユーザーを持っているのであれば「1.管理画面で確認」を行うのが一番良さそうです。&lt;br&gt;
 もし、管理画面へログインするアカウントがい場合は「2.コマンドで確認」が有効です。&lt;br&gt;
 また、「3.ソースコードで確認」は一応紹介しましたが、これを行うのであれば、「2.コマンドで確認」を行う方が良いです。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Jawsdays2016 ハンズオンブースのスピーカーやります！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/02/14/jawsdays2016-workshop-speker.html"/>
-    <id>http://blog.url.com/2016/02/14/jawsdays2016-workshop-speker.html</id>
-    <published>2016-02-14T09:00:00+09:00</published>
-    <updated>2016-02-29T12:31:09+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;来たる、2016/3/12(土)に今年も&lt;a href="http://jawsdays2016.jaws-ug.jp/"&gt;JawsDays2016&lt;/a&gt;が開催されます。&lt;/p&gt;
-
-&lt;p&gt;AWSの成長とともに、年々参加者、規模も大きくなっているJawsdays、毎年1ユーザとして楽しみに参加させて頂いておりまししたが、今年はなんと、私小熊がスピーカーの一人として参加する機会を頂きました！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="jawsdays2016" src="/images/jawsdays2016-bg.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;以下、私のセッションの紹介ページ抜粋です。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;h3 id="11時10分--静的html公開フローをサーバレスでdevops！"&gt;11時10分- 静的HTML公開フローをサーバレスでDevOps！&lt;/h3&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;株式会社プラウディットの小熊さんがお届けする「静的HTML公開フローをサーバレスでDevOps！」は、ほぼ絶対落ちないコーポレートサイトを、Github + CircleCi + AWSのS3というストレージサービスを利用して、サーバレスで構築するハンズオンです。 このセッションに参加すれば、あなたのサイトも簡単にYahoo砲に耐えられるようになります！&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://jawsdays2016.jaws-ug.jp/speaker/259"&gt;スピーカー紹介ページ&lt;/a&gt;&lt;br&gt;
-&lt;img alt="スピーカー" src="/images/speaker01.png" /&gt;&lt;/p&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;セッションブースは「workshop」＝いわゆるハンズオンブースの１コマとなります。&lt;/p&gt;
-
-&lt;p&gt;もちろん、元ネタは同Blogの同名記事&lt;a href="http://blog.proudit.jp/2015/11/27/github-circleci-s3.html"&gt;静的HTML公開フローをサーバレスでDevOps！&lt;/a&gt;がベースとなっておりますが、ハンズオン用にブラッシュアップしましたので、この記事ではよく分からなかった、うまく行かなかった、などの方にも分かりやすく、試しやすい形となっております。&lt;/p&gt;
-
-&lt;p&gt;1コマ=50分の短いセッションですが、AWS S3と各種SaaSを連携したDevOpsの要素満載のセッションとなります。&lt;/p&gt;
-
-&lt;p&gt;みなさまお誘い合わせの上、受講頂ければと思います！&lt;/p&gt;
-
-&lt;p&gt;まだチケット間に合いますよーw&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="https://jaws-days.doorkeeper.jp/events/36835"&gt;JawsDaysチケット販売ページ&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>GitHubとCircleCIを連携させよう！！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/02/09/connect-github-to-circleci.html"/>
-    <id>http://blog.url.com/2016/02/09/connect-github-to-circleci.html</id>
-    <published>2016-02-09T09:00:00+09:00</published>
-    <updated>2016-02-15T11:46:48+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;CircleCIは継続的インテグレーション(Continuous Integration)を行うためのWebサービスです。&lt;br&gt;
-指定したGitHubリポジトリをウォッチし、更新があると自動でビルド〜デプロイを行える仕組みを作れます。&lt;br&gt;
-とりあえず今回は初めのGitHubとCircleCIを連携させるところを行います。&lt;/p&gt;
-
-&lt;h1 id="事前準備"&gt;事前準備&lt;/h1&gt;
-
-&lt;p&gt;・&lt;a href="../../../2016/02/01/regist-gihub.html"&gt;GitHubアカウントの取得&lt;/a&gt;&lt;br&gt;
-CircleCIを利用するにはGitHubアカウントが必要となります。&lt;/p&gt;
-
-&lt;h1 id="連携設定"&gt;連携設定&lt;/h1&gt;
-
-&lt;h4 id="1.ログイン"&gt;1.ログイン&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href="https://circleci.com/"&gt;Circleci&lt;/a&gt;へアクセスし「Sign in」をクリックします。&lt;br&gt;
-&lt;img alt="20160125_circleci01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7dfec881-aa24-9e8c-05d0-1102f5e1fe38.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="2.githubログイン"&gt;2.GitHubログイン&lt;/h4&gt;
-
-&lt;p&gt;ログイン画面が表示されるので事前に準備したGitHubアカウントへログインします。&lt;br&gt;
-&lt;img alt="20160125_circleci02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f592d016-db70-bb23-13cd-ff4fa87dc3f7.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="3.認証"&gt;3.認証&lt;/h4&gt;
-
-&lt;p&gt;認証画面が表示されるため、「Authorize application」をクリックします。&lt;br&gt;
-&lt;img alt="20160125_circleci03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/e216dafa-2cdb-ed89-37c3-e959ce58a43e.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="4.アカウントの選択"&gt;4.アカウントの選択&lt;/h4&gt;
-
-&lt;p&gt;CircleCIと連携するGitHubアカウントを指定します。&lt;br&gt;
-&lt;img alt="20160125_circleci04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/26c3a9d3-a7c8-8260-d2fe-407f3c8ef8ed.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="5.リポジトリの選択"&gt;5.リポジトリの選択&lt;/h4&gt;
-
-&lt;p&gt;アカウントを指定すると、リポジトリがリストされるので連携したいリポジトリの「Build project」をクリックします。&lt;br&gt;
-&lt;img alt="20160125_circleci05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/73519472-6b06-00d4-10f5-9154aa2a8836.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="6.プランの選択"&gt;6.プランの選択&lt;/h4&gt;
-
-&lt;p&gt;利用するプランを指定します。&lt;br&gt;
-&lt;img alt="20160125_circleci07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b7b01720-8410-392c-1a1c-5ccdd2f992af.png" /&gt;&lt;/p&gt;
-
-&lt;h4 id="7.完了"&gt;7.完了&lt;/h4&gt;
-
-&lt;p&gt;以上で連携が完了です。&lt;br&gt;
-&lt;img alt="20160125_circleci08.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/bcd9bede-56ab-605d-7a93-8ba705802215.png" /&gt;&lt;/p&gt;
-
-&lt;h1 id="最後に"&gt;最後に&lt;/h1&gt;
-
-&lt;p&gt;以上、今回はGitHubとCircleCIを連携させる部分だけ行いました。&lt;br&gt;
-実際にデプロイまで行うには&lt;em&gt;circle.yml&lt;/em&gt;というファイルを使って管理する必要があります。&lt;br&gt;
-そこについては、また時間があるときに書ければと思います。&lt;/p&gt;
 </content>
   </entry>
 </feed>

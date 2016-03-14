@@ -2,7 +2,7 @@
 title: 移転しました！
 date: 2016-03-11
 tags: お知らせ 
-author: toguma
+author: proudcloud
 ---
 
 3月よりオフィスを渋谷から新宿へ移転致しました。
@@ -13,11 +13,11 @@ author: toguma
 エルプリメント新宿158号室
 ```
 
-[ディレクターズ様](https://www.directorz.co.jp/)から移転のお祝いを頂きました。
+<a href="https://www.directorz.co.jp/" target="_blank">ディレクターズ様</a>から移転のお祝いを頂きました。
 執務机です！！
 
 
-![机](./20160311/shitumudesk.jpg)
+![机](./2016/0311_iten/shitumudesk.jpg)
 
 素敵な贈り物、ありがとうございました。
 大切に使わせて頂きます！
