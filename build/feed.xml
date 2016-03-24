@@ -5,16 +5,174 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-03-14T09:00:00+09:00</updated>
+  <updated>2016-03-24T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>aws-cliのバージョンをアップグレードする。for MacOS</title>
+    <link rel="alternate" href="http://blog.url.com/2016/03/24/to-update-aws-cli.html"/>
+    <id>http://blog.url.com/2016/03/24/to-update-aws-cli.html</id>
+    <published>2016-03-24T09:00:00+09:00</published>
+    <updated>2016-03-24T10:37:40+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;気がつくとバージョンが上がっているaws-cliコマンド。&lt;br&gt;
+あまりにも頻繁に上がっているので、気が付いたら(向いたら？)バージョンアップを行うようにしています。&lt;br&gt;
+今回見たらバージョン1.10.6となっていました。とりあえず気が向いた(付いた？)のでアップグレードを行おうと思います。&lt;br&gt;
+ちなみにaws-cliのバージョンについては以下から確認できます。&lt;br&gt;
+&lt;a href="https://github.com/aws/aws-cli"&gt;https://github.com/aws/aws-cli&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;また、今回行っている環境はMac OS X El Capitainです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="①バージョンの確認"&gt;①バージョンの確認&lt;/h1&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws --version
+aws-cli/1.9.20 Python/2.7.10 Darwin/15.3.0 botocore/1.3.20
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;aws-cli&lt;/em&gt;のところを見ると&lt;em&gt;1.9.20&lt;/em&gt;となっているのがわかります。&lt;br&gt;
+現時点(&lt;em&gt;2016-02-19&lt;/em&gt;)での最新バージョンは&lt;em&gt;1.10.6&lt;/em&gt;でした。&lt;br&gt;
+&lt;a href="https://github.com/aws/aws-cli"&gt;https://github.com/aws/aws-cli&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="②アップグレード"&gt;②アップグレード&lt;/h1&gt;
+
+&lt;p&gt;それではアップグレードを行いたいと思います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo pip install --upgrade awscli
+Password:
+〜 省略 〜
+Collecting awscli
+  Downloading awscli-1.10.6-py2.py3-none-any.whl (887kB)
+    100% |████████████████████████████████| 888kB 627kB/s 
+Requirement already up-to-date: rsa&amp;lt;=3.3.0,&amp;gt;=3.1.2 in /Library/Python/2.7/site-packages (from awscli)
+Collecting s3transfer==0.0.1 (from awscli)
+  Downloading s3transfer-0.0.1-py2.py3-none-any.whl
+Requirement already up-to-date: colorama&amp;lt;=0.3.3,&amp;gt;=0.2.5 in /Library/Python/2.7/site-packages (from awscli)
+Collecting botocore==1.3.28 (from awscli)
+  Downloading botocore-1.3.28-py2.py3-none-any.whl (2.2MB)
+    100% |████████████████████████████████| 2.2MB 253kB/s 
+Requirement already up-to-date: docutils&amp;gt;=0.10 in /Library/Python/2.7/site-packages (from awscli)
+Requirement already up-to-date: pyasn1&amp;gt;=0.1.3 in /Library/Python/2.7/site-packages (from rsa&amp;lt;=3.3.0,&amp;gt;=3.1.2-&amp;gt;awscli)
+Requirement already up-to-date: futures&amp;lt;4.0.0,&amp;gt;=2.2.0 in /Library/Python/2.7/site-packages (from s3transfer==0.0.1-&amp;gt;awscli)
+Requirement already up-to-date: jmespath&amp;lt;1.0.0,&amp;gt;=0.7.1 in /Library/Python/2.7/site-packages (from botocore==1.3.28-&amp;gt;awscli)
+Collecting python-dateutil&amp;lt;3.0.0,&amp;gt;=2.1 (from botocore==1.3.28-&amp;gt;awscli)
+  Downloading python_dateutil-2.4.2-py2.py3-none-any.whl (188kB)
+    100% |████████████████████████████████| 192kB 2.4MB/s 
+Collecting six&amp;gt;=1.5 (from python-dateutil&amp;lt;3.0.0,&amp;gt;=2.1-&amp;gt;botocore==1.3.28-&amp;gt;awscli)
+  Downloading six-1.10.0-py2.py3-none-any.whl
+Installing collected packages: six, python-dateutil, botocore, s3transfer, awscli
+  Found existing installation: six 1.4.1
+    DEPRECATION: Uninstalling a distutils installed project (six) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.
+    Uninstalling six-1.4.1:
+Exception:
+Traceback (most recent call last):
+  File "/Library/Python/2.7/site-packages/pip/basecommand.py", line 209, in main
+    status = self.run(options, args)
+  File "/Library/Python/2.7/site-packages/pip/commands/install.py", line 317, in run
+    prefix=options.prefix_path,
+  File "/Library/Python/2.7/site-packages/pip/req/req_set.py", line 725, in install
+    requirement.uninstall(auto_confirm=True)
+  File "/Library/Python/2.7/site-packages/pip/req/req_install.py", line 752, in uninstall
+    paths_to_remove.remove(auto_confirm)
+  File "/Library/Python/2.7/site-packages/pip/req/req_uninstall.py", line 115, in remove
+    renames(path, new_path)
+  File "/Library/Python/2.7/site-packages/pip/utils/__init__.py", line 266, in renames
+    shutil.move(old, new)
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py", line 302, in move
+    copy2(src, real_dst)
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py", line 131, in copy2
+    copystat(src, dst)
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py", line 103, in copystat
+    os.chflags(dst, st.st_flags)
+OSError: [Errno 1] Operation not permitted: '/tmp/pip-l_kdbZ-uninstall/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/six-1.4.1-py2.7.egg-info'
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;なにやらエラーが発生。。。どうやらsix 1.4.1があることが原因らしい。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;  Found existing installation: six 1.4.1
+    DEPRECATION: Uninstalling a distutils installed project (six) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.
+    Uninstalling six-1.4.1:
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;対応方法はいろいろありますが、今回はsixを無視してアップグレードする対応を行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo pip install --upgrade awscli --ignore-installed six
+〜 省略 〜
+Collecting awscli
+  Downloading awscli-1.10.6-py2.py3-none-any.whl (887kB)
+    100% |████████████████████████████████| 888kB 657kB/s 
+Collecting six
+  Downloading six-1.10.0-py2.py3-none-any.whl
+Collecting rsa&amp;lt;=3.3.0,&amp;gt;=3.1.2 (from awscli)
+  Downloading rsa-3.3-py2.py3-none-any.whl (44kB)
+    100% |████████████████████████████████| 45kB 7.0MB/s 
+Collecting s3transfer==0.0.1 (from awscli)
+  Downloading s3transfer-0.0.1-py2.py3-none-any.whl
+Collecting colorama&amp;lt;=0.3.3,&amp;gt;=0.2.5 (from awscli)
+  Downloading colorama-0.3.3.tar.gz
+Collecting botocore==1.3.28 (from awscli)
+  Downloading botocore-1.3.28-py2.py3-none-any.whl (2.2MB)
+    100% |████████████████████████████████| 2.2MB 263kB/s 
+Collecting docutils&amp;gt;=0.10 (from awscli)
+  Downloading docutils-0.12.tar.gz (1.6MB)
+    100% |████████████████████████████████| 1.6MB 365kB/s 
+Collecting pyasn1&amp;gt;=0.1.3 (from rsa&amp;lt;=3.3.0,&amp;gt;=3.1.2-&amp;gt;awscli)
+  Downloading pyasn1-0.1.9-py2.py3-none-any.whl
+Collecting futures&amp;lt;4.0.0,&amp;gt;=2.2.0 (from s3transfer==0.0.1-&amp;gt;awscli)
+  Downloading futures-3.0.5-py2-none-any.whl
+Collecting jmespath&amp;lt;1.0.0,&amp;gt;=0.7.1 (from botocore==1.3.28-&amp;gt;awscli)
+  Downloading jmespath-0.9.0-py2.py3-none-any.whl
+Collecting python-dateutil&amp;lt;3.0.0,&amp;gt;=2.1 (from botocore==1.3.28-&amp;gt;awscli)
+  Downloading python_dateutil-2.4.2-py2.py3-none-any.whl (188kB)
+    100% |████████████████████████████████| 192kB 2.7MB/s 
+Installing collected packages: pyasn1, rsa, futures, jmespath, six, python-dateutil, docutils, botocore, s3transfer, colorama, awscli
+  Running setup.py install for docutils ... done
+  Running setup.py install for colorama ... done
+Successfully installed awscli-1.10.6 botocore-1.3.20 colorama-0.3.3 docutils-0.12 futures-3.0.5 jmespath-0.9.0 pyasn1-0.1.9 python-dateutil-1.5 rsa-3.3 s3transfer-0.0.1 six-1.4.1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;無事アップグレードできました。&lt;br&gt;
+念のためawsコマンドでバージョンを表示します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws --version
+aws-cli/1.10.6 Python/2.7.10 Darwin/15.3.0 botocore/1.3.28
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最新のバージョンになっているのが確認できました。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>移転祝いを頂きました_(2)</title>
+    <link rel="alternate" href="http://blog.url.com/2016/03/15/itenoiwai-next.html"/>
+    <id>http://blog.url.com/2016/03/15/itenoiwai-next.html</id>
+    <published>2016-03-15T09:00:00+09:00</published>
+    <updated>2016-03-23T23:24:03+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;株式会社ネクスト上田様より移転のお祝いを頂きました！&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+・来客用スリッパ&lt;/p&gt;
+
+&lt;p&gt;・靴べら&lt;/p&gt;
+
+&lt;p&gt;・傘立て&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+です！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="ネクスト社お祝い" src="/images/./2016/0315_oiwai/nextoiwai.JPG" /&gt;&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+素敵な贈り物、ありがとうございました。&lt;br&gt;
+大切に使わせて頂きます！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>JAWSDAYS2016に参加してきました！</title>
     <link rel="alternate" href="http://blog.url.com/2016/03/14/jawsdays2016.html"/>
     <id>http://blog.url.com/2016/03/14/jawsdays2016.html</id>
     <published>2016-03-14T09:00:00+09:00</published>
-    <updated>2016-03-14T17:03:12+09:00</updated>
+    <updated>2016-03-23T23:24:03+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -84,7 +242,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/03/11/itenosirase.html"/>
     <id>http://blog.url.com/2016/03/11/itenosirase.html</id>
     <published>2016-03-11T09:00:00+09:00</published>
-    <updated>2016-03-14T17:05:05+09:00</updated>
+    <updated>2016-03-23T23:24:03+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -472,192 +630,6 @@ CloudFrontの「from-cloudfront-to-s3-test」からアクセスができる設�
 これもCloudFrontの「Origin」作成時に「Origin Access Identity」を[Create a New Identity]にすることで今回は新規に作成しています。&lt;/p&gt;
 
 &lt;p&gt;ということでアクセス許可設定が完了しました。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>lsofを使ってプロセスが利用しているポートを確認する。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/02/22/how-to-use-lsof.html"/>
-    <id>http://blog.url.com/2016/02/22/how-to-use-lsof.html</id>
-    <published>2016-02-22T09:00:00+09:00</published>
-    <updated>2016-02-23T13:17:38+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;&lt;code&gt;lsof&lt;/code&gt;を使ってプロセスが利用しているポートを確認します。&lt;/p&gt;
-
-&lt;p&gt;利用シーンとして、自分はzabbixなどでポートやプロセスの監視設定をするときの確認で使ったりします。&lt;/p&gt;
-
-&lt;h1 id="利用されているポートを表示する"&gt;利用されているポートを表示する&lt;/h1&gt;
-
-&lt;p&gt;まずは、現在利用されているポートの一覧を表示します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -i
-COMMAND    PID     USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
-dhclient  1254     root    5u  IPv4    6837      0t0  UDP *:bootpc
-sshd      1440     root    3u  IPv4    7378      0t0  TCP *:ssh (LISTEN)
-sshd      1440     root    4u  IPv6    7380      0t0  TCP *:ssh (LISTEN)
-mysqld    2055    mysql   17u  IPv4    8001      0t0  TCP *:mysql (LISTEN)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;このコマンドにパイプ( | )でgrep LISTENなどを付け加えてあげると&lt;br&gt;
-LISTENしているプロセスのみが表示させることができます。&lt;/p&gt;
-
-&lt;h1 id="あるポートを利用しているプロセスを調べる"&gt;あるポートを利用しているプロセスを調べる&lt;/h1&gt;
-
-&lt;p&gt;オプション&lt;code&gt;-i:ポート番号&lt;/code&gt;でそのポートを利用しているプロセスを調べることができます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -i:80
-COMMAND   PID  USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
-nginx   27576  root   10u  IPv4 3025923      0t0  TCP *:http (LISTEN)
-nginx   27578 nginx   10u  IPv4 3025923      0t0  TCP *:http (LISTEN)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ここでは&lt;em&gt;80&lt;/em&gt;番ポートはnginxが利用しているというのがわかります。&lt;/p&gt;
-
-&lt;p&gt;カンマ区切りで番号をしていると、複数ポートを同時に調べることもできます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -i:22,80
-COMMAND   PID     USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
-sshd     1440     root    3u  IPv4    7378      0t0  TCP *:ssh (LISTEN)
-sshd     1440     root    4u  IPv6    7380      0t0  TCP *:ssh (LISTEN)
-sshd    27402     root    3u  IPv4 3024720      0t0  TCP 10.0.0.229:ssh-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:50596 (ESTABLISHED)
-sshd    27404 ec2-user    3u  IPv4 3024720      0t0  TCP 10.0.0.229:ssh-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:50596 (ESTABLISHED)
-nginx   27576     root   10u  IPv4 3025923      0t0  TCP *:http (LISTEN)
-nginx   27578    nginx   10u  IPv4 3025923      0t0  TCP *:http (LISTEN)
-nginx   27578    nginx   15u  IPv4 3058872      0t0  TCP 10.0.0.229:http-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:54589 (ESTABLISHED)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;さらに&lt;code&gt;-iTCP&lt;/code&gt;や&lt;code&gt;-iUDP&lt;/code&gt;でTCPやUDPの指定をすることも可能です。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -iTCP:22
-COMMAND   PID     USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
-sshd     1440     root    3u  IPv4    7378      0t0  TCP *:ssh (LISTEN)
-sshd     1440     root    4u  IPv6    7380      0t0  TCP *:ssh (LISTEN)
-sshd    27402     root    3u  IPv4 3024720      0t0  TCP 10.0.0.229:ssh-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:50596 (ESTABLISHED)
-sshd    27404 ec2-user    3u  IPv4 3024720      0t0  TCP 10.0.0.229:ssh-&amp;gt;s225.HtokyoFL3.vectant.ne.jp:50596 (ESTABLISHED)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;【項目について】&lt;br&gt;
-COMMAND : 実行プログラム&lt;br&gt;
-PID : プロセスID&lt;br&gt;
-USER : 実行ユーザ&lt;br&gt;
-NODE : プロトコル&lt;br&gt;
-NAME : ポート&lt;br&gt;
-(LISTEN) : 待ち受け状態&lt;/p&gt;
-
-&lt;p&gt;今回はポートを利用しているプロセスの表示ですが、せっかくなので他の用途も載せておきます。&lt;/p&gt;
-
-&lt;h1 id="特定のpidを持つプロセスが開いているファイルを表示"&gt;特定のPIDを持つプロセスが開いているファイルを表示&lt;/h1&gt;
-
-&lt;p&gt;&lt;code&gt;-p&lt;/code&gt;オプションはプロセスIDを元に、そのプロセスが利用しているファイルなどを表示します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -p 1440
-COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
-sshd    1440 root  cwd    DIR  202,1     4096    2 /
-sshd    1440 root  rtd    DIR  202,1     4096    2 /
-sshd    1440 root  txt    REG  202,1   617128 7432 /usr/sbin/sshd
-sshd    1440 root  mem    REG  202,1    62864 3764 /lib64/libnss_files-2.17.so
-sshd    1440 root  mem    REG  202,1    44224 3776 /lib64/librt-2.17.so
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id="特定のプロセスが開いているファイルを表示"&gt;特定のプロセスが開いているファイルを表示&lt;/h1&gt;
-
-&lt;p&gt;&lt;code&gt;-c&lt;/code&gt;オプションは特定のプロセスが利用しているファイルなどを表示します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;# lsof -c nginx
-COMMAND   PID  USER   FD   TYPE             DEVICE SIZE/OFF    NODE NAME
-nginx   27576  root  cwd    DIR              202,1     4096  272412 /etc/nginx/conf.d
-nginx   27576  root  rtd    DIR              202,1     4096       2 /
-nginx   27576  root  txt    REG              202,1   964976   18099 /usr/sbin/nginx
-nginx   27576  root  DEL    REG                0,4          3025922 /dev/zero
-nginx   27576  root  mem    REG              202,1    22096  272808　/usr/lib64/perl5/vendor_perl/auto/nginx/nginx.so
-nginx   27576  root  mem    REG              202,1    62864    3764 /lib64/libnss_files-2.17.so
-nginx   27576  root  mem    REG              202,1    10856    6562 /usr/lib64/libXau.so.6.0.0
-nginx   27576  root  mem    REG              202,1   126288    3886 /usr/lib64/libselinux.so.1
-nginx   27576  root  mem    REG              202,1   165264    4092 /lib64/libexpat.so.1.5.2
-nginx   27576  root  mem    REG              202,1   122312    6606 /usr/lib64/libxcb.so.1.1.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Redmineのバージョンを確認する。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/02/15/comfirm-a-version-of-redmine.html"/>
-    <id>http://blog.url.com/2016/02/15/comfirm-a-version-of-redmine.html</id>
-    <published>2016-02-15T09:00:00+09:00</published>
-    <updated>2016-02-15T17:31:59+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;Redmineのバージョンを確認する方法です。&lt;/p&gt;
-
-&lt;p&gt;方法としては「1.管理画面で確認」「2.コマンドで確認」「3.ソースコードで確認」の３通り紹介します。&lt;/p&gt;
-
-&lt;h1 id="1.管理画面で確認"&gt;1.管理画面で確認&lt;/h1&gt;
-
-&lt;h5 id="1-1.管理者権限のあるアカウントでredmineへログインします。"&gt;1-1.管理者権限のあるアカウントでRedmineへログインします。&lt;/h5&gt;
-
-&lt;h5 id="1-2.「管理」をクリックします。"&gt;1-2.「管理」をクリックします。&lt;/h5&gt;
-
-&lt;p&gt;&lt;img width="332" alt="20160112_redmine01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/df5492e0-2af2-5c90-4946-9db76e5d44ab.png"&gt;&lt;/p&gt;
-
-&lt;h5 id="1-3.「情報」をクリックします。"&gt;1-3.「情報」をクリックします。&lt;/h5&gt;
-
-&lt;p&gt;&lt;img width="202" alt="20160112_redmine02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/84d8540b-d699-5aa6-382b-ba8baeeac291.png"&gt;&lt;/p&gt;
-
-&lt;h5 id="1-4.画面上部に表示されます。"&gt;1-4.画面上部に表示されます。&lt;/h5&gt;
-
-&lt;p&gt;&lt;img width="995" alt="20160112_redmine03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ee8ee97a-9344-6619-97d5-78f4e01f30a7.png"&gt;&lt;/p&gt;
-
-&lt;p&gt;バージョンの他にも、&lt;br&gt;
-・Redmineのインストールの正常性&lt;br&gt;
-・データベースの種類&lt;br&gt;
-・Rdmineの実行環境&lt;br&gt;
-などが確認できます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="2.コマンドで確認"&gt;2.コマンドで確認&lt;/h1&gt;
-
-&lt;h5 id="2-1.サーバへログインし、redmineをインストールしたディレクトリへ移動します。"&gt;2-1.サーバへログインし、Redmineをインストールしたディレクトリへ移動します。&lt;/h5&gt;
-
-&lt;h5 id="2-2.以下のコマンドを実行します。"&gt;2-2.以下のコマンドを実行します。&lt;/h5&gt;
-
-&lt;p&gt;※旧バージョンだとscript/aboutの場合があります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ruby bin/about 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;Environment:
-  Redmine version                3.2.0.stable
-  Ruby version                   2.0.0-p647 (2015-08-18) [x86_64-linux]
-  Rails version                  4.2.5
-  Environment                    production
-  Database adapter               Mysql2
-SCM:
-  Subversion                     1.8.13
-  Git                            2.4.3
-  Filesystem                     
-Redmine plugins:
-  no plugin installed
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;管理画面で表示されているものと同等の内容が確認できます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="3.ソースコードで確認"&gt;3.ソースコードで確認&lt;/h1&gt;
-
-&lt;h5 id="3-1.サーバへログインし、redmineをインストールしたディレクトリへ移動します。"&gt;3-1.サーバへログインし、Redmineをインストールしたディレクトリへ移動します。&lt;/h5&gt;
-
-&lt;p&gt;lib/redmine/version.rbの冒頭にバージョンを表す数値が定義されています。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cat lib/redmine/version.rb 
-require 'rexml/document'
-
-module Redmine
-  module VERSION #:nodoc:
-    MAJOR = 3
-    MINOR = 2
-    TINY  = 0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上の３つの方法がありますが。&lt;br&gt;
-管理権限付きのユーザーを持っているのであれば「1.管理画面で確認」を行うのが一番良さそうです。&lt;br&gt;
-もし、管理画面へログインするアカウントがい場合は「2.コマンドで確認」が有効です。&lt;br&gt;
-また、「3.ソースコードで確認」は一応紹介しましたが、これを行うのであれば、「2.コマンドで確認」を行う方が良いです。&lt;/p&gt;
 </content>
   </entry>
 </feed>
