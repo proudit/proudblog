@@ -9,17 +9,17 @@ author: proudcloud
 
 <br>
 
-![お披露目会](./2016/0329_nuokai/noukai1.JPG)
+![お披露目会](./2016/0329_noukai/noukai1.JPG)
 
 <br>
 
 差し入れも頂きました！ありがとうございました。
 
 
-![お披露目会](./2016/0329_nuokai/noukai2.JPG)
+![お披露目会](./2016/0329_noukai/noukai2.JPG)
 シャンパン、ビール、ラスクです。
 
-![お披露目会](./2016/0329_nuokai/noukai3.JPG)
+![お披露目会](./2016/0329_noukai/noukai3.JPG)
 柿の葉寿司もおいしかったです〜！ごちそうさまでした。
 
 <br>
