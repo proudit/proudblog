@@ -2,7 +2,7 @@ header {
 
   $header-background-top: darken($base-accent-color, 25);
   $header-background-bottom: adjust-hue($header-background-top, -70);
-  $header-color: #191970;
+  $header-color: #0080ff;
   $gradient-angle: 10deg;
   $header-image: "/images/mountains.png";
 
@@ -28,7 +28,7 @@ header {
     font-size: 28px;
     font-weight: 50%;
     padding: 10px 0 4px 0;
-    text-shadow: 0 0 12px lighten($header-color, 10);
+    /*　text-shadow: 0 0 12px lighten($header-color, 10);　/*
     font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;
 
     @include media($medium-screen-up) {
