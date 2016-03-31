@@ -28,7 +28,7 @@ header {
     font-size: 28px;
     font-weight: 50%;
     padding: 10px 0 4px 0;
-    /*　text-shadow: 0 0 12px lighten($header-color, 10);　/*
+    /*　text-shadow: 0 0 12px lighten($header-color, 10);　*/
     font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;
 
     @include media($medium-screen-up) {
