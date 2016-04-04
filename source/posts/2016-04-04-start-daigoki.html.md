@@ -1,8 +1,8 @@
 ---
-title:プラウディット5期目を迎えました
-date:2016-04-04
-tags:お知らせ
-author:proudcloud
+title: プラウディット5期目を迎えました
+date: 2016-04-04
+tags: お知らせ
+author: proudcloud
 ---
 
 4月1日より弊社プラウディットは第5期目に入りました。
