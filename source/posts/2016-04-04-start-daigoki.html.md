@@ -1,5 +1,5 @@
 ---
-title: プラウディット5期目を迎えました
+title:プラウディット5期目を迎えました
 date: 2016-04-04
 tags: お知らせ
 author: proudcloud
