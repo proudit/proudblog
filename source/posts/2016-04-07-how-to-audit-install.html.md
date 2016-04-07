@@ -6,7 +6,7 @@ author: kohei
 ---
 
 # はじめに
-## autditとは？
+## auditとは？
 auditとはLinuxサーバで用いる監査ツールです。
 
 <br>
