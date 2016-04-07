@@ -5,16 +5,163 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-03-29T09:00:00+09:00</updated>
+  <updated>2016-04-07T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>auditについてインストールと簡単な利用方法のメモ。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/04/07/how-to-audit-install.html"/>
+    <id>http://blog.url.com/2016/04/07/how-to-audit-install.html</id>
+    <published>2016-04-07T09:00:00+09:00</published>
+    <updated>2016-04-07T17:12:53+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;h2 id="autditとは？"&gt;autditとは？&lt;/h2&gt;
+
+&lt;p&gt;auditとはLinuxサーバで用いる監査ツールです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="どんなことができるの？"&gt;どんなことができるの？&lt;/h2&gt;
+
+&lt;p&gt;SELinuxのAVC拒否、システムログイン、アカウント変更、sudoなどを使った認証結果などを監査することができます。&lt;br&gt;
+・システムイベントの記録&lt;br&gt;
+・監査イベントの記録&lt;br&gt;
+・バックアップのチェック&lt;br&gt;
+・ログファイルの切り替え&lt;br&gt;
+・設定ファイルの変更チェック&lt;br&gt;
+etc...&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="導入"&gt;導入&lt;/h1&gt;
+
+&lt;p&gt;auditのインストールと設定について簡単に説明します。&lt;/p&gt;
+
+&lt;h2 id="1.-パッケージインストール"&gt;1. パッケージインストール&lt;/h2&gt;
+
+&lt;p&gt;RedHat系はyum、Debian系はapt-getでパッケージインストールができます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo apt-get install auditd
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo yum install audit
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;※パッケージの指定がapt-getの場合はauditd、yumの場合はauditとなるので注意してください。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="2.-構成"&gt;2. 構成&lt;/h2&gt;
+
+&lt;p&gt;基本的にauditdは設定ファイル(auditd.conf)とルール定義ファイル(audit.rules)、ログ(audit.log)の３つから構成されます。&lt;br&gt;
+またこれらのファイルは、デフォルトで以下のパスに配置されます。&lt;br&gt;
+・設定ファイル：&lt;em&gt;/etc/audit/auditd.conf&lt;/em&gt;&lt;br&gt;
+・ルール定義ファイル：&lt;em&gt;/etc/audit/audit.rules&lt;/em&gt;&lt;br&gt;
+・ログ：&lt;em&gt;/var/log/audit.log&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;ということでインストールができたので、とにかく利用してみましょう。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="3.-ルールの確認"&gt;3. ルールの確認&lt;/h2&gt;
+
+&lt;p&gt;まずは、ルールの確認です。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo auditctl -l
+No rules
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;初期は何もルールが設定されていないので&amp;quot;&lt;em&gt;No rules&lt;/em&gt;&amp;quot;となります。&lt;br&gt;
+それでは何か追加してみましょう。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="4.-ルールの追加"&gt;4. ルールの追加&lt;/h2&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo auditctl -a exit,always -F arch=b64 -S open -F path=/etc/resolv.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;-a filter,action&lt;/strong&gt;&lt;/em&gt;：指定したルールを追加します。&lt;em&gt;filter&lt;/em&gt;でフィルタを指定し、&lt;em&gt;action&lt;/em&gt;で監査イベントを生成するかどうかを指定します。&lt;br&gt;
+ちなみに、&lt;em&gt;-a&lt;/em&gt;でルールを末尾に追加、&lt;em&gt;-A&lt;/em&gt;でルールを先頭に追加です。&lt;br&gt;
+&lt;em&gt;&lt;strong&gt;-F&lt;/strong&gt;&lt;/em&gt;：監査イベントで抜き出すための条件式を定義します。&lt;br&gt;
+&lt;em&gt;&lt;strong&gt;-S&lt;/strong&gt;&lt;/em&gt;：システムコール名やシステムコール番号を指定します。allはワイルドカードです。&lt;br&gt;
+&lt;em&gt;&lt;strong&gt;-k&lt;/strong&gt;&lt;/em&gt;：監査イベントにラベルを付けてログを後から検索できるようにする場合に指定します。&lt;/p&gt;
+
+&lt;p&gt;詳しい内容はまた記載しませんが、これは&amp;quot;&lt;em&gt;/etc/resolv.conf&lt;/em&gt;&amp;quot;をopenするのをチェックしています。&lt;/p&gt;
+
+&lt;p&gt;ルールの追加が完了したらもう一度確認コマンドを実行してみましょう。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo auditctl -l
+LIST_RULES: exit,always arch=3221225534 (0xc000003e) watch=/etc/resolv.conf syscall=open
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ルールが追加されたのが確認できます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="5.-ルールの削除"&gt;5. ルールの削除&lt;/h2&gt;
+
+&lt;p&gt;それでは追加したルールを今度は削除してみます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo auditctl -d exit,always -F arch=b64 -S open -F path=/etc/resolv.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;-d&lt;/strong&gt;&lt;/em&gt;：指定したルールを削除します。&lt;/p&gt;
+
+&lt;p&gt;それでは削除できているか確認します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo auditctl -l
+No rules
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;一つしかルールがなかったので削除すると&amp;quot;No rules&amp;quot;になりました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="今回のまとめ"&gt;今回のまとめ&lt;/h1&gt;
+
+&lt;p&gt;・auditはLinuxサーバで利用する監査ツール&lt;br&gt;
+・RedHat系はyum、Debian系はapt-getでパッケージインストールができる。&lt;br&gt;
+・パッケージインストールの指定はyumだとaudit、apt-getだとauditdになる。&lt;br&gt;
+・&lt;em&gt;auditctl -l&lt;/em&gt;でルールの確認&lt;br&gt;
+・&lt;em&gt;auditctl -a&lt;/em&gt;でルールの追加&lt;br&gt;
+・&lt;em&gt;auditctl -d&lt;/em&gt;でルールの削除&lt;/p&gt;
+
+&lt;p&gt;以上です。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>プラウディット5期目を迎えました</title>
+    <link rel="alternate" href="http://blog.url.com/2016/04/04/start-daigoki.html"/>
+    <id>http://blog.url.com/2016/04/04/start-daigoki.html</id>
+    <published>2016-04-04T09:00:00+09:00</published>
+    <updated>2016-04-07T16:24:32+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;4月1日より弊社プラウディットは第5期目に入りました。&lt;br&gt;
+これもひとえに日頃よりご指導頂いている皆様のおかげです。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+新オフィスにて迎えた今期も更に充実したサービス、そして新しいことにも挑戦すべく、&lt;br&gt;
+一同頑張って参ります！&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;実は本日4月4日はプラウディット設立記念日。&lt;br&gt;
+朝からどんよりとした空模様ですが、&lt;br&gt;
+オフィスでは気分が上がるよう素敵な香りと共にお仕事をしています。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="今日のアロマ" src="/images/./2016/0404_todayofaroma/sunrhythm.jpg" /&gt;&lt;br&gt;
+サンリズム：フレッシュな柑橘類(オレンジ、レモン、グレープフルーツ)とほのかなバニラの甘い香り。&lt;br&gt;
+気分を明るく晴れやかにしてくれます！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>2016年納会＆オフィスお披露目会</title>
     <link rel="alternate" href="http://blog.url.com/2016/03/29/noukai-hengiu.html"/>
     <id>http://blog.url.com/2016/03/29/noukai-hengiu.html</id>
     <published>2016-03-29T09:00:00+09:00</published>
-    <updated>2016-03-29T16:21:03+09:00</updated>
+    <updated>2016-03-30T14:42:48+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -51,7 +198,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/03/28/how-to-use-docker-from-login-to-commit.html"/>
     <id>http://blog.url.com/2016/03/28/how-to-use-docker-from-login-to-commit.html</id>
     <published>2016-03-28T09:00:00+09:00</published>
-    <updated>2016-03-29T16:20:47+09:00</updated>
+    <updated>2016-03-30T14:42:48+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -317,100 +464,6 @@ aws-cli/1.10.6 Python/2.7.10 Darwin/15.3.0 botocore/1.3.28
 &lt;p&gt;&lt;img alt="ネクスト社お祝い" src="/images/./2016/0315_oiwai/nextoiwai.JPG" /&gt;&lt;br&gt;
 &lt;br&gt;&lt;br&gt;
 素敵な贈り物、ありがとうございました。&lt;br&gt;
-大切に使わせて頂きます！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>JAWSDAYS2016に参加してきました！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/03/14/jawsdays2016.html"/>
-    <id>http://blog.url.com/2016/03/14/jawsdays2016.html</id>
-    <published>2016-03-14T09:00:00+09:00</published>
-    <updated>2016-03-28T13:48:41+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;div style="text-align:center"&gt;
-&lt;img src="../../../images/2016/0314_jawsdays/20160314_jawsdays2016.png"&gt;
-&lt;/div&gt;
-
-&lt;p&gt;先日行われた「&lt;a href="http://jawsdays2016.jaws-ug.jp" target="_blank"&gt;JAWSDAYS2016&lt;/a&gt;」で、代表の小熊がスピーカーとして登壇させていただきましたー！&lt;br&gt;
-&lt;div style="text-align:center"&gt;&lt;br&gt;
-&lt;font size="2"&gt;&lt;br&gt;
-&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_01.jpg" /&gt;&lt;br&gt;
-会場には顔ハメも用意♪&lt;br&gt;
-&lt;/font&gt;&lt;br&gt;
-&lt;/div&gt;&lt;/p&gt;
-
-&lt;p&gt;今回担当させていただいたのは「Workshop」ブースの１コマで「静的HTML公開フローをサーバレスでDevOps！」という内容で、簡単に言うと「HTMLやCSSなどで作成された静的サイトをサーバを利用しないで動かしちゃいましょう」という内容です。&lt;br&gt;
-&lt;div style="text-align:center"&gt;&lt;br&gt;
-&lt;font size="2"&gt;&lt;br&gt;
-&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_02.jpg" /&gt;&lt;br&gt;
-なんと出番はトップバッター!&lt;br&gt;
-&lt;/font&gt;&lt;br&gt;
-&lt;/div&gt;&lt;/p&gt;
-
-&lt;p&gt;今まで登壇することがなかったのに、初めての場所が「JAWSDAYS2016」という参加者1,000人越えのビックイベント！！！どきどきですね。。。&lt;br&gt;
-&lt;div style="text-align:center"&gt;&lt;br&gt;
-&lt;font size="2"&gt;&lt;br&gt;
-&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_04.jpg" /&gt;&lt;br&gt;
-土曜の朝からこの数。。。しかも9割ほど初参加だそうです。&lt;br&gt;
-&lt;/font&gt;&lt;br&gt;
-&lt;/div&gt;&lt;/p&gt;
-
-&lt;p&gt;そしていざ、開始ということだったのですが、、、、ネットワークが繋がらない！？&lt;br&gt;
-&lt;div style="text-align:center"&gt;&lt;br&gt;
-&lt;font size="2"&gt;&lt;br&gt;
-&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_03.jpg" /&gt;&lt;br&gt;
-さっきまで繋がってたのに。。。トップバッターならではの障害ですね。。。&lt;br&gt;
-&lt;/font&gt;&lt;br&gt;
-&lt;/div&gt;&lt;/p&gt;
-
-&lt;p&gt;Workshop参加者用に用意していたネットワークがあったのですが、みんなが一斉に繋いだせいか回線がダウン。。。すぐに復旧しそうもないのでハンズオン形式は仕方なく諦めて、小熊さん実演を見てもらう形式に急遽変更。&lt;br&gt;
-&lt;div style="text-align:center"&gt;&lt;br&gt;
-&lt;font size="2"&gt;&lt;br&gt;
-&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_05.jpg" /&gt;&lt;br&gt;
-&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_06.jpg" /&gt;&lt;br&gt;
-それでもすぐに気持ちを切り替えて対応！&lt;br&gt;
-&lt;/font&gt;&lt;br&gt;
-&lt;/div&gt;&lt;/p&gt;
-
-&lt;p&gt;初っ端のトラブルはありつつも、なんとか時間通り無事終了。参加してくださった方々もみんな真剣に最後まで聴いてくれていました。つくづくハンズオンできなくてすみません。。。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="最後に"&gt;最後に&lt;/h1&gt;
-
-&lt;p&gt;今回イベントに参加してくださった皆様、登壇の機会を与えてくださった西島さん、Workshopを手伝ってくださった神さん、多田さん及び運営スタッフの皆様。&lt;br&gt;
-本当にありがとうございました！これからもどんどん参加して行こうと思いますので、これからも宜しくお願い致します!!&lt;br&gt;
-&lt;div style="text-align:center"&gt;&lt;br&gt;
-&lt;font size="2"&gt;&lt;br&gt;
-&lt;img alt="jawsdays" src="/images/./2016/0314_jawsdays/20160314_jawsdays2016_07.jpg" /&gt;&lt;br&gt;
-左からサーバーワークス多田さんGENOVA神さん、プラウディット小熊、プラウディット山田&lt;br&gt;
-&lt;/font&gt;&lt;br&gt;
-&lt;/div&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>移転しました！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/03/11/itenosirase.html"/>
-    <id>http://blog.url.com/2016/03/11/itenosirase.html</id>
-    <published>2016-03-11T09:00:00+09:00</published>
-    <updated>2016-03-28T13:48:41+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;3月よりオフィスを渋谷から新宿へ移転致しました。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;〒160-0022
-東京都新宿区新宿6-7-22
-エルプリメント新宿158号室
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a href="https://www.directorz.co.jp/" target="_blank"&gt;ディレクターズ様&lt;/a&gt;から移転のお祝いを頂きました。&lt;br&gt;
-執務机です！！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="机" src="/images/./2016/0311_iten/shitumudesk.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;素敵な贈り物、ありがとうございました。&lt;br&gt;
 大切に使わせて頂きます！&lt;/p&gt;
 </content>
   </entry>
