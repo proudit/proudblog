@@ -1,6 +1,6 @@
 ---
 title: 子供の写真保管方法〜便利なフォトブックサービス〜
-date: 2016-04-11
+date: 2016-04-12
 tags: お役立ち情報
 author: ayako
 ---
@@ -10,9 +10,11 @@ author: ayako
 ついつい撮った写真は保存したまま溜まっていて、容量も増えて
 整理が追いつかずにどうしよう？と思うこともしばしば。
 
+
 子供の写真データってなかなか消せないんですよね。
 我が家は定期的に、外付けHDDやCD-Rにデータを移して保管しています。
 ただ、別媒体に移してしまったデータってなかなか見る機会ないですよね。
+
 
 #手軽に作れるフォトブックとは？
 
@@ -21,7 +23,9 @@ author: ayako
 ネットで検索するとフォトブックを扱っているサイトはたくさんあります。
 我が家で利用しているのは、
 
+
 **★TOLOT**
+
 <a href="http://tolot.com/lp/cost/?acc=ga&gclid=CPGemdbXhcwCFVMIvAod11YECA" target="_blank">http://tolot.com/lp/cost/?acc=ga&gclid=CPGemdbXhcwCFVMIvAod11YECA</a>
 
 ページ数64ページで500円！
@@ -35,11 +39,14 @@ PCを開かずにできちゃいます！
 
 また写真入りのスケジュール張やお薬手帳なんかも作ることができます。
 
+
 利用したことはありませんが、[<a href="http://nohana.jp/" target="_blank">ノハナ</a>]では毎月一冊無料(送料別)で作れちゃうサービスも
 あるようです。これもTOLOTと同じようにとても手軽なサービスだと思います。
 
 
+
 **★しまうまプリント**
+
 <a href="https://www.n-pri.jp/photobook/" target="_blank">https://www.n-pri.jp/photobook/</a>
 
 
@@ -53,7 +60,9 @@ TOLOTより自由度があります。
 
 両者ともに値段も良心的でクオリティも十分です。
 
+
 #最後に
+
 
 上記2つ以外にもフォトブックを作成できるサービスはたくさんあります！
 もちろんお子さんの成長記録だけでなく、友人への贈り物、旅行の記録、色々な用途で利用できるフォトブックサービス。
@@ -62,7 +71,7 @@ TOLOTより自由度があります。
 スマートフォンやPCの中で眠ったままの写真を是非フォトブックにしてみてください！
 <div style="text-align:center">
 <font size="2">
-![photobook](./2016/0411_photobook/20160411_photobook_01.jpg)
+![photobook](./2016/0412_photobook/20160412_photobook_01.jpg)
 1歳の誕生日記念に作ったフォトブックを眺める息子。
 </font>
 </div>
