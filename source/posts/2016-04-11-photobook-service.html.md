@@ -1,6 +1,6 @@
 ---
 title: 子供の写真保管方法〜便利なフォトブックサービス〜
-date: 2016-04-12
+date: 2016-04-11
 tags: お役立ち情報
 author: ayako
 ---
@@ -62,7 +62,7 @@ TOLOTより自由度があります。
 スマートフォンやPCの中で眠ったままの写真を是非フォトブックにしてみてください！
 <div style="text-align:center">
 <font size="2">
-![photobook](./2016/0412_photobook/20160412_photobook_01.jpg)
+![photobook](./2016/0411_photobook/20160411_photobook_01.jpg)
 1歳の誕生日記念に作ったフォトブックを眺める息子。
 </font>
 </div>
