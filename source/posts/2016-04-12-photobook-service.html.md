@@ -81,10 +81,10 @@ PCを開かずにできちゃいます！
 
 
 スマートフォンやPCの中で眠ったままの写真を是非フォトブックにしてみてください！
-<br>
 
 <div style="text-align:center">
 <img src="../../../images/2016/0412_photobook/20160412_photobook_01.jpg">
+<br>
 <font size="2">
 1歳の誕生日記念に作ったフォトブックを眺める息子。
 </font>
