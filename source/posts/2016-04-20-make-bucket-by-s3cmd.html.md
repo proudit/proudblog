@@ -1,6 +1,6 @@
 ---
 title: AWS CLIでAWS Account IDを取得する。
-date: 2016-04-19
+date: 2016-04-20
 tags: s3cmd, IDCF
 author: kohei
 ---
