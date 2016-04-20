@@ -1,7 +1,7 @@
 ---
 title: AWS CLIでAWS Account IDを取得する。
 date: 2016-04-11
-tags: お知らせ
+tags: AWS, aws-cli, STS
 author: kohei
 ---
 

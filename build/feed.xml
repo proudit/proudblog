@@ -5,16 +5,395 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-04-11T09:00:00+09:00</updated>
+  <updated>2016-04-19T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
     <title>AWS CLIでAWS Account IDを取得する。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/04/19/make-bucket-by-s3cmd.html"/>
+    <id>http://blog.url.com/2016/04/19/make-bucket-by-s3cmd.html</id>
+    <published>2016-04-19T09:00:00+09:00</published>
+    <updated>2016-04-19T13:11:10+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;コマンドを利用してIDCFクラウドのオブジェクトストレージへアクセスするにはs3cmdを利用するのが一般的のようです。&lt;br&gt;
+一応、IDCフロンティアのサイトにも載ってました。&lt;br&gt;
+&lt;a href="http://www.idcf.jp/help/storage/guide/s3cmd_guide.html"&gt;IDCF - [Linux]サードパーティのツールご利用ガイド s3cmd のご利用方法&lt;/a&gt;&lt;br&gt;
+とはいえ、動作保証やサポートはされていないみたいですが。。。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="オブジェクトストレージとは"&gt;オブジェクトストレージとは&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;ファイルシステムのようにデータをファイルやブロック単位で扱うのではなく、オブジェクトという単位で扱うストレージです。&lt;br&gt;
+また、ファイルシステムではないので階層構造がなく、オブジェクト同士はフラットな関係になっています。&lt;br&gt;
+基本的にデータサイズや保存数に制限がないため、大容量のデータを扱うことに適しています。&lt;br&gt;
+今回は&lt;a href="http://www.idcf.jp/cloud/storage/"&gt;IDCFクラウドのオブジェクトストレージ&lt;/a&gt;ですが、他にも&lt;a href="https://aws.amazon.com/jp/s3/"&gt;AWSのAmazon S3&lt;/a&gt;や&lt;a href="https://azure.microsoft.com/ja-jp/services/storage/"&gt;MicrosoftのAzure Storage&lt;/a&gt;などが有名です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="s3cmdインストール"&gt;s3cmdインストール&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;とりあえず今回はMacOSとUbuntuのインストールを行いました。&lt;br&gt;
+&lt;strong&gt;・MacOSの場合&lt;/strong&gt;&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo brew install s3cmd
+==&amp;gt; Downloading https://homebrew.bintray.com/bottles/s3cmd-1.6.0.el_capitan.bottle.tar.gz
+######################################################################## 100.0%
+==&amp;gt; Pouring s3cmd-1.6.0.el_capitan.bottle.tar.gz
+🍺  /usr/local/Cellar/s3cmd/1.6.0: 55 files, 738.3K
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;strong&gt;・Ubuntuの場合&lt;/strong&gt;&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ apt-get install s3cmd
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following NEW packages will be installed:
+  s3cmd
+0 upgraded, 1 newly installed, 0 to remove and 202 not upgraded.
+Need to get 67.6 kB of archives.
+After this operation, 295 kB of additional disk space will be used.
+Get:1 http://jp.archive.ubuntu.com/ubuntu/ trusty/universe s3cmd all 1.1.0~beta3-2 [67.6 kB]
+Fetched 67.6 kB in 0s (1,018 kB/s)
+Selecting previously unselected package s3cmd.
+(Reading database ... 91433 files and directories currently installed.)
+Preparing to unpack .../s3cmd_1.1.0~beta3-2_all.deb ...
+Unpacking s3cmd (1.1.0~beta3-2) ...
+Processing triggers for man-db (2.6.7.1-1) ...
+Setting up s3cmd (1.1.0~beta3-2) ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id=".s3cfgの作成"&gt;.s3cfgの作成&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;インストールができたので、次はs3cmdの設定ファイルとなる.s3cfgを作成します。&lt;br&gt;
+作成は以下のコマンドで行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd --configure
+
+Enter new values or accept defaults in brackets with Enter.
+Refer to user manual for detailed description of all options.
+
+Access key and Secret key are your identifiers for Amazon S3
+Access Key: ********************
+Secret Key: ****************************************
+
+Encryption password is used to protect your files from reading
+by unauthorized persons while in transfer to S3
+Encryption password:
+Path to GPG program [/usr/bin/gpg]:
+
+When using secure HTTPS protocol all communication with Amazon S3
+servers is protected from 3rd party eavesdropping. This method is
+slower than plain HTTP and can't be used if you're behind a proxy
+Use HTTPS protocol [No]:
+
+On some networks all internet access must go through a HTTP proxy.
+Try setting it here if you can't conect to S3 directly
+HTTP Proxy server name:
+
+New settings:
+  Access Key: ********************
+  Secret Key: ****************************************
+  Encryption password:
+  Path to GPG program: /usr/bin/gpg
+  Use HTTPS protocol: False
+  HTTP Proxy server name:
+  HTTP Proxy server port: 0
+
+Test access with supplied credentials? [Y/n] n
+
+Save settings? [y/N] y
+Configuration saved to '/hogehoge/.s3cfg'
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="設定の修正"&gt;設定の修正&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;.s3cfgのhost_baseとhost_bucketの値をIDCFのエンドポイントに変更します。&lt;br&gt;
+エンドポイントは&lt;br&gt;
+「IDCF管理画面 &amp;gt; オブジェクトストレージ &amp;gt; APIユーザー」で対象となるAPIユーザー名をクリックすると確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cd ~/
+$ vi .s3cfg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;[変更前]
+host_base = s3.amazonaws.com
+host_bucket = %(bucket)s.s3.amazonaws.com
+
+[変更後]
+host_base = ds.jp-east.idcfcloud.com
+host_bucket = %(bucket)s.ds.jp-east.idcfcloud.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;また、プライベートコネクトを利用する場合はhost_bucketのエンドポイントの最後を「.local」にする必要があります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;host_bucket = %(bucket)s.ds.jp-east.idcfcloud.local
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;*実際にプライベートコネクトを利用する場合は他にも申請やサーバー設定などが必要となります。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケット参照"&gt;バケット参照&lt;/h1&gt;
+
+&lt;hr&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;はじめはバケットがないため、コマンドを実行しても何も返ってきません。&lt;br&gt;
+ただ、もし.s3cfgを変更せずにバケット参照すると以下のようにERRORとなります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
+ERROR: S3 error: 403 (InvalidAccessKeyId): The AWS Access Key Id you provided does not exist in our records.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケットの作成"&gt;バケットの作成&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;ということで、バケットを作成してみます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd mb s3://proudit-test
+Bucket 's3://proudit-test/' created
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再度バケットを参照すると作成できているのが確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
+2016-04-13 05:01  s3://proudit-test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケットの削除"&gt;バケットの削除&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;とりあえず今回は作成まで確認できたので削除します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd rb s3://proudit-test
+Bucket 's3://proudit-test/' removed
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;参照すると何も返ってこないので削除されたのが確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上で完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;とりあえず、今回はs3cmdをインストールしてバケットの作成・削除だけ行いました。&lt;br&gt;
+s3cmdのコマンドについてIDCフロンティアのサイトに載っていますので、その他のコマンドについて知りたい方はそちらを参照していただければと思います。&lt;br&gt;
+&lt;a href="https://www.faq.idcf.jp/app/answers/detail/a_id/360/~/s3cmdのコマンド一覧"&gt;IDCF - s3cmdのコマンド一覧&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;また、awsコマンドを利用してもオブジェクトストレージにアクセスできるみたいです。&lt;br&gt;
+&lt;a href="http://inaba-serverdesign.jp/blog/20151212/s3cmd_awscli_s3_idcf.html"&gt;s3cmdじゃなくてawscli s3を使おう～IDCFクラウドオブジェクトストレージでも&lt;/a&gt;&lt;br&gt;
+しかも検証によるとそっちの方が早いという結果が出たとのこと。&lt;br&gt;
+そこについては今度自分でも検証しようと思います。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>今話題のサーバレスとは？</title>
+    <link rel="alternate" href="http://blog.url.com/2016/04/15/server-less-toha.html"/>
+    <id>http://blog.url.com/2016/04/15/server-less-toha.html</id>
+    <published>2016-04-15T09:00:00+09:00</published>
+    <updated>2016-04-18T12:34:53+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;&lt;font size=2&gt;&lt;br&gt;
+最近話題になってきているサーバレス、我が社でも熱いトピックです。&lt;br&gt;
+ただ、インフラ知識ほぼゼロに等しいわたしからしてみると、&lt;br&gt;
+サーバレスという言葉を聞いた時、『？？？？』。&lt;br&gt;
+サーバレスってことはサーバがいらないってこと！？じゃあどうやってシステム動くの？&lt;br&gt;
+分からないことだらけです。&lt;/p&gt;
+
+&lt;p&gt;ということで調べてみました。&lt;br&gt;
+素人目線の見解なので、ツッコミポイントも多いと思いますが...ご容赦ください。&lt;br&gt;
+&lt;/font&gt;&lt;/p&gt;
+
+&lt;h1 id="サーバレスとは"&gt;サーバレスとは&lt;/h1&gt;
+
+&lt;p&gt;特に決まった定義は今のところ存在しないようです。&lt;/p&gt;
+
+&lt;p&gt;色々と調べていく中で一番しっくり来たのがこれ。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+&lt;em&gt;オンプレミスで運用していた時代から基盤の主がクラウドへ移り、システムのメンテナンス性や拡張性を柔軟にするために、クラウドの管理までなくしてしまう、サーバレスアーキテクチャという考え方が注目されています。&lt;br&gt;
+&lt;a href="http://www.kobelcosys.co.jp/column/itwords/20160401/"&gt;http://www.kobelcosys.co.jp/column/itwords/20160401/&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+実際、”レス”といってもサーバ自体が全く無いわけではないです。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+例えばサーバレスを実現するために&lt;/p&gt;
+
+&lt;p&gt;&amp;quot;AWS S3＋API Gateway ＋ Lambda&amp;quot;&lt;/p&gt;
+
+&lt;p&gt;を利用したとします。&lt;/p&gt;
+
+&lt;p&gt;これらは全てAWSのサービスなのでサーバの管理はAWS側でやってくれます。&lt;/p&gt;
+
+&lt;p&gt;サーバ自体は存在していますが、管理が不要なのでサーバの存在を意識せずに運用をすることができます。&lt;br&gt;
+この”存在を意識しない”というところがサーバレスのポイントなのかな、と思います。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+※AWSを使ったサーバレスとは上記のようなサービスを使う、ということの他にEC2やRDSを使わ無い。という考え方もあるようです。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="サーバレスのメリット"&gt;サーバレスのメリット&lt;/h1&gt;
+
+&lt;p&gt;・サーバの管理が不要&lt;br&gt;
+セキュリティのアップデートやバックアップ、容量可変など、サーバ保守が不要になる。&lt;br&gt;
+もちろん構築も不要。&lt;/p&gt;
+
+&lt;p&gt;・コストパフォーマンスに優れている&lt;br&gt;
+管理が不要になる分、人件費もその分カットされ、尚且つサーバレスはプログラムの処理が必要な時だけ動作させることができます。AWSなども利用料で課金されるので必要な時だけ動作するこの仕組みは非常にコストパフォーマンスに優れていると言えます。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+これだけ見ていると、サーバレスってインフラ屋さんがいなくても大丈夫なのでは？と思ってしまうのですが。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+例えば、短期的なキャンペーンサイトを作らなければならないとなった場合。&lt;br&gt;
+まずサーバの手配をしなければなりません。&lt;br&gt;
+ほぼ静的なサイトなので、サーバレス程度の基盤で十分。時間もコストもかけずに環境を用意したい。&lt;br&gt;
+サーバレスなんてどうだろう？&lt;br&gt;
+でも一体サーバレスな環境ってどうやって用意するの？&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+といった時に何も気にせずサーバレスの環境を提供してもらえたら嬉しいですよね。&lt;br&gt;
+こういうサービスを提供するのもインフラ屋さんのお仕事だと思っています。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+もちろんサーバレスを提供する上でのコストも抑えられているので、お客様にも低価格で&lt;br&gt;
+サーバレス環境を素早く提供することが可能になります。&lt;br&gt;
+また、実際利用してみるとサーバレスでは不十分という場合にも、他のサービスを組み合わせて最適な環境を作り出すお手伝いができます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="所感"&gt;所感&lt;/h1&gt;
+
+&lt;p&gt;この記事を書くまでも色々なサイトを調べ、やっとまとまってきた感じなのですが、それでもまだほわーーんとしている状態です(笑)&lt;/p&gt;
+
+&lt;p&gt;どの方も述べられているのが、サーバレスとはまだ未発達の分野であり、決まった定義がないということ。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+オンプレミス→クラウド→サーバレス&lt;/p&gt;
+
+&lt;p&gt;と時代はどんどん変化していますが、変化する一番の要因はより時間とコストをかけず、&lt;br&gt;
+いかに楽に柔軟に運用できるか、ということ。&lt;br&gt;
+そしてその変化のスピードが速いのもこの業界ならでは。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+インフラってあるのが当たり前であり、動いているのが当たり前。&lt;br&gt;
+はっきり言ってエンドユーザにとっては全く意識されていない裏の世界。&lt;br&gt;
+だからこそそこに従事しているエンジニアが少しでも楽をして、尚且つ更に＋αのサービスを作り出すことができるようになればいいですよね。&lt;br&gt;
+その上でサーバレスアーキテクチャというものが今注目されているのかな、と。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>子供の写真保管方法〜便利なフォトブックサービス〜</title>
+    <link rel="alternate" href="http://blog.url.com/2016/04/12/photobook-service.html"/>
+    <id>http://blog.url.com/2016/04/12/photobook-service.html</id>
+    <published>2016-04-12T09:00:00+09:00</published>
+    <updated>2016-04-18T12:34:53+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="写真の保管どうしてますか？"&gt;写真の保管どうしてますか？&lt;/h1&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+スマートフォンで手軽に写真が撮れてしまう時代。&lt;br&gt;
+ついつい撮った写真は保存したまま溜まっていて、容量も増えて整理が追いつかずにどうしよう？と思うこともしばしば。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;特に子供の写真データってなかなか消せないんですよね(汗)&lt;br&gt;
+我が家は定期的に、外付けHDDやCD-Rにデータを移して保管しています。&lt;br&gt;
+ただ、別媒体に移してしまったデータってなかなか見る機会ないですよね。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="手軽に作れるフォトブックとは？"&gt;手軽に作れるフォトブックとは？&lt;/h1&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+こんな時に便利なのが、フォトブック！&lt;/p&gt;
+
+&lt;p&gt;ネットで検索するとフォトブックを扱っているサイトはたくさんあります。&lt;br&gt;
+我が家で利用しているのは、今の所２つ。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;★TOLOT&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://tolot.com/lp/cost/?acc=ga&amp;gclid=CPGemdbXhcwCFVMIvAod11YECA" target="_blank"&gt;&lt;a href="http://tolot.com/lp/cost/?acc=ga&amp;amp;gclid=CPGemdbXhcwCFVMIvAod11YECA"&gt;http://tolot.com/lp/cost/?acc=ga&amp;amp;gclid=CPGemdbXhcwCFVMIvAod11YECA&lt;/a&gt;&lt;/a&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;ページ数64ページで500円！&lt;br&gt;
+ワンコインで作れます。&lt;/p&gt;
+
+&lt;p&gt;スマートフォンアプリで作成も可能で手軽に作れる一冊。&lt;br&gt;
+PCを開かずにできちゃいます！&lt;/p&gt;
+
+&lt;p&gt;本のサイズやページ数などパターンは限られいますが、コンパクトな作りで何と言っても安くて手軽なので、&lt;br&gt;
+生後すぐのお子さんの一ヶ月ごとの記録を残しておきたい、遠く離れたおじいちゃんおばあちゃんへの定期的な子供の成長報告なんかにもおすすめです。&lt;/p&gt;
+
+&lt;p&gt;また写真入りのスケジュール張やお薬手帳なんかも作ることができちゃいます！&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;利用したことはありませんが、[&lt;a href="http://nohana.jp/" target="_blank"&gt;ノハナ&lt;/a&gt;]では毎月一冊無料(送料別)で作れちゃうサービスもあるようです。&lt;br&gt;
+これもTOLOTと同じようにとても手軽なサービスだと思います。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;★しまうまプリント&lt;/strong&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://www.n-pri.jp/photobook/" target="_blank"&gt;&lt;a href="https://www.n-pri.jp/photobook/"&gt;https://www.n-pri.jp/photobook/&lt;/a&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;本サイズやページ数にいくつか種類があり、ページレイアウトデザインも複数から選択できます。&lt;/p&gt;
+
+&lt;p&gt;我が家は年間の総まとめとしてこちらを利用しています。&lt;br&gt;
+こちらの場合は、表紙としてカバーがつく、文字フォントもいくつか選べるなど、TOLOTより自由度があります。&lt;br&gt;
+ちょうど先月息子が２歳の誕生日を迎えたので、近々２冊目を作る予定です。&lt;/p&gt;
+
+&lt;p&gt;両者ともに値段も良心的でクオリティも十分です。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="最後に"&gt;最後に&lt;/h1&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;上記2つ以外にもフォトブックを作成できるサービスはたくさんあります！&lt;/p&gt;
+
+&lt;p&gt;もちろんお子さんの成長記録だけでなく、友人への贈り物、旅行の記録、色々な用途で利用できるフォトブックサービス。&lt;/p&gt;
+
+&lt;p&gt;値段も手頃なものが多いので、写真をプリントしてアルバムを整理して、というのが面倒だな、苦手だなという人にはおすすめ。&lt;/p&gt;
+
+&lt;p&gt;スマートフォンやPCの中で眠ったままの写真を是非フォトブックにしてみてください！&lt;br&gt;
+&lt;div style="text-align:center"&gt;&lt;br&gt;
+&lt;font size="2"&gt;&lt;br&gt;
+&lt;img alt="jawsdays" src="/images/./2016/0412_photobook/20160412_photobook_01.jpg" /&gt;&lt;br&gt;
+1歳の誕生日記念に作ったフォトブックを眺める息子。&lt;br&gt;
+&lt;/font&gt;&lt;br&gt;
+&lt;/div&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>AWS CLIでAWS Account IDを取得する。</title>
     <link rel="alternate" href="http://blog.url.com/2016/04/11/get-awsaccountid-by-aws-cli.html"/>
     <id>http://blog.url.com/2016/04/11/get-awsaccountid-by-aws-cli.html</id>
     <published>2016-04-11T09:00:00+09:00</published>
-    <updated>2016-04-11T13:12:55+09:00</updated>
+    <updated>2016-04-19T12:59:21+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -114,7 +493,7 @@ aws-cli/1.10.18 Python/2.7.10 Darwin/15.4.0 botocore/1.4.9
     <link rel="alternate" href="http://blog.url.com/2016/04/07/how-to-audit-install.html"/>
     <id>http://blog.url.com/2016/04/07/how-to-audit-install.html</id>
     <published>2016-04-07T09:00:00+09:00</published>
-    <updated>2016-04-11T12:58:30+09:00</updated>
+    <updated>2016-04-11T14:21:05+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -254,292 +633,6 @@ No rules
 &lt;p&gt;&lt;img alt="今日のアロマ" src="/images/./2016/0404_todayofaroma/sunrhythm.jpg" /&gt;&lt;br&gt;
 サンリズム：フレッシュな柑橘類(オレンジ、レモン、グレープフルーツ)とほのかなバニラの甘い香り。&lt;br&gt;
 気分を明るく晴れやかにしてくれます！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>2016年納会＆オフィスお披露目会</title>
-    <link rel="alternate" href="http://blog.url.com/2016/03/29/noukai-hengiu.html"/>
-    <id>http://blog.url.com/2016/03/29/noukai-hengiu.html</id>
-    <published>2016-03-29T09:00:00+09:00</published>
-    <updated>2016-03-30T14:42:48+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;先日新オフィスにお客様をお招きし、2016年度の納会＆新オフィスお披露目会をしました！&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="お披露目会" src="/images/./2016/0329_noukai/noukai1.JPG" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;差し入れも頂きました〜。ありがとうございます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="お披露目会" src="/images/./2016/0329_noukai/noukai2.JPG" /&gt;&lt;/p&gt;
-
-&lt;p&gt;シャンパン、ビール、ラスクです。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="お披露目会" src="/images/./2016/0329_noukai/noukai3.JPG" /&gt;&lt;/p&gt;
-
-&lt;p&gt;柿の葉寿司もおいしかったです〜！&lt;br&gt;
-沢山食べてお腹いっぱいになりました。ごちそうさまでした。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;他にも写真には写っていませんが、沢山の差し入れを頂きました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-アットホームな雰囲気の中、楽しい会になりました♪&lt;br&gt;
-皆様お忙しい中お越し頂き、ありがとうございました！！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Dockerコンテナのリポジトリ管理　DockerHubへログイン、イメージの取得〜更新、コミットまで。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/03/28/how-to-use-docker-from-login-to-commit.html"/>
-    <id>http://blog.url.com/2016/03/28/how-to-use-docker-from-login-to-commit.html</id>
-    <published>2016-03-28T09:00:00+09:00</published>
-    <updated>2016-03-30T14:42:48+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;今回はDockerHubでのプライベートリポジトリ管理（手動）を想定しました。&lt;br&gt;
-まずはDockerHubへログインした上でリポジトリからコンテナをpullで取得し、その後コンテナ自身を更新します。その後commit→pushでDockerHubにあるリポジトリを更新します。&lt;br&gt;
-以上が「コンテナか管理」の際に行う基本的な流れになると思います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="1.dockerhubへのログイン"&gt;1.DockerHubへのログイン&lt;/h1&gt;
-
-&lt;p&gt;まずはリポジトリへアクセスできるようにするため、DockerHubへログインを行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker login
-Username: kohei
-Password:
-Email: kohei@hogehoge.jp
-WARNING: login credentials saved in /Users/kohei/.docker/config.json
-Login Succeeded
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="2.コンテナのpull"&gt;2.コンテナのpull&lt;/h1&gt;
-
-&lt;p&gt;ローカルリポジトリに存在するdocker imageを確認します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;現在はローカルリポジトリにはimageが存在しないため何もリストされていません。&lt;br&gt;
-確認ができたら&lt;code&gt;$ docker pull リポジトリ:タグ&lt;/code&gt;でDockerHubからimageを取得します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker pull kohei/httpd:ver1.0
-ver1.0: Pulling from kohei/httpd
-a2c33fe967de: Pull complete
-d3bf674be7aa: Pull complete
-13bab7291cec: Pull complete
-e87afdecef01: Pull complete
-4cf71c080937: Pull complete
-Digest: sha256:5b940d5b742317185db6b1d25b06e6e68060b08f8fdd53f36a6bd6d471bd7043
-Status: Downloaded newer image for kohei/httpd:ver1.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;再度&lt;code&gt;$ docker images&lt;/code&gt;を実行すると、先ほどpullしたimageが取得できているのが確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-kohei/httpd         ver1.0              4cf71c080937        2 days ago          264.3 MB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="3.コンテナの更新"&gt;3.コンテナの更新&lt;/h1&gt;
-
-&lt;p&gt;imageが取得できたのでコンテナを更新します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker run -it kohei/httpd:ver1.0 /bin/bash
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンテナを起動してパッケージのインストールやconfの修正などを行います。&lt;br&gt;
-修正が完了したらexitでコンテナから抜けて停止させます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="4.イメージの作成"&gt;4.イメージの作成&lt;/h1&gt;
-
-&lt;p&gt;修正したコンテナの&lt;code&gt;CONTAIER ID&lt;/code&gt;を確認します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker ps -a
-CONTAINER ID        IMAGE                COMMAND             CREATED             STATUS                      PORTS               NAMES
-b10edb89cd05        kohei/httpd:ver1.0   "/bin/bash"         43 seconds ago      Exited (0) 12 seconds ago                       gloomy_khorana
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;確認したら、&lt;code&gt;$ docker commit -m &amp;quot;コメント&amp;quot; &amp;lt;コンテナID&amp;gt; &amp;lt;リポジトリ:タグ&amp;gt;&lt;/code&gt;でローカルリポジトリへコミットします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker commit -m "edited container" b10edb89cd05 kohei/httpd:ver1.0
-02607c25ed22c085a8e4964c91406baa911f194265db5d4ddfd44a2f96e799ec
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;完了したら再度&lt;code&gt;$ docker images&lt;/code&gt;で&lt;code&gt;IMAGE ID&lt;/code&gt;を確認します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-kohei/httpd         ver1.0              02607c25ed22        5 seconds ago       264.3 MB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;すぐに確認すれば&lt;code&gt;CREATED&lt;/code&gt;が数秒前という記載になっています。また、コミットする前に確認した&lt;code&gt;IMAGE ID&lt;/code&gt;は異なるIDになっています。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="5.コンテナのpush"&gt;5.コンテナのpush&lt;/h1&gt;
-
-&lt;p&gt;ローカルリポジトリへコミットが完了したらDockerHubへpushします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ docker push kohei/httpd:ver1.0
-The push refers to a repository [docker.io/kohei/httpd] (len: 1)
-02607c25ed22: Pushed
-4cf71c080937: Image already exists
-e87afdecef01: Image already exists
-13bab7291cec: Image already exists
-d3bf674be7aa: Image already exists
-ver1.0: digest: sha256:fb10c3626b1fc732c314efc132a29f7ee37c52176547a076c72553a97eaee949 size: 9116
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上で完了です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;p&gt;コンテナ中身の更新方法はいろいろあるのでとりあえずrunで起動しての修正にしてます。&lt;br&gt;
-ただ、この一連の流れ(login〜pull〜commit〜push)はコンテナを管理する立場の人にはルーティン作業になると思ったのでメモとしてまとめました。&lt;br&gt;
-loginは一度ログインしてしまえば不要ですが、複数アカウントをまたぐ可能性がある場合はポイントになると思います。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>aws-cliのバージョンをアップグレードする。for MacOS</title>
-    <link rel="alternate" href="http://blog.url.com/2016/03/24/to-update-aws-cli.html"/>
-    <id>http://blog.url.com/2016/03/24/to-update-aws-cli.html</id>
-    <published>2016-03-24T09:00:00+09:00</published>
-    <updated>2016-03-28T13:48:41+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;気がつくとバージョンが上がっているaws-cliコマンド。&lt;br&gt;
-あまりにも頻繁に上がっているので、気が付いたら(向いたら？)バージョンアップを行うようにしています。&lt;br&gt;
-今回見たらバージョン1.10.6となっていました。とりあえず気が向いた(付いた？)のでアップグレードを行おうと思います。&lt;br&gt;
-ちなみにaws-cliのバージョンについては以下から確認できます。&lt;br&gt;
-&lt;a href="https://github.com/aws/aws-cli"&gt;https://github.com/aws/aws-cli&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;また、今回行っている環境はMac OS X El Capitainです。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="①バージョンの確認"&gt;①バージョンの確認&lt;/h1&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws --version
-aws-cli/1.9.20 Python/2.7.10 Darwin/15.3.0 botocore/1.3.20
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;em&gt;aws-cli&lt;/em&gt;のところを見ると&lt;em&gt;1.9.20&lt;/em&gt;となっているのがわかります。&lt;br&gt;
-現時点(&lt;em&gt;2016-02-19&lt;/em&gt;)での最新バージョンは&lt;em&gt;1.10.6&lt;/em&gt;でした。&lt;br&gt;
-&lt;a href="https://github.com/aws/aws-cli"&gt;https://github.com/aws/aws-cli&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="②アップグレード"&gt;②アップグレード&lt;/h1&gt;
-
-&lt;p&gt;それではアップグレードを行いたいと思います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo pip install --upgrade awscli
-Password:
-〜 省略 〜
-Collecting awscli
-  Downloading awscli-1.10.6-py2.py3-none-any.whl (887kB)
-    100% |████████████████████████████████| 888kB 627kB/s 
-Requirement already up-to-date: rsa&amp;lt;=3.3.0,&amp;gt;=3.1.2 in /Library/Python/2.7/site-packages (from awscli)
-Collecting s3transfer==0.0.1 (from awscli)
-  Downloading s3transfer-0.0.1-py2.py3-none-any.whl
-Requirement already up-to-date: colorama&amp;lt;=0.3.3,&amp;gt;=0.2.5 in /Library/Python/2.7/site-packages (from awscli)
-Collecting botocore==1.3.28 (from awscli)
-  Downloading botocore-1.3.28-py2.py3-none-any.whl (2.2MB)
-    100% |████████████████████████████████| 2.2MB 253kB/s 
-Requirement already up-to-date: docutils&amp;gt;=0.10 in /Library/Python/2.7/site-packages (from awscli)
-Requirement already up-to-date: pyasn1&amp;gt;=0.1.3 in /Library/Python/2.7/site-packages (from rsa&amp;lt;=3.3.0,&amp;gt;=3.1.2-&amp;gt;awscli)
-Requirement already up-to-date: futures&amp;lt;4.0.0,&amp;gt;=2.2.0 in /Library/Python/2.7/site-packages (from s3transfer==0.0.1-&amp;gt;awscli)
-Requirement already up-to-date: jmespath&amp;lt;1.0.0,&amp;gt;=0.7.1 in /Library/Python/2.7/site-packages (from botocore==1.3.28-&amp;gt;awscli)
-Collecting python-dateutil&amp;lt;3.0.0,&amp;gt;=2.1 (from botocore==1.3.28-&amp;gt;awscli)
-  Downloading python_dateutil-2.4.2-py2.py3-none-any.whl (188kB)
-    100% |████████████████████████████████| 192kB 2.4MB/s 
-Collecting six&amp;gt;=1.5 (from python-dateutil&amp;lt;3.0.0,&amp;gt;=2.1-&amp;gt;botocore==1.3.28-&amp;gt;awscli)
-  Downloading six-1.10.0-py2.py3-none-any.whl
-Installing collected packages: six, python-dateutil, botocore, s3transfer, awscli
-  Found existing installation: six 1.4.1
-    DEPRECATION: Uninstalling a distutils installed project (six) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.
-    Uninstalling six-1.4.1:
-Exception:
-Traceback (most recent call last):
-  File "/Library/Python/2.7/site-packages/pip/basecommand.py", line 209, in main
-    status = self.run(options, args)
-  File "/Library/Python/2.7/site-packages/pip/commands/install.py", line 317, in run
-    prefix=options.prefix_path,
-  File "/Library/Python/2.7/site-packages/pip/req/req_set.py", line 725, in install
-    requirement.uninstall(auto_confirm=True)
-  File "/Library/Python/2.7/site-packages/pip/req/req_install.py", line 752, in uninstall
-    paths_to_remove.remove(auto_confirm)
-  File "/Library/Python/2.7/site-packages/pip/req/req_uninstall.py", line 115, in remove
-    renames(path, new_path)
-  File "/Library/Python/2.7/site-packages/pip/utils/__init__.py", line 266, in renames
-    shutil.move(old, new)
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py", line 302, in move
-    copy2(src, real_dst)
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py", line 131, in copy2
-    copystat(src, dst)
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py", line 103, in copystat
-    os.chflags(dst, st.st_flags)
-OSError: [Errno 1] Operation not permitted: '/tmp/pip-l_kdbZ-uninstall/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/six-1.4.1-py2.7.egg-info'
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;なにやらエラーが発生。。。どうやらsix 1.4.1があることが原因らしい。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;  Found existing installation: six 1.4.1
-    DEPRECATION: Uninstalling a distutils installed project (six) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.
-    Uninstalling six-1.4.1:
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;対応方法はいろいろありますが、今回はsixを無視してアップグレードする対応を行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo pip install --upgrade awscli --ignore-installed six
-〜 省略 〜
-Collecting awscli
-  Downloading awscli-1.10.6-py2.py3-none-any.whl (887kB)
-    100% |████████████████████████████████| 888kB 657kB/s 
-Collecting six
-  Downloading six-1.10.0-py2.py3-none-any.whl
-Collecting rsa&amp;lt;=3.3.0,&amp;gt;=3.1.2 (from awscli)
-  Downloading rsa-3.3-py2.py3-none-any.whl (44kB)
-    100% |████████████████████████████████| 45kB 7.0MB/s 
-Collecting s3transfer==0.0.1 (from awscli)
-  Downloading s3transfer-0.0.1-py2.py3-none-any.whl
-Collecting colorama&amp;lt;=0.3.3,&amp;gt;=0.2.5 (from awscli)
-  Downloading colorama-0.3.3.tar.gz
-Collecting botocore==1.3.28 (from awscli)
-  Downloading botocore-1.3.28-py2.py3-none-any.whl (2.2MB)
-    100% |████████████████████████████████| 2.2MB 263kB/s 
-Collecting docutils&amp;gt;=0.10 (from awscli)
-  Downloading docutils-0.12.tar.gz (1.6MB)
-    100% |████████████████████████████████| 1.6MB 365kB/s 
-Collecting pyasn1&amp;gt;=0.1.3 (from rsa&amp;lt;=3.3.0,&amp;gt;=3.1.2-&amp;gt;awscli)
-  Downloading pyasn1-0.1.9-py2.py3-none-any.whl
-Collecting futures&amp;lt;4.0.0,&amp;gt;=2.2.0 (from s3transfer==0.0.1-&amp;gt;awscli)
-  Downloading futures-3.0.5-py2-none-any.whl
-Collecting jmespath&amp;lt;1.0.0,&amp;gt;=0.7.1 (from botocore==1.3.28-&amp;gt;awscli)
-  Downloading jmespath-0.9.0-py2.py3-none-any.whl
-Collecting python-dateutil&amp;lt;3.0.0,&amp;gt;=2.1 (from botocore==1.3.28-&amp;gt;awscli)
-  Downloading python_dateutil-2.4.2-py2.py3-none-any.whl (188kB)
-    100% |████████████████████████████████| 192kB 2.7MB/s 
-Installing collected packages: pyasn1, rsa, futures, jmespath, six, python-dateutil, docutils, botocore, s3transfer, colorama, awscli
-  Running setup.py install for docutils ... done
-  Running setup.py install for colorama ... done
-Successfully installed awscli-1.10.6 botocore-1.3.20 colorama-0.3.3 docutils-0.12 futures-3.0.5 jmespath-0.9.0 pyasn1-0.1.9 python-dateutil-1.5 rsa-3.3 s3transfer-0.0.1 six-1.4.1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;無事アップグレードできました。&lt;br&gt;
-念のためawsコマンドでバージョンを表示します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws --version
-aws-cli/1.10.6 Python/2.7.10 Darwin/15.3.0 botocore/1.3.28
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;最新のバージョンになっているのが確認できました。&lt;/p&gt;
 </content>
   </entry>
 </feed>
