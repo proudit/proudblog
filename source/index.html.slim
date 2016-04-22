@@ -4,17 +4,6 @@ per_page: 10
 --- 
 
 
-- if paginate && num_pages > 1
-  p.paginate
-    | Page 
-    = page_number
-    |  of 
-    = num_pages
-    hr
-  - if prev_page
-    p.paginate
-     i.fa.fa-mail-reply<
-      = link_to 'Previous page', prev_page
 
 - page_articles.each_with_index do |article, i|
 
@@ -43,8 +32,21 @@ per_page: 10
   hr
 
 - if paginate
+
+  - if prev_page
+    p.paginate
+     i.fa.fa-mail-reply<
+      = link_to 'Previous page', prev_page
+
   - if next_page
     br
     p.paginate
      i.fa.fa-mail-forward<
       = link_to 'Next page', next_page
+
+  - if paginate && num_pages > 1
+    p.paginate
+      | Page 
+      = page_number
+      |  of 
+      = num_pages
