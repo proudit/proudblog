@@ -1,5 +1,5 @@
 ---
-title: AWS CLIでAWS Account IDを取得する。
+title: s3cmdをインストールしてIDCFクラウドのオブジェクトストレージにバケットを作成する。
 date: 2016-04-20
 tags: s3cmd, IDCF
 author: kohei
