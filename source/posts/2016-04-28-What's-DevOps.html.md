@@ -73,7 +73,7 @@ DevOpsと一言にいっても、会社により実践方法は様々あって�
 他の業界よりもスピード感があるIT業界ですが、今後どのように成長していくのかとても楽しみです。
 
 <br>
-参考サイト
+★今回参考にさせて頂いたサイト
 http://www.atmarkit.co.jp/ait/articles/1512/17/news160.html
 http://www.atmarkit.co.jp/ait/articles/1512/23/news026.html
 http://it.impressbm.co.jp/articles/-/12455
