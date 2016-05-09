@@ -1,7 +1,7 @@
 ---
 title: 第１回 AWSとIDCFをVPN接続する - IDCF準備編（全４回）
 date: 2016-05-02
-tags: IDCFクラウド AWS VPN VyOS vpc 
+tags: IDCFクラウド, AWS, VPN, VyOS, vpc 
 author: kohei
 ---
 
@@ -115,5 +115,5 @@ VyOSでFWでポート4500(UDP)とポート500(UDP)を許可しているのがVPN
 
 次回はAWS側でゲートウェイを準備します。
 
-[>> 第２回 AWSとIDCFをVPN接続する（全４回）](http://qiita.com/kooohei/items/fbc6b32f5a70bf3cfa20)
+[>> 第２回 AWSとIDCFをVPN接続する - AWS準備編（全４回）](http://qiita.com/kooohei/items/fbc6b32f5a70bf3cfa20)
 

@@ -5,16 +5,133 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-05-02T09:00:00+09:00</updated>
+  <updated>2016-05-09T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
+    <title>第２回 AWSとIDCFをVPN接続する - AWS準備編（全４回）</title>
+    <link rel="alternate" href="http://blog.url.com/2016/05/09/how-the-vpn-connection-to-AWS-and-IDCF-2.html"/>
+    <id>http://blog.url.com/2016/05/09/how-the-vpn-connection-to-AWS-and-IDCF-2.html</id>
+    <published>2016-05-09T09:00:00+09:00</published>
+    <updated>2016-05-09T12:37:00+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/906a6ce1352285e793d5"&gt;&amp;lt;&amp;lt; 前回：第１回 AWSとIDCFをVPN接続する - IDCF準備編（全４回）&lt;/a&gt;&lt;br&gt;
+IDCFクラウドにVyOSで仮想マシンを作成して、IDCFクラウドとAWSをVPNで接続する設定を説明します。&lt;br&gt;
+&lt;img alt="idcf-vpn-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9b15d672-f654-ab05-fb61-57cf8951b58e.png" /&gt;&lt;br&gt;
+前回はIDCF側にVyOSを利用してVPNゲートウェイを作成しました。&lt;br&gt;
+&lt;img alt="idcf-vpn-2.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/903a6791-fb65-6fd3-5ecd-566c1a605c52.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回はAWS側のVPNゲートウェイの作成を行います。&lt;br&gt;
+&lt;img alt="idcf-vpn-3.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a8160ab4-f708-851a-40a1-a2239a67e2f5.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="ゲートウェイの作成---aws"&gt;ゲートウェイの作成 - AWS&lt;/h2&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;・AWSマネージメントコンソールにログインします。&lt;br&gt;
+&lt;a href="https://signin.aws.amazon.com/"&gt;https://signin.aws.amazon.com/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・「サービス &amp;gt; すべてのAWSサービス &amp;gt; VPC」をクリックします。&lt;br&gt;
+&lt;img alt="idcf-vpn_2_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3c1e1978-9981-2dc9-4bc2-9a80f2f581f1.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・「仮想プライベートゲートウェイ &amp;gt; 仮想プライベートゲートウェイの作成」をクリックします。&lt;br&gt;
+&lt;img alt="idcf-vpn_2_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/84c49d16-2f80-28a5-c581-7c1034ab22c4.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・「ネームタグ」を入力し「作成」をクリックします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;ネームタグ：VGW-ToIDCF
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img alt="idcf-vpn_2_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7865dcbf-7799-2053-cfbf-5cbd6bd402d9.png" /&gt;&lt;br&gt;
+&lt;img alt="idcf-vpn_2_04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/0dcf384c-7121-e8e7-388a-47c72f1f4236.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・「カスタマーゲートウェイ &amp;gt; カスタマーゲートウェイの作成」をクリックします。&lt;br&gt;
+&lt;img alt="idcf-vpn_2_05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/bbe6ee08-bd67-7e9f-aea2-4ae2c2e9596c.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・各項目を入力し「作成」をクリックします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;ネームタグ：VPNRouterToIDCF
+ルーティング：静的(ここでは動的どちらでもOK)
+IPアドレス：xxx.xxx.xxx.xxx（VPN-IDCFのIPを入力）※
+BGP ASN：65000(動的の場合は指定)
+※第１回 AWSとIDCFをVPN接続する（全４回）の「IPアドレスの設定」で取得したIPです。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img alt="idcf-vpn_2_06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/60665788-eb03-624a-7740-c617535df9d7.png" /&gt;&lt;br&gt;
+&lt;img alt="idcf-vpn_2_07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/0a040c13-9c94-4ee7-da69-e2442031abc9.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・VPN接続の作成：「VPN接続 &amp;gt; VPN接続の作成」をクリックします。&lt;br&gt;
+&lt;img alt="idcf-vpn_2_08.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/18e8f26e-49e1-4c9d-36fc-ffcf48f1f57d.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・各項目を入力し「作成」をクリックします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;ネームタグ：VPNConnectToIDCF
+仮想プライベートゲートウェイ：さっき作成した仮想プライベートゲートウェイ
+カスタマーゲートウェイ：既存(さっき作成したカスタマーゲートウェイ)
+ルーティングオプション：動的(BGPが必要)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img alt="idcf-vpn_2_09.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/c85f1397-8f10-d704-4192-e9c0257d9121.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・設定のダウンロード&lt;br&gt;
+作成したVPN接続を選択し「設定のダウンロード」をクリックします。&lt;br&gt;
+&lt;img alt="idcf-vpn_2_10.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/45699772-b199-d6ef-0210-e3aecfde52d9.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・Vyattaを選択し「ダウンロード」をクリックしてConfigをダウンロードします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;ベンダー：Vyatta
+プラットフォーム：Vyatta Network OS
+ソフトウェア：Vyatta Network OS 6.5+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img alt="idcf-vpn_2_12.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/d1da47b7-051b-d5a4-de57-79f72ac46887.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="vpcへのアタッチ"&gt;VPCへのアタッチ&lt;/h2&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;・対象となる「仮想プライベートゲートウェイ」を選択して「VPCにアタッチ」します。&lt;br&gt;
+&lt;img alt="idcf-vpn_3_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b5a6bb85-ec13-83bb-ba6a-0f0decd0af5d.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・アタッチしたい「VPC」を選んで「アタッチ」をクリックします。&lt;br&gt;
+&lt;img alt="idcf-vpn_3_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f5d48024-7396-4036-9c8b-50bf6bddbf69.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;これでAWS側のVPNゲートウェイの作成が完了しました。あとは両方で作成したVPNゲートウェイを繋げる設定をしてあげるだけです。&lt;/p&gt;
+
+&lt;p&gt;ということで次回はIDCF側で作成したVPNゲートウェイに繋げるための設定を行います。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/f16dcb9e7280b29deee7"&gt;&amp;gt;&amp;gt; 次回：第３回 AWSとIDCFをVPN接続する - VPN接続編（全４回）&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>第１回 AWSとIDCFをVPN接続する - IDCF準備編（全４回）</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/02/how-the-vpn-connection-to-AWS-and-IDCF.html"/>
-    <id>http://blog.url.com/2016/05/02/how-the-vpn-connection-to-AWS-and-IDCF.html</id>
+    <link rel="alternate" href="http://blog.url.com/2016/05/02/how-the-vpn-connection-to-AWS-and-IDCF-1.html"/>
+    <id>http://blog.url.com/2016/05/02/how-the-vpn-connection-to-AWS-and-IDCF-1.html</id>
     <published>2016-05-02T09:00:00+09:00</published>
-    <updated>2016-05-02T13:51:10+09:00</updated>
+    <updated>2016-05-09T12:37:17+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -138,8 +255,95 @@ SSH            接続元IP      TCP      22
 &lt;p&gt;今回は基本的にIDCFクラウドで仮想マシンを作成するための作業と同じです。&lt;br&gt;
 VyOSでFWでポート4500(UDP)とポート500(UDP)を許可しているのがVPN特有の設定です。&lt;/p&gt;
 
-&lt;p&gt;次回はAWS側でゲートウェイを準備します。&lt;br&gt;
-&lt;a href="http://qiita.com/kooohei/items/fbc6b32f5a70bf3cfa20"&gt;&amp;gt;&amp;gt; 第２回 AWSとIDCFをVPN接続する（全４回）&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;次回はAWS側でゲートウェイを準備します。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/fbc6b32f5a70bf3cfa20"&gt;&amp;gt;&amp;gt; 第２回 AWSとIDCFをVPN接続する - AWS準備編（全４回）&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>DevOpsってなんだろう？</title>
+    <link rel="alternate" href="http://blog.url.com/2016/04/28/What's-DevOps.html"/>
+    <id>http://blog.url.com/2016/04/28/What's-DevOps.html</id>
+    <published>2016-04-28T09:00:00+09:00</published>
+    <updated>2016-05-07T22:18:34+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;数年前からよく耳にするようになったDevOps。&lt;br&gt;
+実際私はここ1年の間に初めて出会ったコトバです。一体何なんでしょう？&lt;/p&gt;
+
+&lt;p&gt;調べて自分なりに解釈した内容を簡単にまとめてみました。&lt;br&gt;
+それではいってみましょー。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;DevOpsとは、開発（Development）と運用（Operations）
+が協力し、ビジネス要求に対して、より柔軟に、
+スピーディに対応できるシステムを作り上げるためのプラクティス。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;引用元：&lt;a href="http://www.atmarkit.co.jp/ait/articles/1307/02/news002.html"&gt;http://www.atmarkit.co.jp/ait/articles/1307/02/news002.html&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;方法論のようなものなのでしょうか。&lt;/p&gt;
+
+&lt;h1 id="誤解されてきたdevops"&gt;誤解されてきたDevOps&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;調べていくと諸説あり、2013年から現在まで考え方も変わってきているようです。&lt;br&gt;
+変わっている、というよりしっかりと理解されていなかった、という意見がちらほら。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;DevOpsという考え方が日本に入ってきた当初は、このツールを使ったからDevOps！自動化したからDevOps！といった解釈が一人歩きしてしまい、本質よりも先にその解釈が浸透してしまっていたようです。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="結局devopsってなんなの？"&gt;結局DevOpsってなんなの？&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;一体何をすることなのか？何を使えば？といった方法論が多く語られていますが、&lt;br&gt;
+実は一番大切なのは&lt;em&gt;「なぜやる必要があるのか？」&lt;/em&gt;という部分のようです。&lt;br&gt;
+単なるツールや、プラクティス、開発と運用の協力、という単純な話ではないみたい。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;DevOpsの本質は、&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;「10deploys/Day」1日に10回デプロイできること。
+10回に限らず、1日のうちに何度でもデプロイすること。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;スピードのある開発を目指しましょう。&lt;/p&gt;
+
+&lt;p&gt;いかに早く新規サービスを作り出し、いかに早く、多くの変更を加えてサービスを成長させていくことができるのか。&lt;br&gt;
+最終的な目的は「ビジネスの成長」ということですかね。&lt;/p&gt;
+
+&lt;p&gt;これを実現するために自動化や、ツールの導入、組織や文化をどうするのか、etc...&lt;br&gt;
+ここへきて初めてツール云々の話になるんですね。&lt;/p&gt;
+
+&lt;p&gt;DevOpsと一言にいっても、会社により実践方法は様々あっていい。&lt;br&gt;
+やり方が違っても、DevOpsに対する解釈は大きな違いがないのです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="さいごに"&gt;さいごに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;色々調べてみるとかなり奥が深かったDdvOps...&lt;/p&gt;
+
+&lt;p&gt;今後ますます加速していくであろうサービス開発にきっちり対応し、&lt;br&gt;
+より良いサービスを作る、様々なビジネスチャンスを生み出していけるようにしていこう！&lt;/p&gt;
+
+&lt;p&gt;そこでわたしたち運用会社もその助けができるよう、更には自分たちも&lt;br&gt;
+飛躍していけるように頑張っていかなくてはいけないんだなと、感じました。&lt;/p&gt;
+
+&lt;p&gt;他の業界よりもスピード感があるIT業界ですが、今後どのように成長していくのかとても楽しみです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+★今回参考にさせて頂いたサイト&lt;br&gt;
+&lt;a href="http://www.atmarkit.co.jp/ait/articles/1512/17/news160.html"&gt;http://www.atmarkit.co.jp/ait/articles/1512/17/news160.html&lt;/a&gt;&lt;br&gt;
+&lt;a href="http://www.atmarkit.co.jp/ait/articles/1512/23/news026.html"&gt;http://www.atmarkit.co.jp/ait/articles/1512/23/news026.html&lt;/a&gt;&lt;br&gt;
+&lt;a href="http://it.impressbm.co.jp/articles/-/12455"&gt;http://it.impressbm.co.jp/articles/-/12455&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -147,7 +351,7 @@ VyOSでFWでポート4500(UDP)とポート500(UDP)を許可しているのがVPN
     <link rel="alternate" href="http://blog.url.com/2016/04/25/docker-how-to-install.html"/>
     <id>http://blog.url.com/2016/04/25/docker-how-to-install.html</id>
     <published>2016-04-25T09:00:00+09:00</published>
-    <updated>2016-04-25T17:47:04+09:00</updated>
+    <updated>2016-05-07T22:18:34+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -186,7 +390,7 @@ VyOSでFWでポート4500(UDP)とポート500(UDP)を許可しているのがVPN
     <link rel="alternate" href="http://blog.url.com/2016/04/22/create-csr-openssl.html"/>
     <id>http://blog.url.com/2016/04/22/create-csr-openssl.html</id>
     <published>2016-04-22T09:00:00+09:00</published>
-    <updated>2016-04-25T17:36:33+09:00</updated>
+    <updated>2016-05-07T22:18:34+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -310,7 +514,7 @@ Certificate Request:
     <link rel="alternate" href="http://blog.url.com/2016/04/20/make-bucket-by-s3cmd.html"/>
     <id>http://blog.url.com/2016/04/20/make-bucket-by-s3cmd.html</id>
     <published>2016-04-20T09:00:00+09:00</published>
-    <updated>2016-04-25T17:38:14+09:00</updated>
+    <updated>2016-05-07T22:18:34+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -504,184 +708,6 @@ s3cmdのコマンドについてIDCフロンティアのサイトに載ってい
 &lt;a href="http://inaba-serverdesign.jp/blog/20151212/s3cmd_awscli_s3_idcf.html"&gt;s3cmdじゃなくてawscli s3を使おう～IDCFクラウドオブジェクトストレージでも&lt;/a&gt;&lt;br&gt;
 しかも検証によるとそっちの方が早いという結果が出たとのこと。&lt;br&gt;
 そこについては今度自分でも検証しようと思います。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>今話題のサーバレスとは？</title>
-    <link rel="alternate" href="http://blog.url.com/2016/04/15/server-less-toha.html"/>
-    <id>http://blog.url.com/2016/04/15/server-less-toha.html</id>
-    <published>2016-04-15T09:00:00+09:00</published>
-    <updated>2016-04-18T12:34:53+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;&lt;font size=2&gt;&lt;br&gt;
-最近話題になってきているサーバレス、我が社でも熱いトピックです。&lt;br&gt;
-ただ、インフラ知識ほぼゼロに等しいわたしからしてみると、&lt;br&gt;
-サーバレスという言葉を聞いた時、『？？？？』。&lt;br&gt;
-サーバレスってことはサーバがいらないってこと！？じゃあどうやってシステム動くの？&lt;br&gt;
-分からないことだらけです。&lt;/p&gt;
-
-&lt;p&gt;ということで調べてみました。&lt;br&gt;
-素人目線の見解なので、ツッコミポイントも多いと思いますが...ご容赦ください。&lt;br&gt;
-&lt;/font&gt;&lt;/p&gt;
-
-&lt;h1 id="サーバレスとは"&gt;サーバレスとは&lt;/h1&gt;
-
-&lt;p&gt;特に決まった定義は今のところ存在しないようです。&lt;/p&gt;
-
-&lt;p&gt;色々と調べていく中で一番しっくり来たのがこれ。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-&lt;em&gt;オンプレミスで運用していた時代から基盤の主がクラウドへ移り、システムのメンテナンス性や拡張性を柔軟にするために、クラウドの管理までなくしてしまう、サーバレスアーキテクチャという考え方が注目されています。&lt;br&gt;
-&lt;a href="http://www.kobelcosys.co.jp/column/itwords/20160401/"&gt;http://www.kobelcosys.co.jp/column/itwords/20160401/&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-実際、”レス”といってもサーバ自体が全く無いわけではないです。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-例えばサーバレスを実現するために&lt;/p&gt;
-
-&lt;p&gt;&amp;quot;AWS S3＋API Gateway ＋ Lambda&amp;quot;&lt;/p&gt;
-
-&lt;p&gt;を利用したとします。&lt;/p&gt;
-
-&lt;p&gt;これらは全てAWSのサービスなのでサーバの管理はAWS側でやってくれます。&lt;/p&gt;
-
-&lt;p&gt;サーバ自体は存在していますが、管理が不要なのでサーバの存在を意識せずに運用をすることができます。&lt;br&gt;
-この”存在を意識しない”というところがサーバレスのポイントなのかな、と思います。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-※AWSを使ったサーバレスとは上記のようなサービスを使う、ということの他にEC2やRDSを使わ無い。という考え方もあるようです。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="サーバレスのメリット"&gt;サーバレスのメリット&lt;/h1&gt;
-
-&lt;p&gt;・サーバの管理が不要&lt;br&gt;
-セキュリティのアップデートやバックアップ、容量可変など、サーバ保守が不要になる。&lt;br&gt;
-もちろん構築も不要。&lt;/p&gt;
-
-&lt;p&gt;・コストパフォーマンスに優れている&lt;br&gt;
-管理が不要になる分、人件費もその分カットされ、尚且つサーバレスはプログラムの処理が必要な時だけ動作させることができます。AWSなども利用料で課金されるので必要な時だけ動作するこの仕組みは非常にコストパフォーマンスに優れていると言えます。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-これだけ見ていると、サーバレスってインフラ屋さんがいなくても大丈夫なのでは？と思ってしまうのですが。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-例えば、短期的なキャンペーンサイトを作らなければならないとなった場合。&lt;br&gt;
-まずサーバの手配をしなければなりません。&lt;br&gt;
-ほぼ静的なサイトなので、サーバレス程度の基盤で十分。時間もコストもかけずに環境を用意したい。&lt;br&gt;
-サーバレスなんてどうだろう？&lt;br&gt;
-でも一体サーバレスな環境ってどうやって用意するの？&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-といった時に何も気にせずサーバレスの環境を提供してもらえたら嬉しいですよね。&lt;br&gt;
-こういうサービスを提供するのもインフラ屋さんのお仕事だと思っています。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-もちろんサーバレスを提供する上でのコストも抑えられているので、お客様にも低価格で&lt;br&gt;
-サーバレス環境を素早く提供することが可能になります。&lt;br&gt;
-また、実際利用してみるとサーバレスでは不十分という場合にも、他のサービスを組み合わせて最適な環境を作り出すお手伝いができます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="所感"&gt;所感&lt;/h1&gt;
-
-&lt;p&gt;この記事を書くまでも色々なサイトを調べ、やっとまとまってきた感じなのですが、それでもまだほわーーんとしている状態です(笑)&lt;/p&gt;
-
-&lt;p&gt;どの方も述べられているのが、サーバレスとはまだ未発達の分野であり、決まった定義がないということ。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-オンプレミス→クラウド→サーバレス&lt;/p&gt;
-
-&lt;p&gt;と時代はどんどん変化していますが、変化する一番の要因はより時間とコストをかけず、&lt;br&gt;
-いかに楽に柔軟に運用できるか、ということ。&lt;br&gt;
-そしてその変化のスピードが速いのもこの業界ならでは。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-インフラってあるのが当たり前であり、動いているのが当たり前。&lt;br&gt;
-はっきり言ってエンドユーザにとっては全く意識されていない裏の世界。&lt;br&gt;
-だからこそそこに従事しているエンジニアが少しでも楽をして、尚且つ更に＋αのサービスを作り出すことができるようになればいいですよね。&lt;br&gt;
-その上でサーバレスアーキテクチャというものが今注目されているのかな、と。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>子供の写真保管方法〜便利なフォトブックサービス〜</title>
-    <link rel="alternate" href="http://blog.url.com/2016/04/12/photobook-service.html"/>
-    <id>http://blog.url.com/2016/04/12/photobook-service.html</id>
-    <published>2016-04-12T09:00:00+09:00</published>
-    <updated>2016-04-18T12:34:53+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="写真の保管どうしてますか？"&gt;写真の保管どうしてますか？&lt;/h1&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-スマートフォンで手軽に写真が撮れてしまう時代。&lt;br&gt;
-ついつい撮った写真は保存したまま溜まっていて、容量も増えて整理が追いつかずにどうしよう？と思うこともしばしば。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;特に子供の写真データってなかなか消せないんですよね(汗)&lt;br&gt;
-我が家は定期的に、外付けHDDやCD-Rにデータを移して保管しています。&lt;br&gt;
-ただ、別媒体に移してしまったデータってなかなか見る機会ないですよね。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="手軽に作れるフォトブックとは？"&gt;手軽に作れるフォトブックとは？&lt;/h1&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-こんな時に便利なのが、フォトブック！&lt;/p&gt;
-
-&lt;p&gt;ネットで検索するとフォトブックを扱っているサイトはたくさんあります。&lt;br&gt;
-我が家で利用しているのは、今の所２つ。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;★TOLOT&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://tolot.com/lp/cost/?acc=ga&amp;gclid=CPGemdbXhcwCFVMIvAod11YECA" target="_blank"&gt;&lt;a href="http://tolot.com/lp/cost/?acc=ga&amp;amp;gclid=CPGemdbXhcwCFVMIvAod11YECA"&gt;http://tolot.com/lp/cost/?acc=ga&amp;amp;gclid=CPGemdbXhcwCFVMIvAod11YECA&lt;/a&gt;&lt;/a&gt;&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;ページ数64ページで500円！&lt;br&gt;
-ワンコインで作れます。&lt;/p&gt;
-
-&lt;p&gt;スマートフォンアプリで作成も可能で手軽に作れる一冊。&lt;br&gt;
-PCを開かずにできちゃいます！&lt;/p&gt;
-
-&lt;p&gt;本のサイズやページ数などパターンは限られいますが、コンパクトな作りで何と言っても安くて手軽なので、&lt;br&gt;
-生後すぐのお子さんの一ヶ月ごとの記録を残しておきたい、遠く離れたおじいちゃんおばあちゃんへの定期的な子供の成長報告なんかにもおすすめです。&lt;/p&gt;
-
-&lt;p&gt;また写真入りのスケジュール張やお薬手帳なんかも作ることができちゃいます！&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;利用したことはありませんが、[&lt;a href="http://nohana.jp/" target="_blank"&gt;ノハナ&lt;/a&gt;]では毎月一冊無料(送料別)で作れちゃうサービスもあるようです。&lt;br&gt;
-これもTOLOTと同じようにとても手軽なサービスだと思います。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;★しまうまプリント&lt;/strong&gt;&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="https://www.n-pri.jp/photobook/" target="_blank"&gt;&lt;a href="https://www.n-pri.jp/photobook/"&gt;https://www.n-pri.jp/photobook/&lt;/a&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;本サイズやページ数にいくつか種類があり、ページレイアウトデザインも複数から選択できます。&lt;/p&gt;
-
-&lt;p&gt;我が家は年間の総まとめとしてこちらを利用しています。&lt;br&gt;
-こちらの場合は、表紙としてカバーがつく、文字フォントもいくつか選べるなど、TOLOTより自由度があります。&lt;br&gt;
-ちょうど先月息子が２歳の誕生日を迎えたので、近々２冊目を作る予定です。&lt;/p&gt;
-
-&lt;p&gt;両者ともに値段も良心的でクオリティも十分です。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="最後に"&gt;最後に&lt;/h1&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;上記2つ以外にもフォトブックを作成できるサービスはたくさんあります！&lt;/p&gt;
-
-&lt;p&gt;もちろんお子さんの成長記録だけでなく、友人への贈り物、旅行の記録、色々な用途で利用できるフォトブックサービス。&lt;/p&gt;
-
-&lt;p&gt;値段も手頃なものが多いので、写真をプリントしてアルバムを整理して、というのが面倒だな、苦手だなという人にはおすすめ。&lt;/p&gt;
-
-&lt;p&gt;スマートフォンやPCの中で眠ったままの写真を是非フォトブックにしてみてください！&lt;br&gt;
-&lt;div style="text-align:center"&gt;&lt;br&gt;
-&lt;font size="2"&gt;&lt;br&gt;
-&lt;img alt="jawsdays" src="/images/./2016/0412_photobook/20160412_photobook_01.jpg" /&gt;&lt;br&gt;
-1歳の誕生日記念に作ったフォトブックを眺める息子。&lt;br&gt;
-&lt;/font&gt;&lt;br&gt;
-&lt;/div&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>
