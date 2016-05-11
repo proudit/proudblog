@@ -1,7 +1,7 @@
 ---
 title: 2016年ゴールデンウィーク！
 date: 2016-05-11
-tags: 日常,holiday
+tags: holiday
 author: ayako
 ---
 
