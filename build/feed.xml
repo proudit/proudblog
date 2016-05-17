@@ -5,10 +5,139 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-05-09T09:00:00+09:00</updated>
+  <updated>2016-05-16T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>第３回 AWSとIDCFをVPN接続する - VPN接続編（全４回）</title>
+    <link rel="alternate" href="http://blog.url.com/2016/05/16/how-the-vpn-connection-to-AWS-and-IDCF-3.html"/>
+    <id>http://blog.url.com/2016/05/16/how-the-vpn-connection-to-AWS-and-IDCF-3.html</id>
+    <published>2016-05-16T09:00:00+09:00</published>
+    <updated>2016-05-16T16:28:27+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/fbc6b32f5a70bf3cfa20"&gt;&amp;lt;&amp;lt; 前回：第２回 AWSとIDCFをVPN接続する - AWS準備編（全４回）&lt;/a&gt;&lt;br&gt;
+IDCFクラウドにVyOSで仮想マシンを作成して、IDCFクラウドとAWSをVPNで接続する設定を説明します。&lt;br&gt;
+&lt;img alt="idcf-vpn-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9b15d672-f654-ab05-fb61-57cf8951b58e.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ここまでで、IDCFとAWSの両方にVPNゲートウェイのを用意するところまで完了しました。&lt;br&gt;
+前回の「VPN接続の作成」の際に「設定のダウンロード」を行っているのであとはそのAWS側で取得したコンフィグをIDCF側で設定してあげれば接続できるようになります。&lt;br&gt;
+ということで今回はIDCFとAWS間の接続設定を行います。&lt;br&gt;
+&lt;img alt="idcf-vpn-4.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/2111d578-734d-ad00-1175-1c6bce14db14.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="vpn接続設定---idcf"&gt;VPN接続設定 - IDCF&lt;/h2&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;・VyOSへログイン&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ssh vyos@&amp;lt;サーバーIP&amp;gt; -i &amp;lt;鍵のパス&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・コンフィグの流し込み&lt;br&gt;
+前回の&lt;a href="#"&gt;第２回 AWSとIDCFをVPN接続する（全４回）&lt;/a&gt;で「VPN接続の作成」の「設定をダウンロード」した際にダウンロードしたコンフィグを流し込みます。(コピペでOK)&lt;br&gt;
+もしうまくいかない場合はコメントアウト（先頭に「!」がある行)を除いてみてください。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・VPC Tunnelのlocal-address設定&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;vyos@vyos# set vpn ipsec site-to-site peer 52.192.68.69 local-address 10.13.0.146
+[edit]
+vyos@vyos# set vpn ipsec site-to-site peer 52.193.106.189 local-address 10.13.0.146
+[edit]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・設定の保存&lt;br&gt;
+設定を保存します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;vyos@vyos# commit
+[edit]
+vyos@vyos# save
+Saving configuration to '/config/config.boot'...
+Done
+[edit]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・IPsec再起動&lt;br&gt;
+基本的には設定を保存した時点で接続されますが、一応再起動しておきます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo /etc/init.d/ipsec restart
+Restarting strongswan IPsec services: ipsecStopping strongSwan IPsec...
+Starting strongSwan 4.5.2 IPsec [starter]...
+.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・接続確認&lt;br&gt;
+vti0とvti1がAWSと接続しているtunnelです。どちらもu/u(Up)しているのが確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ show interfaces
+Codes: S - State, L - Link, u - Up, D - Down, A - Admin Down
+Interface        IP Address                        S/L  Description
+---------        ----------                        ---  -----------
+eth0             10.13.0.146/21                    u/u
+lo               127.0.0.1/8                       u/u
+                 ::1/128
+vti0             169.254.25.22/30                  u/u  VPC tunnel 1
+vti1             169.254.24.82/30                  u/u  VPC tunnel 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここでもvti0とvti1がconnectedと成っているが確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ show ip route
+Codes: K - kernel route, C - connected, S - static, R - RIP, O - OSPF,
+       I - ISIS, B - BGP, &amp;gt; - selected route, * - FIB route
+
+S&amp;gt;* 0.0.0.0/0 [210/0] via 10.13.0.1, eth0
+C&amp;gt;* 10.13.0.0/21 is directly connected, eth0
+C&amp;gt;* 127.0.0.0/8 is directly connected, lo
+C&amp;gt;* 169.254.24.80/30 is directly connected, vti1
+C&amp;gt;* 169.254.25.20/30 is directly connected, vti0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;「VPC tunnel 1と2」2つのvti接続が確認でき、どちらもStateがupと成っています。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ show vpn ipsec sa
+Peer ID / IP                            Local ID / IP
+------------                            -------------
+52.192.68.69                            10.13.0.146
+
+    Description: VPC tunnel 1
+
+    Tunnel  State  Bytes Out/In   Encrypt  Hash    NAT-T  A-Time  L-Time  Proto
+    ------  -----  -------------  -------  ----    -----  ------  ------  -----
+    vti     up     7.4K/6.6K      aes128   sha1    yes    1587    3600    all
+
+Peer ID / IP                            Local ID / IP
+------------                            -------------
+52.193.106.189                          10.13.0.146
+
+    Description: VPC tunnel 2
+
+    Tunnel  State  Bytes Out/In   Encrypt  Hash    NAT-T  A-Time  L-Time  Proto
+    ------  -----  -------------  -------  ----    -----  ------  ------  -----
+    vti     up     7.5K/4.9K      aes128   sha1    yes    1262    3600    all
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;また、AWS側は以下で確認できます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;以上で無事IDCF-AWS間をVPN接続できました。&lt;br&gt;
+ただ、これだけではただ繫っただけでサーバー間で通信を行うには不完全です。&lt;br&gt;
+ということで、次回は最後の仕上げとして通信を行うための設定を行います。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/6ba28436485096100161"&gt;&amp;gt;&amp;gt; 最終回：第４回 AWSとIDCFをVPN接続する - 最後の仕上げ編（全４回）&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>第２回 AWSとIDCFをVPN接続する - AWS準備編（全４回）</title>
     <link rel="alternate" href="http://blog.url.com/2016/05/09/how-the-vpn-connection-to-AWS-and-IDCF-2.html"/>
@@ -507,207 +636,6 @@ Certificate Request:
 
 &lt;p&gt;周りに助けられながら無事に終わりました。&lt;br&gt;
 次回からはもうこれで大丈夫！！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>s3cmdをインストールしてIDCFクラウドのオブジェクトストレージにバケットを作成する。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/04/20/make-bucket-by-s3cmd.html"/>
-    <id>http://blog.url.com/2016/04/20/make-bucket-by-s3cmd.html</id>
-    <published>2016-04-20T09:00:00+09:00</published>
-    <updated>2016-05-07T22:18:34+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;コマンドを利用してIDCFクラウドのオブジェクトストレージへアクセスするにはs3cmdを利用するのが一般的のようです。&lt;br&gt;
-一応、IDCフロンティアのサイトにも載ってました。&lt;br&gt;
-&lt;a href="http://www.idcf.jp/help/storage/guide/s3cmd_guide.html"&gt;IDCF - [Linux]サードパーティのツールご利用ガイド s3cmd のご利用方法&lt;/a&gt;&lt;br&gt;
-とはいえ、動作保証やサポートはされていないみたいですが。。。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="オブジェクトストレージとは"&gt;オブジェクトストレージとは&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;ファイルシステムのようにデータをファイルやブロック単位で扱うのではなく、オブジェクトという単位で扱うストレージです。&lt;br&gt;
-また、ファイルシステムではないので階層構造がなく、オブジェクト同士はフラットな関係になっています。&lt;br&gt;
-基本的にデータサイズや保存数に制限がないため、大容量のデータを扱うことに適しています。&lt;br&gt;
-今回は&lt;a href="http://www.idcf.jp/cloud/storage/"&gt;IDCFクラウドのオブジェクトストレージ&lt;/a&gt;ですが、他にも&lt;a href="https://aws.amazon.com/jp/s3/"&gt;AWSのAmazon S3&lt;/a&gt;や&lt;a href="https://azure.microsoft.com/ja-jp/services/storage/"&gt;MicrosoftのAzure Storage&lt;/a&gt;などが有名です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="s3cmdインストール"&gt;s3cmdインストール&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;とりあえず今回はMacOSとUbuntuのインストールを行いました。&lt;br&gt;
-&lt;strong&gt;・MacOSの場合&lt;/strong&gt;&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo brew install s3cmd
-==&amp;gt; Downloading https://homebrew.bintray.com/bottles/s3cmd-1.6.0.el_capitan.bottle.tar.gz
-######################################################################## 100.0%
-==&amp;gt; Pouring s3cmd-1.6.0.el_capitan.bottle.tar.gz
-🍺  /usr/local/Cellar/s3cmd/1.6.0: 55 files, 738.3K
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-&lt;strong&gt;・Ubuntuの場合&lt;/strong&gt;&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ apt-get install s3cmd
-Reading package lists... Done
-Building dependency tree
-Reading state information... Done
-The following NEW packages will be installed:
-  s3cmd
-0 upgraded, 1 newly installed, 0 to remove and 202 not upgraded.
-Need to get 67.6 kB of archives.
-After this operation, 295 kB of additional disk space will be used.
-Get:1 http://jp.archive.ubuntu.com/ubuntu/ trusty/universe s3cmd all 1.1.0~beta3-2 [67.6 kB]
-Fetched 67.6 kB in 0s (1,018 kB/s)
-Selecting previously unselected package s3cmd.
-(Reading database ... 91433 files and directories currently installed.)
-Preparing to unpack .../s3cmd_1.1.0~beta3-2_all.deb ...
-Unpacking s3cmd (1.1.0~beta3-2) ...
-Processing triggers for man-db (2.6.7.1-1) ...
-Setting up s3cmd (1.1.0~beta3-2) ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id=".s3cfgの作成"&gt;.s3cfgの作成&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;インストールができたので、次はs3cmdの設定ファイルとなる.s3cfgを作成します。&lt;br&gt;
-作成は以下のコマンドで行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd --configure
-
-Enter new values or accept defaults in brackets with Enter.
-Refer to user manual for detailed description of all options.
-
-Access key and Secret key are your identifiers for Amazon S3
-Access Key: ********************
-Secret Key: ****************************************
-
-Encryption password is used to protect your files from reading
-by unauthorized persons while in transfer to S3
-Encryption password:
-Path to GPG program [/usr/bin/gpg]:
-
-When using secure HTTPS protocol all communication with Amazon S3
-servers is protected from 3rd party eavesdropping. This method is
-slower than plain HTTP and can't be used if you're behind a proxy
-Use HTTPS protocol [No]:
-
-On some networks all internet access must go through a HTTP proxy.
-Try setting it here if you can't conect to S3 directly
-HTTP Proxy server name:
-
-New settings:
-  Access Key: ********************
-  Secret Key: ****************************************
-  Encryption password:
-  Path to GPG program: /usr/bin/gpg
-  Use HTTPS protocol: False
-  HTTP Proxy server name:
-  HTTP Proxy server port: 0
-
-Test access with supplied credentials? [Y/n] n
-
-Save settings? [y/N] y
-Configuration saved to '/hogehoge/.s3cfg'
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="設定の修正"&gt;設定の修正&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;.s3cfgのhost_baseとhost_bucketの値をIDCFのエンドポイントに変更します。&lt;br&gt;
-エンドポイントは&lt;br&gt;
-「IDCF管理画面 &amp;gt; オブジェクトストレージ &amp;gt; APIユーザー」で対象となるAPIユーザー名をクリックすると確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cd ~/
-$ vi .s3cfg
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;[変更前]
-host_base = s3.amazonaws.com
-host_bucket = %(bucket)s.s3.amazonaws.com
-
-[変更後]
-host_base = ds.jp-east.idcfcloud.com
-host_bucket = %(bucket)s.ds.jp-east.idcfcloud.com
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;また、プライベートコネクトを利用する場合はhost_bucketのエンドポイントの最後を「.local」にする必要があります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;host_bucket = %(bucket)s.ds.jp-east.idcfcloud.local
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;*実際にプライベートコネクトを利用する場合は他にも申請やサーバー設定などが必要となります。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="バケット参照"&gt;バケット参照&lt;/h1&gt;
-
-&lt;hr&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;はじめはバケットがないため、コマンドを実行しても何も返ってきません。&lt;br&gt;
-ただ、もし.s3cfgを変更せずにバケット参照すると以下のようにERRORとなります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
-ERROR: S3 error: 403 (InvalidAccessKeyId): The AWS Access Key Id you provided does not exist in our records.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="バケットの作成"&gt;バケットの作成&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;ということで、バケットを作成してみます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd mb s3://proudit-test
-Bucket 's3://proudit-test/' created
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;再度バケットを参照すると作成できているのが確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
-2016-04-13 05:01  s3://proudit-test
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="バケットの削除"&gt;バケットの削除&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;とりあえず今回は作成まで確認できたので削除します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd rb s3://proudit-test
-Bucket 's3://proudit-test/' removed
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;参照すると何も返ってこないので削除されたのが確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上で完了です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;とりあえず、今回はs3cmdをインストールしてバケットの作成・削除だけ行いました。&lt;br&gt;
-s3cmdのコマンドについてIDCフロンティアのサイトに載っていますので、その他のコマンドについて知りたい方はそちらを参照していただければと思います。&lt;br&gt;
-&lt;a href="https://www.faq.idcf.jp/app/answers/detail/a_id/360/~/s3cmdのコマンド一覧"&gt;IDCF - s3cmdのコマンド一覧&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;また、awsコマンドを利用してもオブジェクトストレージにアクセスできるみたいです。&lt;br&gt;
-&lt;a href="http://inaba-serverdesign.jp/blog/20151212/s3cmd_awscli_s3_idcf.html"&gt;s3cmdじゃなくてawscli s3を使おう～IDCFクラウドオブジェクトストレージでも&lt;/a&gt;&lt;br&gt;
-しかも検証によるとそっちの方が早いという結果が出たとのこと。&lt;br&gt;
-そこについては今度自分でも検証しようと思います。&lt;/p&gt;
 </content>
   </entry>
 </feed>
