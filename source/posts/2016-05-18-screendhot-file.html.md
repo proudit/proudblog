@@ -1,7 +1,7 @@
 ---
 title: スクロールが必要なweb画面のスクリーンショットを撮る方法
 date: 2016-05-18
-tags: スクリーンショット,スクロール,chrome拡張機能
+tags: スクリーンショット,スクロール,chrome拡張機能
 author: ayako
 ---
 
@@ -27,7 +27,7 @@ Google Chromeの拡張機能「Full Page Screen Capture』
 
 [追加方法]
 
-・chrome ＞　環境設定　＞　詳細設定　＞　ユーザー補助機能をさら　に追加
+・chrome ＞　環境設定　＞　詳細設定　＞　ユーザー補助機能をさら　に追加
 
 ・chromeウェブストアが出てくるので、そこでFull Page Screen Captureを検索！
 
