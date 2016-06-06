@@ -5,16 +5,84 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-05-30T09:00:00+09:00</updated>
+  <updated>2016-06-06T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>AWS S3バケットに独自ドメインを割り当てる。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/06/assign-your-own-domain-to-the-aws-s3-bucket.html"/>
+    <id>http://blog.url.com/2016/06/06/assign-your-own-domain-to-the-aws-s3-bucket.html</id>
+    <published>2016-06-06T09:00:00+09:00</published>
+    <updated>2016-06-06T10:49:41+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;AWS S3に作成したバケットに対して独自ドメインの割り当てを行います。&lt;/p&gt;
+
+&lt;p&gt;これによって静的サイトであればS3のみで完結するため、そこら辺のサーバーを動かすよりも低コストで高安定なサイト運営が可能となります。&lt;/p&gt;
+
+&lt;h2 id="前提条件"&gt;前提条件&lt;/h2&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;今回利用する独自ドメインがRoute53にてドメイン管理できることを前提に行います。
+また、今回割り当てるドメインは「hogehoge.hengjiu.jp」で行います。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケットの作成---s3"&gt;バケットの作成 - S3&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;・S3の「バケットを作成」で新規にバケットを作成します。&lt;br&gt;
+&lt;img alt="s3_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/72f93b5a-c551-b7bc-7bb9-bf2423206291.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;・作成したバケットのプロパティで「ウェブサイトのホスティングを有効にする」に変更して保存します。&lt;br&gt;
+&lt;img alt="s3_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1251fb2c-2e53-a280-36c8-77361267f69f.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="ドメイン登録---route53"&gt;ドメイン登録 - Route53&lt;/h1&gt;
+
+&lt;p&gt;・Route 53のHosted zones で対象のDomain Nameをクリックします。&lt;br&gt;
+&lt;img alt="route53_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1214fea9-685d-02f7-5fd5-8c249b676388.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;・Create Record Setをクリックします。&lt;br&gt;
+&lt;img alt="route53_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ea7ff1e8-4f73-dd82-360f-007c955afd1e.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;・Nameにサブドメイン(hogehoge)を入力し、AliasをYesにしてAlias Target入力状態にするとS3で作成したバケット名「hogehoge.hengjiu.jp」が表示されるので、それを選択して「Create」をします。&lt;br&gt;
+&lt;img alt="route53_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a6859d8d-4df8-a564-f4f2-939aee13ba24.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上で完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;S3バケットに独自ドメインを割り当てるためには「バケット名は割り当てるドメイン名と同じにする」ということに注意が必要です。&lt;/p&gt;
+
+&lt;p&gt;もし、レコード作成時に作成したバケットが表示されない(&lt;em&gt;No Targets Available&lt;/em&gt;)場合は、&lt;br&gt;
+&lt;code&gt;&lt;br&gt;
+・作成したバケットの名前間が違う。&lt;br&gt;
+・ウェブサイトホストティングが有効になっていない。&lt;br&gt;
+&lt;/code&gt;&lt;br&gt;
+などが考えられるのでもう一度確認してみてください。&lt;/p&gt;
+
+&lt;p&gt;また、割り当てる際の作業手順は今回説明したように（S3でバケット作成 → Route53でレコード登録）で行うが良いと思います。&lt;br&gt;
+ですが、どうしても先にレコード登録をする必要がある場合は、Alias Targetに「s3-website-ap-northeast-1.amazonaws.com.」を入力すれば事前に作成しておくことが可能です。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>IDCFクラウドのコマンドラインツールをインストールする。 - MacOSX</title>
     <link rel="alternate" href="http://blog.url.com/2016/05/30/how-to-install-the-idcf-command-line-tool-for-macosx.html"/>
     <id>http://blog.url.com/2016/05/30/how-to-install-the-idcf-command-line-tool-for-macosx.html</id>
     <published>2016-05-30T09:00:00+09:00</published>
-    <updated>2016-05-30T20:30:05+09:00</updated>
+    <updated>2016-06-06T10:40:14+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -693,97 +761,6 @@ Peer ID / IP                            Local ID / IP
 ということで、次回は最後の仕上げとして通信を行うための設定を行います。&lt;/p&gt;
 
 &lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/6ba28436485096100161"&gt;&amp;gt;&amp;gt; 最終回：第４回 AWSとIDCFをVPN接続する - 最後の仕上げ編（全４回）&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>2016年ゴールデンウィーク！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/11/long-Holiday.html"/>
-    <id>http://blog.url.com/2016/05/11/long-Holiday.html</id>
-    <published>2016-05-11T09:00:00+09:00</published>
-    <updated>2016-05-17T12:39:40+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="今年のゴールデンウィークは"&gt;今年のゴールデンウィークは&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;長かったゴールデンウィークも終わってしまいましたね。&lt;br&gt;
-最大で10連休、という方も多かったのではないでしょうか。&lt;br&gt;
-プラウディットのお休みは暦通りでした〜。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;我が家のゴールデンウィークはパパもほぼお仕事だったので遠出はしませんでしが、近場で楽しみましたよ〜！&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="どこに行ったかというと・・・"&gt;どこに行ったかというと・・・&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;連休期間中、“原作出版70周年記念 きかんしゃトーマススペシャルギャラリー”&lt;br&gt;
-なるものが開催されていたので、&lt;br&gt;
-トーマス好きな息子を連れて、おじいちゃん、おばあちゃんと共に行ってきました！&lt;/p&gt;
-
-&lt;p&gt;&lt;font size=5&gt;&lt;/p&gt;
-
-&lt;p&gt;原鉄道模型博物館へ！！&lt;/p&gt;
-
-&lt;p&gt;&lt;/font&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;font size=2&gt;&lt;/p&gt;
-
-&lt;p&gt;この博物館、実は全て個人の方がお持ちになっていた模型やコレクションが展示されているんです！&lt;br&gt;
-詳しいお話はこちらへ⇩&lt;br&gt;
-&lt;a href="http://www.hara-mrm.com/about/index.html"&gt;http://www.hara-mrm.com/about/index.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;/font&gt;&lt;/p&gt;
-
-&lt;p&gt;お目当のトーマスのコーナーは、大きなプラレールのコースにたくさんの&lt;br&gt;
-トーマスの仲間が走っている模型？や、&lt;br&gt;
-トーマスプラレールで遊べる広場がちょこっと。&lt;/p&gt;
-
-&lt;p&gt;スペースは意外に小さかったのですが、子供達はそれぞれトーマスに大興奮していました。&lt;br&gt;
-息子も滞在時間のほぼ8割がたここで遊んでいました。&lt;/p&gt;
-
-&lt;p&gt;あとは、スタンプラリーをしてトーマスのステッカーをゲット！&lt;/p&gt;
-
-&lt;p&gt;その他は鉄道の模型やカメラの展示があり、一番すごかったのは&lt;em&gt;いちばんテツモパーク&lt;/em&gt;という&lt;br&gt;
-蒸気・電気・トロリーの軌道が走る巨大なジオラマ。&lt;br&gt;
-トーマスギャラリーも開催されていたので、トーマスの仲間達も走っていましたー。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="原鉄道模型博物館" src="/images/./2016/0511_holiday/20160511_thomas.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-また連休中のイベントとして、博物館の半券を見せると、ミニ機関車？に乗れることができ、ここも息子のお気に入りでした。&lt;br&gt;
-が、10メートルあるかないかくらいの直線線路を往復する、といったほんとにちょっとした乗り物でした。&lt;/p&gt;
-
-&lt;p&gt;このトーマスのイベントは5月末まで開催されているそうです。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;原鉄道模型博物館、トーマスイベントがやっていたので、&lt;br&gt;
-行ってみましたが多分イベントがなければ２歳の息子には少しレベルが&lt;br&gt;
-高すぎるかもしれません。。&lt;/p&gt;
-
-&lt;p&gt;巨大ジオラマはじーっと見ていましたが、その他の模型はほぼスルーで走り去って行きました。というよりトーマスにむかって一直線でした(笑)&lt;/p&gt;
-
-&lt;p&gt;電車が好きな子、というよりは鉄道模型が好きな大人、&lt;br&gt;
-もうすこし大きい子供向けの施設なのかな、という印象でした。&lt;/p&gt;
-
-&lt;p&gt;この他には別日でみなとみらいでお買い物したり、&lt;br&gt;
-臨港パークでお散歩したりしていました。&lt;br&gt;
-そしてGW中盤に息子は発熱、３日間ほど引きこもりでした・・・。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="臨港パーク" src="/images/./2016/0511_holiday/20160511_myson.jpg" /&gt;&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;次は夏休みですね！どこにいこうかな〜。&lt;br&gt;
-それまでお仕事がんばりましょう！！&lt;/p&gt;
 </content>
   </entry>
 </feed>
