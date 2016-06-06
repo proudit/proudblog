@@ -5,16 +5,641 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-05-16T09:00:00+09:00</updated>
+  <updated>2016-06-06T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>AWS S3バケットに独自ドメインを割り当てる。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/06/assign-your-own-domain-to-the-aws-s3-bucket.html"/>
+    <id>http://blog.url.com/2016/06/06/assign-your-own-domain-to-the-aws-s3-bucket.html</id>
+    <published>2016-06-06T09:00:00+09:00</published>
+    <updated>2016-06-06T10:49:41+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;AWS S3に作成したバケットに対して独自ドメインの割り当てを行います。&lt;/p&gt;
+
+&lt;p&gt;これによって静的サイトであればS3のみで完結するため、そこら辺のサーバーを動かすよりも低コストで高安定なサイト運営が可能となります。&lt;/p&gt;
+
+&lt;h2 id="前提条件"&gt;前提条件&lt;/h2&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;今回利用する独自ドメインがRoute53にてドメイン管理できることを前提に行います。
+また、今回割り当てるドメインは「hogehoge.hengjiu.jp」で行います。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケットの作成---s3"&gt;バケットの作成 - S3&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;・S3の「バケットを作成」で新規にバケットを作成します。&lt;br&gt;
+&lt;img alt="s3_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/72f93b5a-c551-b7bc-7bb9-bf2423206291.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;・作成したバケットのプロパティで「ウェブサイトのホスティングを有効にする」に変更して保存します。&lt;br&gt;
+&lt;img alt="s3_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1251fb2c-2e53-a280-36c8-77361267f69f.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="ドメイン登録---route53"&gt;ドメイン登録 - Route53&lt;/h1&gt;
+
+&lt;p&gt;・Route 53のHosted zones で対象のDomain Nameをクリックします。&lt;br&gt;
+&lt;img alt="route53_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1214fea9-685d-02f7-5fd5-8c249b676388.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;・Create Record Setをクリックします。&lt;br&gt;
+&lt;img alt="route53_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ea7ff1e8-4f73-dd82-360f-007c955afd1e.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;・Nameにサブドメイン(hogehoge)を入力し、AliasをYesにしてAlias Target入力状態にするとS3で作成したバケット名「hogehoge.hengjiu.jp」が表示されるので、それを選択して「Create」をします。&lt;br&gt;
+&lt;img alt="route53_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a6859d8d-4df8-a564-f4f2-939aee13ba24.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上で完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;S3バケットに独自ドメインを割り当てるためには「バケット名は割り当てるドメイン名と同じにする」ということに注意が必要です。&lt;/p&gt;
+
+&lt;p&gt;もし、レコード作成時に作成したバケットが表示されない(&lt;em&gt;No Targets Available&lt;/em&gt;)場合は、&lt;br&gt;
+&lt;code&gt;&lt;br&gt;
+・作成したバケットの名前間が違う。&lt;br&gt;
+・ウェブサイトホストティングが有効になっていない。&lt;br&gt;
+&lt;/code&gt;&lt;br&gt;
+などが考えられるのでもう一度確認してみてください。&lt;/p&gt;
+
+&lt;p&gt;また、割り当てる際の作業手順は今回説明したように（S3でバケット作成 → Route53でレコード登録）で行うが良いと思います。&lt;br&gt;
+ですが、どうしても先にレコード登録をする必要がある場合は、Alias Targetに「s3-website-ap-northeast-1.amazonaws.com.」を入力すれば事前に作成しておくことが可能です。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>IDCFクラウドのコマンドラインツールをインストールする。 - MacOSX</title>
+    <link rel="alternate" href="http://blog.url.com/2016/05/30/how-to-install-the-idcf-command-line-tool-for-macosx.html"/>
+    <id>http://blog.url.com/2016/05/30/how-to-install-the-idcf-command-line-tool-for-macosx.html</id>
+    <published>2016-05-30T09:00:00+09:00</published>
+    <updated>2016-06-06T10:40:14+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;MacOSからIDCFクラウドに対してコマンドラインツールを利用して操作できるようにします。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="事前準備"&gt;事前準備&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;今回インストールするにあたって、gitとpipの２つのコマンドが必要となります。&lt;br&gt;
+なので、まだインストールしていない場合は以下のコマンドでインストールしておいてください。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo brew install git
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ curl -kL https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
+$ sudo easy_install pip
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="インストール"&gt;インストール&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;事前準備が完了したら、いよいよコマンドのインストールを行います。&lt;br&gt;
+インストールはidcfのgithubリポジトリにあるcloudstack-apiをします。&lt;br&gt;
+&lt;a href="https://github.com/idcf/cloudstack-api"&gt;https://github.com/idcf/cloudstack-api&lt;/a&gt;&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo pip install git+https://github.com/idcf/cloudstack-api
+
+・・・
+    cc -fno-strict-aliasing -fno-common -dynamic -arch i386 -arch x86_64 -g -Os -pipe -fno-common -fno-strict-aliasing -fwrapv -DENABLE_DTRACE -DMACOSX -DNDEBUG -Wall -Wstrict-prototypes -Wshorten-64-to-32 -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -DENABLE_DTRACE -arch i386 -arch x86_64 -pipe -I/usr/include/libxml2 -Isrc/lxml/includes -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c src/lxml/lxml.etree.c -o build/temp.macosx-10.11-intel-2.7/src/lxml/lxml.etree.o -w -flat_namespace
+    In file included from src/lxml/lxml.etree.c:320:
+    src/lxml/includes/etree_defs.h:14:10: fatal error: 'libxml/xmlversion.h' file not found
+    #include "libxml/xmlversion.h"
+             ^
+    1 error generated.
+    Compile failed: command 'cc' failed with exit status 1
+    creating tmp
+    cc -I/usr/include/libxml2 -I/usr/include/libxml2 -c /tmp/xmlXPathInit3sJd9Z.c -o tmp/xmlXPathInit3sJd9Z.o
+    /tmp/xmlXPathInit3sJd9Z.c:1:10: fatal error: 'libxml/xpath.h' file not found
+    #include "libxml/xpath.h"
+             ^
+    1 error generated.
+    *********************************************************************************
+    Could not find function xmlCheckVersion in library libxml2. Is libxml2 installed?
+    Perhaps try: xcode-select --install
+    *********************************************************************************
+    error: command 'cc' failed with exit status 1
+
+    ----------------------------------------
+Command "/usr/bin/python -u -c "import setuptools, tokenize;__file__='/private/tmp/pip-build-GIuK3z/lxml/setup.py';exec(compile(getattr(tokenize, 'open', open)(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" install --record /tmp/pip-Mmw1r6-record/install-record.txt --single-version-externally-managed --compile" failed with error code 1 in /private/tmp/pip-build-GIuK3z/lxml
+You are using pip version 8.0.2, however version 8.1.1 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;なにやらインストールが失敗してしまったみたいです。。。&lt;br&gt;
+でもよく見ると、&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;*********************************************************************************
+    Could not find function xmlCheckVersion in library libxml2. Is libxml2 installed?
+    Perhaps try: xcode-select --install
+    *********************************************************************************
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;という表示が出ています。&lt;br&gt;
+インストールに必要な関数(xmlCheckVersion)が見つからないみたいです。Perhaps tryという箇所でインストール方法も教えてくれているので、とりあえずその通りに実行します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ xcode-select --install
+xcode-select: note: install requested for command line developer tools
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再度インストールを実行します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo pip install git+https://github.com/idcf/cloudstack-api
+
+The directory '/Users/kohei/Library/Caches/pip/http' or its parent directory is not owned by the current user and the cache has been disabled. Please check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
+The directory '/Users/kohei/Library/Caches/pip' or its parent directory is not owned by the current user and caching wheels has been disabled. check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
+Collecting git+https://github.com/idcf/cloudstack-api
+  Cloning https://github.com/idcf/cloudstack-api to /tmp/pip-FkXf1Z-build
+Requirement already satisfied (use --upgrade to upgrade): setuptools in /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python (from cloudstack.compute==0.10.2)
+Requirement already satisfied (use --upgrade to upgrade): httplib2 in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
+Requirement already satisfied (use --upgrade to upgrade): simplejson in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
+Requirement already satisfied (use --upgrade to upgrade): argparse in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
+Requirement already satisfied (use --upgrade to upgrade): prettytable==0.5 in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
+Requirement already satisfied (use --upgrade to upgrade): parsedatetime==0.8.7 in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
+Collecting lxml (from cloudstack.compute==0.10.2)
+  Downloading lxml-3.6.0.tar.gz (3.7MB)
+    100% |████████████████████████████████| 3.7MB 151kB/s
+Installing collected packages: lxml, cloudstack.compute
+  Running setup.py install for lxml ... done
+  Running setup.py install for cloudstack.compute ... done
+Successfully installed cloudstack.compute-0.10.2 lxml-3.6.0
+You are using pip version 8.0.2, however version 8.1.1 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;今度はインストールできたみたいです。&lt;br&gt;
+一応試しにコマンドを実行してみると、&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api --version
+cloudstack-api v0.10.2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ちゃんとバージョン情報の確認ができました。&lt;/p&gt;
+
+&lt;p&gt;ただ、このままではインストールしただけなので、次は環境へアクセスできるように設定を行います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="環境設定"&gt;環境設定&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;idcfヘアクセスできるようにするには&lt;code&gt;.idcfrc&lt;/code&gt;というファイルを作成し、そこに必要な情報を記載してあげる必要があります。&lt;/p&gt;
+
+&lt;p&gt;ということではじめに必要な情報の取得です。&lt;br&gt;
+情報は管理コンソールの「仮想マシン」&amp;gt;「API」から確認できます。&lt;/p&gt;
+
+&lt;p&gt;まずは、API KeyとSecret Keyは画面の「API」の項目から取得できます。ボードクリップアイコンをクリックするとコピーできます。&lt;br&gt;
+&lt;img alt="20160517-01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/145b8cb9-2357-ee5d-f9ae-c78043f9bad0.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;次にエンドポイント情報を取得します。今回は「東日本リージョン」ということで進めたいと思うので、先ほどと同じように東日本の箇所にあるクリップボードアイコンをクリックしてコピーします。&lt;br&gt;
+&lt;img alt="20160517-02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/904688ef-7cc6-e705-77c1-e69dc420fb91.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;３つの情報が取得できたらいよいよ「.idcfrc」ファイルを作成します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ vi ~/.idcfrc
+
+[account]
+host=https://compute.jp-east.idcfcloud.com/client/api
+api_key=***********************************
+secret_key=***********************************
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;hostにはエンドポイントが入ります。&lt;br&gt;
+また、アクセス権限をユーザーだけが読み書きできるように変更もしておきます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ chmod 600 ~/.idcfrc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上で環境へアクセスできるところまで準備ができました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;環境設定まで完了したので実際にアクセスできるか確認してみましょう。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listZones
+{
+  "listzonesresponse": {
+    "count": 5,
+    "zone": [
+      {
+        "allocationstate": "Enabled",
+・・・
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;レスポンス内容は割愛しますが、ずらっとJSON形式でゾーン情報が表示されればOKです。&lt;/p&gt;
+
+&lt;p&gt;補足ですが、もし環境設定の情報が間違っていたりすると、&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listZones
+No option 'api_key' in section: 'account'
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;といった内容が表示されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;今回はIDCFクラウドをAPIコマンドで操作できるようにするためのセットアップを行いました。&lt;br&gt;
+これによって仮想マシンを作成するたびに管理コンソールへいちいちログインするのではなく、コマンドで一発作成が可能となります。また、スクリプトなどを組んでおけば仮想マシンの作成からグローバルIPの付与といった一連の処理も可能です。&lt;/p&gt;
+
+&lt;p&gt;ただ、現在使えるcloudstack-apiコマンドは限られています。&lt;br&gt;
+詳しい内容は&lt;a href="http://docs.idcf.jp/cloud/api/"&gt;IDCFのAPI References&lt;/a&gt;に一覧があるので参考にしてください。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>jQuery Validationを使ってフォームチェックをしてみる</title>
+    <link rel="alternate" href="http://blog.url.com/2016/05/27/jQuery-validation-1.html"/>
+    <id>http://blog.url.com/2016/05/27/jQuery-validation-1.html</id>
+    <published>2016-05-27T09:00:00+09:00</published>
+    <updated>2016-05-30T20:15:50+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;フォーム入力をする際、必須項目を未入力のまますっ飛ばすとフォームが赤くなって「必須記入項目です」なんて言われてしまったことありませんか？&lt;br&gt;
+今回、その動作をプラウディットHPに実装することになりました。&lt;/p&gt;
+
+&lt;p&gt;プロの方なら簡単なことなんだと思いますが、なんせ無知なので...&lt;br&gt;
+とっても時間がかかりました。&lt;/p&gt;
+
+&lt;p&gt;ちなみに、本番実装はまだです。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="jqueryって？validationって？"&gt;jQueryって？Validationって？&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;まずここからです。&lt;br&gt;
+jQueryは聞いたことあるなー。Validationに関しては全く初めましてです！&lt;/p&gt;
+
+&lt;p&gt;詳しい説明は省きますが、jQueryとはJavaScriptのライブラリのこと。&lt;br&gt;
+そしてValidationとは、&lt;br&gt;
+入力フォームのバリデーション（チェック）を簡単に実装することが出来るjQueryプラグイン。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="まずサンプルを実装してみる"&gt;まずサンプルを実装してみる&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;いろんなサイトにValidationの実装の仕方が載っているので、調べて手頃なものを引っ張ってきました。&lt;/p&gt;
+
+&lt;p&gt;今回参考にしたのは&lt;br&gt;
+&lt;a href="http://www.webdesign-fan.com/jquery-validation-engine"&gt;http://www.webdesign-fan.com/jquery-validation-engine&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;一旦ローカルで実装するため、必要なファイルをダウンロードして、&lt;br&gt;
+サイト内にあったhtmlファイルを設置。&lt;/p&gt;
+
+&lt;p&gt;してみましたが、なぜか動きません。&lt;/p&gt;
+
+&lt;p&gt;jquery.validationEngine-ja.jsのファイルのパスが間違っていました。&lt;br&gt;
+js配下のlaguageフォルダの下にjquery.validationEngine-ja.jsが入ってしまっていて、&lt;br&gt;
+ファイルの読み込みができていませんでした。&lt;br&gt;
+その他のファイルと同じ階層に移動。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0527_validation/validation_test_1.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;これで解決。&lt;br&gt;
+無事に動作確認できました。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="既存のhtmlにvalidationを追加"&gt;既存のHTMLにValidationを追加&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;サンプルと同じように、ファイルを設置、コードを追加してみました！&lt;/p&gt;
+
+&lt;p&gt;あら？validation動いてない...&lt;/p&gt;
+
+&lt;p&gt;既存のhtmlには既に他のjavascriptも使われているので、何かが影響して動かないのか、&lt;br&gt;
+パスが違うのか...&lt;/p&gt;
+
+&lt;p&gt;今回追加したファイルは&lt;/p&gt;
+
+&lt;p&gt;・jquery-1.8.2.min.js (jQueryの本体)&lt;br&gt;
+・jquery.validationEngine.js (プラグインの本体)&lt;br&gt;
+・languages/jquery.validationEngine-ja.js (日本語ファイル)&lt;br&gt;
+・validationEngine.jquery.css (スタイルシート)&lt;/p&gt;
+
+&lt;p&gt;head要素内で上記ファイルが読み込めるようコードを記述。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;    &amp;lt;!-- ▼jQuery本体 --&amp;gt;
+    &amp;lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"&amp;gt;&amp;lt;/script&amp;gt;
+    &amp;lt;!-- ▼バリデーション --&amp;gt;
+    &amp;lt;link rel="stylesheet" href="css/validationEngine.jquery.css"&amp;gt;
+    &amp;lt;script src="js/jquery.validationEngine.js"&amp;gt;&amp;lt;/script&amp;gt;
+    &amp;lt;script src="js/jquery.validationEngine-ja.js"&amp;gt;&amp;lt;/script&amp;gt;
+
+    &amp;lt;script&amp;gt;
+      $(function(){
+        jQuery("#form").validationEngine();
+      });
+    &amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;フォームタグ内のチェックをしたいclass要素にvalidate[]という要素を追加&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;&amp;lt;form fole="form"&amp;gt;
+&amp;lt;div class="container"&amp;gt;
+            &amp;lt;div class="col-xs-8 col-xs-offset-2"&amp;gt;
+                &amp;lt;div class="row"&amp;gt;
+                    &amp;lt;div class="col-sm-2"&amp;gt;&amp;lt;label for="name"&amp;gt;NAME&amp;lt;/label&amp;gt;&amp;lt;/div&amp;gt;
+                        &amp;lt;div class="col-sm-10 form-group"&amp;gt;
+                            &amp;lt;input type="text" class="validate[required] form-control input_per70" name="name"  id="name" placeholder="プラウド 太郎"&amp;gt;
+                        &amp;lt;/div&amp;gt;
+
+            ----------以下省略----------
+
+             &amp;lt;div class="form-group text-center"&amp;gt;
+                     &amp;lt;!-- &amp;lt;button onClick="uploadFile();" type="submit" class="btn btn-dark"&amp;gt;Send Inquiry&amp;lt;/button&amp;gt; --&amp;gt;
+                     &amp;lt;input onClick="uploadFile();" type="button" value="Send Inquiry"  class="btn btn-dark" /&amp;gt;
+                &amp;lt;/div&amp;gt;
+        &amp;lt;/form&amp;gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="今回はまってしまった原因"&gt;今回はまってしまった原因&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;①フォームチェックを行いたい対象のフォームIDがきちんと指定できていなかった&lt;/p&gt;
+
+&lt;p&gt;既存のファイルではform fole=&amp;quot;form&amp;quot;という記述になっていました。&lt;br&gt;
+ここをform id=&amp;quot;form&amp;quot;に変更しました。&lt;/p&gt;
+
+&lt;p&gt;②jQueryファイルを２つ読みこもうとしていた&lt;/p&gt;
+
+&lt;p&gt;設定を加える前に、すでにjquery.jsというフィルが存在しているところへ、&lt;br&gt;
+jquery-1.8.2.min.jsを読み込もうとしていました。&lt;/p&gt;
+
+&lt;p&gt;そのため、jquery.jsを削除。&lt;br&gt;
+こちらを削除したことで、その他の動作に影響もなさそうでした。&lt;/p&gt;
+
+&lt;p&gt;上記2点を行ったところ、しっかり動いてくれました。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0527_validation/validation_test_2.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;※ちなみに、jquery.jsとjquery.min.jsの違いとして、ファイルサイズの大きさ、&lt;br&gt;
+コードの見やすさがあるようです。&lt;br&gt;
+.minの方がサイズを小さくするために改行も削除され変数名も簡略化されていて読みにくく&lt;br&gt;
+なっているようですが。&lt;/p&gt;
+
+&lt;p&gt;自分でカスタマイズしたい人には圧縮されていない方がおすすめ、とのこと。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;簡単にまとめましたが、ここに辿り着くまでコードを何度も読んだり、コードの順番を変えてみたり、ファイルの階層を変えてみたり、、&lt;br&gt;
+解決する気が全くしない...なんて思いながら。&lt;br&gt;
+本当に根気のいる作業だなと思いましたが、自分で解決できると楽しいですね！&lt;/p&gt;
+
+&lt;p&gt;ただ、まだこれで終わりではありません。&lt;br&gt;
+現在のままだと、必須項目ですというチェックをすることはできてもフォームが未入力でもフォームの送信ができてしまうんです...&lt;/p&gt;
+
+&lt;p&gt;この部分についてはまた調べてみようと思います。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>第４回 AWSとIDCFをVPN接続する - 最後の仕上げ編</title>
+    <link rel="alternate" href="http://blog.url.com/2016/05/26/how-the-vpn-connection-to-AWS-and-IDCF-4.html"/>
+    <id>http://blog.url.com/2016/05/26/how-the-vpn-connection-to-AWS-and-IDCF-4.html</id>
+    <published>2016-05-26T09:00:00+09:00</published>
+    <updated>2016-05-30T20:15:50+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/f16dcb9e7280b29deee7"&gt;&amp;lt;&amp;lt; 前回：第３回 AWSとIDCFをVPN接続する - VPN接続編（全４回）&lt;/a&gt;&lt;br&gt;
+IDCFクラウドにVyOSで仮想マシンを作成して、IDCFクラウドとAWSをVPNで接続する設定を説明します。&lt;br&gt;
+&lt;img alt="idcf-vpn-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9b15d672-f654-ab05-fb61-57cf8951b58e.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回でIDCFのVPNゲートウェイにAWSで取得したコンフィグを流し込み、ついにIDCFとAWS間のVPN接続が完了しました。&lt;br&gt;
+&lt;img alt="idcf-vpn-7.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b290de8c-a844-3286-22e6-3e305e593004.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;とはいえ、このままではただVPN接続しただけで、サーバー間で通信を行うことはできません。&lt;/p&gt;
+
+&lt;p&gt;そこで仕上げとして、サーバー間で通信ができるようにルーティングとセキュリティグループの設定を行います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="ルーティング設定"&gt;ルーティング設定&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="aws"&gt;AWS&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="idcf-vpn-5.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f143d7a0-9cf1-f292-da00-0cea9741299c.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ここで必要なのは「ルートテーブル」と「セキュリティグループ」の２点です。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+・ルートテーブル&lt;br&gt;
+作成した「VPN接続」の「要約」タブの内容が表示されていることを確認し「VPC」をクリックします。&lt;br&gt;
+&lt;img alt="idcf-vpn_4_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/422d6f5e-bd8f-54f5-f59a-c1cb4a8cd7c1.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+対象の「VPC」の「概要」タブを表示し「ルートテーブル」をクリックします。&lt;br&gt;
+&lt;img alt="idcf-vpn_4_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/31fbb0e9-5aba-10ad-eb67-847d8b2fc0a9.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+対象の「ルートテーブル」の「ルート」の内容を「編集」してルーティングを追加します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;10.13.0.0/21     vgw-adsfad（仮想プライベートゲートウェイ）
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;※サブネットで別のルートテーブルも利用している場合はそちらを追加する必要があるかもしれないので注意が必要です。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="idcf-vpn_4_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1b79aa29-30a6-d660-0a7a-f198453d97da.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・セキュリティグループの設定&lt;br&gt;
+インスタンスに紐付いているセキュリティグループに対象となるIDCF側のNWを追加します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;    タイプ        プロトコル  ポート範囲   送信元
+すべてのトラフィック    すべて    すべて   10.13.0.0 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="idcf"&gt;IDCF&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt="idcf-vpn-6.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/5da656ec-d04e-2357-0f3f-2d4df62c3d5b.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;IDCFではAWSのようなルートテーブルなどのルーティングを一括管理するものがないので各サーバに対しスタティックルートの設定を行う必要があります。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+・スタティックルートの設定&lt;br&gt;
+サーバへログインします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ssh hogehoge@xxx.xxx.xxx.xxx
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+ルーティングを追加します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -net 172.31.0.0 gw 10.13.0.2 netmask 255.255.0.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;今回はコマンドによる一時的な追加ですが、永久的に追加するのであればstatic-routesに直接記載します。(Ubuntuの場合)&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;#!/bin/sh
+/sbin/route add -net 172.31.0.0 gw 10.13.0.2 netmask 255.255.0.0 dev eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;また、実行権限が必要なのでお忘れなく。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo chmod +x /etc/network/if-up.d/static-routes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;それでは疎通ができたかpingで確認してみましょう。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="aws環境から確認"&gt;AWS環境から確認&lt;/h2&gt;
+
+&lt;p&gt;それではAWS環境にあるサーバにログインしてください。&lt;/p&gt;
+
+&lt;p&gt;まずは、ルーティングの確認です。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.20.0.1       0.0.0.0         UG        0 0          0 eth0
+172.31.0.0       0.0.0.0         255.255.0.0   U         0 0          0 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;とは言ってもAWSの場合はルートテーブルで管理してますので&lt;code&gt;netstat&lt;/code&gt;では確認できません。&lt;br&gt;
+ということでとりあえず疎通確認します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ping xxx.xxx.xxx.xxx
+PING xxx.xxx.xxx.xxx (xxx.xxx.xxx.xxx) 56(84) bytes of data.
+64 bytes from xxx.xxx.xxx.xxx: icmp_seq=1 ttl=63 time=11.1 ms
+64 bytes from xxx.xxx.xxx.xxx: icmp_seq=2 ttl=63 time=12.7 ms
+64 bytes from xxx.xxx.xxx.xxx: icmp_seq=3 ttl=63 time=10.4 ms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;無事、確認できました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="idcf環境から確認"&gt;IDCF環境から確認&lt;/h2&gt;
+
+&lt;p&gt;まずはルーティングの確認です。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.13.0.1       0.0.0.0         UG        0 0          0 eth0
+10.13.0.0       0.0.0.0         255.255.248.0   U         0 0          0 eth0
+xxx.xxx.xxx.xxx &amp;lt;VyOSのIP&amp;gt;      255.255.0.0     UG        0 0          0 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こちらはルーティングが確認できました。(まぁ、さっき追加したので当たり前ですねw)&lt;br&gt;
+ということで疎通確認しましょう。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ping xxx.xxx.xxx.xxx
+PING xxx.xxx.xxx.xxx (xxx.xxx.xxx.xxx) 56(84) bytes of data.
+64 bytes from xxx.xxx.xxx.xxx: icmp_seq=1 ttl=63 time=11.1 ms
+64 bytes from xxx.xxx.xxx.xxx: icmp_seq=2 ttl=63 time=12.7 ms
+64 bytes from xxx.xxx.xxx.xxx: icmp_seq=3 ttl=63 time=10.4 ms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こちらも無事、確認できました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;以上で今回はAWSの対向の環境はIDCFですが、VPN接続するために利用しているのはVyOSです。&lt;br&gt;
+なので、その他の環境であっても同様の設定(ポート許可など)ができればVyOSを利用してVPN接続が可能です。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>スクロールが必要なweb画面のスクリーンショットを撮る方法</title>
+    <link rel="alternate" href="http://blog.url.com/2016/05/18/screendhot-file.html"/>
+    <id>http://blog.url.com/2016/05/18/screendhot-file.html</id>
+    <published>2016-05-18T09:00:00+09:00</published>
+    <updated>2016-05-24T11:08:06+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;何かと便利なスクリーンショット。&lt;br&gt;
+取得したファイルを資料の添付イメージとして利用することも多いかと思います。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+ただ、画面に収まっているページしか取得できずに困ったことって&lt;br&gt;
+ありませんか？&lt;br&gt;
+本当は全部のページを一発でできたらいいのに...と何度思ったことか。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+今回、資料作りにスクリーンショットが必要になったので、調べてみました。&lt;br&gt;
+きっと何かいい方法があるはず！&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="full-page-screen-capture"&gt;Full Page Screen Capture&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;今回使ってみたのは、&lt;/p&gt;
+
+&lt;p&gt;Google Chromeの拡張機能「Full Page Screen Capture』&lt;/p&gt;
+
+&lt;p&gt;[追加方法]&lt;/p&gt;
+
+&lt;p&gt;・chrome ＞　環境設定　＞　詳細設定　＞　ユーザー補助機能をさら　に追加&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+・chromeウェブストアが出てくるので、そこでFull Page Screen Captureを検索！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0518_screenshot/20160518_03.png" /&gt;&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+わたしはすでに追加済みになっていますが、これをchromeに追加するだけでOK。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+該当のページを開いて、右上にあるカメラマークをぽちっとするだけ！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0518_screenshot/20160518_01.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;すると別タブで取得したファイルが開くので、そのファイルを保存するだけ。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0518_screenshot/20160518_02.png" /&gt;&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+簡単ですね〜！&lt;br&gt;
+必要に応じて、不要部分は画像編集で切り抜きすればいいだけです。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+欲を言えば該当の画面でそのままスクロールして必要なところだけ&lt;br&gt;
+スクリーンショットが取れれば尚嬉しいです。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+そんな機能ないかな。&lt;br&gt;
+また探してみます。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>第３回 AWSとIDCFをVPN接続する - VPN接続編（全４回）</title>
     <link rel="alternate" href="http://blog.url.com/2016/05/16/how-the-vpn-connection-to-AWS-and-IDCF-3.html"/>
     <id>http://blog.url.com/2016/05/16/how-the-vpn-connection-to-AWS-and-IDCF-3.html</id>
     <published>2016-05-16T09:00:00+09:00</published>
-    <updated>2016-05-16T16:28:27+09:00</updated>
+    <updated>2016-05-17T12:39:40+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -136,506 +761,6 @@ Peer ID / IP                            Local ID / IP
 ということで、次回は最後の仕上げとして通信を行うための設定を行います。&lt;/p&gt;
 
 &lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/6ba28436485096100161"&gt;&amp;gt;&amp;gt; 最終回：第４回 AWSとIDCFをVPN接続する - 最後の仕上げ編（全４回）&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>第２回 AWSとIDCFをVPN接続する - AWS準備編（全４回）</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/09/how-the-vpn-connection-to-AWS-and-IDCF-2.html"/>
-    <id>http://blog.url.com/2016/05/09/how-the-vpn-connection-to-AWS-and-IDCF-2.html</id>
-    <published>2016-05-09T09:00:00+09:00</published>
-    <updated>2016-05-09T12:37:00+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/906a6ce1352285e793d5"&gt;&amp;lt;&amp;lt; 前回：第１回 AWSとIDCFをVPN接続する - IDCF準備編（全４回）&lt;/a&gt;&lt;br&gt;
-IDCFクラウドにVyOSで仮想マシンを作成して、IDCFクラウドとAWSをVPNで接続する設定を説明します。&lt;br&gt;
-&lt;img alt="idcf-vpn-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9b15d672-f654-ab05-fb61-57cf8951b58e.png" /&gt;&lt;br&gt;
-前回はIDCF側にVyOSを利用してVPNゲートウェイを作成しました。&lt;br&gt;
-&lt;img alt="idcf-vpn-2.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/903a6791-fb65-6fd3-5ecd-566c1a605c52.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;今回はAWS側のVPNゲートウェイの作成を行います。&lt;br&gt;
-&lt;img alt="idcf-vpn-3.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a8160ab4-f708-851a-40a1-a2239a67e2f5.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="ゲートウェイの作成---aws"&gt;ゲートウェイの作成 - AWS&lt;/h2&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;・AWSマネージメントコンソールにログインします。&lt;br&gt;
-&lt;a href="https://signin.aws.amazon.com/"&gt;https://signin.aws.amazon.com/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「サービス &amp;gt; すべてのAWSサービス &amp;gt; VPC」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_2_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3c1e1978-9981-2dc9-4bc2-9a80f2f581f1.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「仮想プライベートゲートウェイ &amp;gt; 仮想プライベートゲートウェイの作成」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_2_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/84c49d16-2f80-28a5-c581-7c1034ab22c4.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「ネームタグ」を入力し「作成」をクリックします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;ネームタグ：VGW-ToIDCF
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn_2_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7865dcbf-7799-2053-cfbf-5cbd6bd402d9.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_2_04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/0dcf384c-7121-e8e7-388a-47c72f1f4236.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「カスタマーゲートウェイ &amp;gt; カスタマーゲートウェイの作成」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_2_05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/bbe6ee08-bd67-7e9f-aea2-4ae2c2e9596c.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・各項目を入力し「作成」をクリックします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;ネームタグ：VPNRouterToIDCF
-ルーティング：静的(ここでは動的どちらでもOK)
-IPアドレス：xxx.xxx.xxx.xxx（VPN-IDCFのIPを入力）※
-BGP ASN：65000(動的の場合は指定)
-※第１回 AWSとIDCFをVPN接続する（全４回）の「IPアドレスの設定」で取得したIPです。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn_2_06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/60665788-eb03-624a-7740-c617535df9d7.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_2_07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/0a040c13-9c94-4ee7-da69-e2442031abc9.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・VPN接続の作成：「VPN接続 &amp;gt; VPN接続の作成」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_2_08.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/18e8f26e-49e1-4c9d-36fc-ffcf48f1f57d.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・各項目を入力し「作成」をクリックします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;ネームタグ：VPNConnectToIDCF
-仮想プライベートゲートウェイ：さっき作成した仮想プライベートゲートウェイ
-カスタマーゲートウェイ：既存(さっき作成したカスタマーゲートウェイ)
-ルーティングオプション：動的(BGPが必要)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn_2_09.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/c85f1397-8f10-d704-4192-e9c0257d9121.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・設定のダウンロード&lt;br&gt;
-作成したVPN接続を選択し「設定のダウンロード」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_2_10.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/45699772-b199-d6ef-0210-e3aecfde52d9.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・Vyattaを選択し「ダウンロード」をクリックしてConfigをダウンロードします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;ベンダー：Vyatta
-プラットフォーム：Vyatta Network OS
-ソフトウェア：Vyatta Network OS 6.5+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn_2_12.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/d1da47b7-051b-d5a4-de57-79f72ac46887.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="vpcへのアタッチ"&gt;VPCへのアタッチ&lt;/h2&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;・対象となる「仮想プライベートゲートウェイ」を選択して「VPCにアタッチ」します。&lt;br&gt;
-&lt;img alt="idcf-vpn_3_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b5a6bb85-ec13-83bb-ba6a-0f0decd0af5d.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・アタッチしたい「VPC」を選んで「アタッチ」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_3_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f5d48024-7396-4036-9c8b-50bf6bddbf69.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;これでAWS側のVPNゲートウェイの作成が完了しました。あとは両方で作成したVPNゲートウェイを繋げる設定をしてあげるだけです。&lt;/p&gt;
-
-&lt;p&gt;ということで次回はIDCF側で作成したVPNゲートウェイに繋げるための設定を行います。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/f16dcb9e7280b29deee7"&gt;&amp;gt;&amp;gt; 次回：第３回 AWSとIDCFをVPN接続する - VPN接続編（全４回）&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>第１回 AWSとIDCFをVPN接続する - IDCF準備編（全４回）</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/02/how-the-vpn-connection-to-AWS-and-IDCF-1.html"/>
-    <id>http://blog.url.com/2016/05/02/how-the-vpn-connection-to-AWS-and-IDCF-1.html</id>
-    <published>2016-05-02T09:00:00+09:00</published>
-    <updated>2016-05-09T12:37:17+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;IDCFクラウドにVyOSで仮想マシンを作成して、IDCFクラウドとAWSをVPNで接続する設定を説明します。&lt;br&gt;
-&lt;img alt="idcf-vpn-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9b15d672-f654-ab05-fb61-57cf8951b58e.png" /&gt;&lt;br&gt;
-できるだけ行っていることが意識しやすいように作業ポイントごとに回を区切っています。&lt;br&gt;
-今回はIDCFクラウドで仮想マシンを作成し、グローバルIPアドレスを付与しFWの設定まで行います。&lt;br&gt;
-&lt;img alt="idcf-vpn-2.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/903a6791-fb65-6fd3-5ecd-566c1a605c52.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="ゲートウェイの作成---idcf"&gt;ゲートウェイの作成 - IDCF&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;IDCFクラウドでは仮想マシンでVyOSが選択できるのでそれを利用します。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="仮想マシンの作成"&gt;仮想マシンの作成&lt;/h2&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;・IDCF クラウドにログインします。&lt;br&gt;
-&lt;a href="https://account.idcfcloud.com/"&gt;https://account.idcfcloud.com/&lt;/a&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_00.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/14be8274-6b3c-bc32-5a40-2260daa2f051.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「コンピューティング」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/43a362af-8f77-5bea-0cf8-c800b7c81e52.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「仮想マシンの作成」をクリックします。（左右どちらでもOKです。）&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7f671fe5-d7a5-a66c-f352-b7d9ba5762c9.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・以下の情報を入力し「確認画面へ」をクリックします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;マシンタイプ：Light（light.S1）
-イメージ：その他（VyOS  1.1.3 64-bit）
-ボリューム： -
-SSH Key：SSH Key選択（今回は事前に用意していたのを利用）
-仮想マシン台数：1
-ネットワークインターフェース：radian-network1（今回はデフォルトで用意されているNWを選択）
-詳細情報：マシン名１ VPN-ToAWS
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn_1-1_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/7e55e559-412e-9d0f-ca87-98c2b62e8e16.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ae2d311f-62cb-c581-8ae2-63b7856eb8a0.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/be27ebf2-83f0-c239-2d23-3498f472958d.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/5c87f2c9-e073-7e61-bf83-019821763867.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/e2c47ce6-7fd8-9fcf-c779-c58193a27ef8.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_08.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/bf3cfa22-1e05-e24d-ce78-1fe15b58cf14.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_09.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/e86ed5a9-f660-a71d-2135-6f32f675215f.png" /&gt;&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_10.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/5d6a9ff8-9214-969e-efc1-b6cb8492ac0d.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・内容を確認しOKであれば「作成」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_1-1_11.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a64b4ce0-4892-6887-9f29-ecd829841090.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="ipアドレスの設定"&gt;IPアドレスの設定&lt;/h2&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;・「IPアドレス &amp;gt; IPアドレスの取得」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_1-2_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/07d6794b-b879-f36a-4785-2e0bb94174a3.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・IPアドレス名の入力、ゾーンとネットワークを選択し「取得する」をクリックします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;IPアドレス名：VPN-IDCF
-ゾーン：radian
-ネットワーク：radian-network1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn_1-2_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/8645e217-5952-842e-1d63-f9654c9d8b69.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「はい」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_1-2_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/942402b6-bd04-f810-dcc6-97d4cb56b371.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・取得した「IPアドレス」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_1-2_04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/70c9d053-4532-86de-192f-f06392d4348a.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「NAT」をクリックし、先ほど作成した仮想マシンを選択して「有効化」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_1-2_05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/4d02ded3-ac82-4b4b-ff71-c8aa409886ae.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・「はい」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_1-2_06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/820ca11d-cbf1-254a-ca5c-fb2cfab98a17.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="fwの設定"&gt;FWの設定&lt;/h2&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;・「ファイアウォール」でポートの許可を設定します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;[コメント]        [ソースCIDR]  [タイプ]  [ポートレンジ]
-NAT Traversal  0.0.0.0/0    UDP      4500
-NAT Traversal  0.0.0.0/0    UDP      500
-SSH            接続元IP      TCP      22
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn_1-3_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/2037ff02-908e-afe1-06de-fafa1f985985.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ここでSSHを許可していますが、これは作業するための設定です。全て(全４回)が完了したら削除しましょう。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回は基本的にIDCFクラウドで仮想マシンを作成するための作業と同じです。&lt;br&gt;
-VyOSでFWでポート4500(UDP)とポート500(UDP)を許可しているのがVPN特有の設定です。&lt;/p&gt;
-
-&lt;p&gt;次回はAWS側でゲートウェイを準備します。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/fbc6b32f5a70bf3cfa20"&gt;&amp;gt;&amp;gt; 第２回 AWSとIDCFをVPN接続する - AWS準備編（全４回）&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>DevOpsってなんだろう？</title>
-    <link rel="alternate" href="http://blog.url.com/2016/04/28/What's-DevOps.html"/>
-    <id>http://blog.url.com/2016/04/28/What's-DevOps.html</id>
-    <published>2016-04-28T09:00:00+09:00</published>
-    <updated>2016-05-07T22:18:34+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;数年前からよく耳にするようになったDevOps。&lt;br&gt;
-実際私はここ1年の間に初めて出会ったコトバです。一体何なんでしょう？&lt;/p&gt;
-
-&lt;p&gt;調べて自分なりに解釈した内容を簡単にまとめてみました。&lt;br&gt;
-それではいってみましょー。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;DevOpsとは、開発（Development）と運用（Operations）
-が協力し、ビジネス要求に対して、より柔軟に、
-スピーディに対応できるシステムを作り上げるためのプラクティス。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;em&gt;引用元：&lt;a href="http://www.atmarkit.co.jp/ait/articles/1307/02/news002.html"&gt;http://www.atmarkit.co.jp/ait/articles/1307/02/news002.html&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;方法論のようなものなのでしょうか。&lt;/p&gt;
-
-&lt;h1 id="誤解されてきたdevops"&gt;誤解されてきたDevOps&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;調べていくと諸説あり、2013年から現在まで考え方も変わってきているようです。&lt;br&gt;
-変わっている、というよりしっかりと理解されていなかった、という意見がちらほら。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;DevOpsという考え方が日本に入ってきた当初は、このツールを使ったからDevOps！自動化したからDevOps！といった解釈が一人歩きしてしまい、本質よりも先にその解釈が浸透してしまっていたようです。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="結局devopsってなんなの？"&gt;結局DevOpsってなんなの？&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;一体何をすることなのか？何を使えば？といった方法論が多く語られていますが、&lt;br&gt;
-実は一番大切なのは&lt;em&gt;「なぜやる必要があるのか？」&lt;/em&gt;という部分のようです。&lt;br&gt;
-単なるツールや、プラクティス、開発と運用の協力、という単純な話ではないみたい。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;DevOpsの本質は、&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;「10deploys/Day」1日に10回デプロイできること。
-10回に限らず、1日のうちに何度でもデプロイすること。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;スピードのある開発を目指しましょう。&lt;/p&gt;
-
-&lt;p&gt;いかに早く新規サービスを作り出し、いかに早く、多くの変更を加えてサービスを成長させていくことができるのか。&lt;br&gt;
-最終的な目的は「ビジネスの成長」ということですかね。&lt;/p&gt;
-
-&lt;p&gt;これを実現するために自動化や、ツールの導入、組織や文化をどうするのか、etc...&lt;br&gt;
-ここへきて初めてツール云々の話になるんですね。&lt;/p&gt;
-
-&lt;p&gt;DevOpsと一言にいっても、会社により実践方法は様々あっていい。&lt;br&gt;
-やり方が違っても、DevOpsに対する解釈は大きな違いがないのです。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="さいごに"&gt;さいごに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;色々調べてみるとかなり奥が深かったDdvOps...&lt;/p&gt;
-
-&lt;p&gt;今後ますます加速していくであろうサービス開発にきっちり対応し、&lt;br&gt;
-より良いサービスを作る、様々なビジネスチャンスを生み出していけるようにしていこう！&lt;/p&gt;
-
-&lt;p&gt;そこでわたしたち運用会社もその助けができるよう、更には自分たちも&lt;br&gt;
-飛躍していけるように頑張っていかなくてはいけないんだなと、感じました。&lt;/p&gt;
-
-&lt;p&gt;他の業界よりもスピード感があるIT業界ですが、今後どのように成長していくのかとても楽しみです。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-★今回参考にさせて頂いたサイト&lt;br&gt;
-&lt;a href="http://www.atmarkit.co.jp/ait/articles/1512/17/news160.html"&gt;http://www.atmarkit.co.jp/ait/articles/1512/17/news160.html&lt;/a&gt;&lt;br&gt;
-&lt;a href="http://www.atmarkit.co.jp/ait/articles/1512/23/news026.html"&gt;http://www.atmarkit.co.jp/ait/articles/1512/23/news026.html&lt;/a&gt;&lt;br&gt;
-&lt;a href="http://it.impressbm.co.jp/articles/-/12455"&gt;http://it.impressbm.co.jp/articles/-/12455&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>dockerのインストール for MacOS</title>
-    <link rel="alternate" href="http://blog.url.com/2016/04/25/docker-how-to-install.html"/>
-    <id>http://blog.url.com/2016/04/25/docker-how-to-install.html</id>
-    <published>2016-04-25T09:00:00+09:00</published>
-    <updated>2016-05-07T22:18:34+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;p&gt;Docker ToolboxでMac OS Xにdockerをインストールを行います。&lt;/p&gt;
-
-&lt;p&gt;1.まずDocker Toolboxのページへ行きます。&lt;br&gt;&lt;br&gt;
-&lt;a href="https://www.docker.com/docker-toolbox"&gt;https://www.docker.com/docker-toolbox&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;2.Download(Mac)ボタンを押してダウンロードをします。&lt;br&gt;&lt;br&gt;
-&lt;img alt="docker-toolbox1-300x249.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/71cea7b3-8213-7410-c8c6-ff2ce6ec9a99.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;3.ダウンロードしたパッケージをクリックしてインストーラーを起動させます。&lt;/p&gt;
-
-&lt;p&gt;4.起動したらナビゲーションに従い進みます。&lt;br&gt;
-&lt;img alt="docker-toolbox2-300x211.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/95a753cc-9409-efe1-3c97-e3141dc88a00.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="docker-toolbox3-300x211.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/44be53e3-4788-3ae3-def9-2439c60aa2b2.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="docker-toolbox4-300x214.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3f808694-d676-1ce8-aba2-2ff6d0940ac5.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="docker-toolbox6-300x214.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/fac6e78a-5e39-c63f-4449-6bfc3633d2f2.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;5.インストールが完了するとLaunchpadに「Docker Quickstart Terminal」「Kitematic」「VirtualBox」の３つがインストールされます。&lt;br&gt;
-&lt;img alt="docker-toolbox7-300x83.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/0a4784c9-dff8-7d7c-ed16-37bd7db04a17.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;6.「Docker Quickstart Terminal」をクリックするとTerminalが立ち上がり、VirtualBox上にDocker環境が構築されます。&lt;br&gt;
-&lt;img alt="docker-toolbox8-300x233.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/d2ed5332-439f-35eb-7730-1e1da9251b9d.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="docker-toolbox9-300x235.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/bd9974f9-dae7-122d-8385-38b80193e584.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上、dockerのインストールが完了です。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>opensslコマンドでCSRを作成する</title>
-    <link rel="alternate" href="http://blog.url.com/2016/04/22/create-csr-openssl.html"/>
-    <id>http://blog.url.com/2016/04/22/create-csr-openssl.html</id>
-    <published>2016-04-22T09:00:00+09:00</published>
-    <updated>2016-05-07T22:18:34+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;&lt;font size=2&gt;&lt;br&gt;
-以前からCSRの作成はやったことがありますが、opensslコマンドでの作成は初めて。&lt;br&gt;
-(今までは用意されていたシェルを利用していました。)&lt;br&gt;
-備忘録として一連の作業内容を記録したいと思います。&lt;/p&gt;
-
-&lt;p&gt;unix系のOSでは標準で利用できるようですが、windows上で利用する場合はアプリケーションのインストールが必要となるようです。&lt;br&gt;
-&lt;a href="https://jp.globalsign.com/support/faq/177.html"&gt;https://jp.globalsign.com/support/faq/177.html&lt;/a&gt;&lt;br&gt;
-&lt;/font&gt;&lt;/p&gt;
-
-&lt;h2 id="事前準備"&gt;事前準備&lt;/h2&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;　・サーバキーペア用パスフレーズ&lt;br&gt;
-　・DN情報&lt;/p&gt;
-
-&lt;p&gt;※今回bit数は2048bitを指定、アルゴリズムはsha-2で作成します。&lt;/p&gt;
-
-&lt;h1 id="さっそく作成"&gt;さっそく作成&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;まずopensslがちゃんと利用できるのかコマンドを入れてみました。&lt;br&gt;
-試しにダウンロードされているバージョンを確認。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ openssl version
-OpenSSL 0.9.8zg 14 July 2015
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;font size=2&gt;　&lt;br&gt;
-今回、普段使っているMAC上で作成を行ったので、デスクトップに&lt;a href="http://www.proudit.jpというディレクトリを作り、そこで作業をしました。"&gt;www.proudit.jpというディレクトリを作り、そこで作業をしました。&lt;/a&gt;&lt;br&gt;
-&lt;/font&gt;&lt;/p&gt;
-
-&lt;p&gt;まずキーペアの作成を行います。&lt;/p&gt;
-
-&lt;p&gt;※2048bitを指定&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ openssl genrsa -des3 2048 &amp;gt; www.proudit.jp.key
-
-Generating RSA private key, 2048 bit long modulus
-...............................................+++
-......................+++
-e is 65537 (0x10001)
-Enter pass phrase:
-Verifying - Enter pass phrase:
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;続いてCSRの作成です。&lt;br&gt;
-コマンド入力後、DN情報を入力します。&lt;/p&gt;
-
-&lt;p&gt;※アルゴリズムはsha-2としますので、-sha256と記述します&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;
-$ openssl req -new -key www.proudit.jp.key -sha256 -out www.proudit.jp.csr
-Enter pass phrase for www.proudit.jp.key:
-You are about to be asked to enter information that will be incorporated
-into your certificate request.
-What you are about to enter is what is called a Distinguished Name or a DN.
-There are quite a few fields but you can leave some blank
-For some fields there will be a default value,
-If you enter '.', the field will be left blank.
------
-Country Name (2 letter code) [AU]:JP
-State or Province Name (full name) [Some-State]:Tokyo
-Locality Name (eg, city) []:Shinjuku-ku
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:Proudit Inc.
-Organizational Unit Name (eg, section) []:
-Common Name (e.g. server FQDN or YOUR name) []:www.proudit.jp
-Email Address []:
-
-Please enter the following 'extra' attributes
-to be sent with your certificate request
-A challenge password []:
-An optional company name []:
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CSRの内容を確認。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;
-$ openssl req -text -noout -in /Users/ayako/Desktop/www.proudit.jp/www.proudit.jp.csr
-
-Certificate Request:
-    Data:
-        Version: 0 (0x0)
-        Subject: C=JP, ST=Tokyo, L=Shinjuku-ku, O=Proudit Inc., CN=www.proudit.jp
-        Subject Public Key Info:
-            Public Key Algorithm: rsaEncryption
-            RSA Public Key: (2048 bit)
-                Modulus (2048 bit):
-
-　　　　　　　　　　　　　※�略※     
-      Signature Algorithm: sha256WithRSAEncryption 
-　　　　　　　　　　　　　※略※       
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;DN情報、bit数、アルゴリズム、指定通りで作成されていることが確認できました！&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;opensslでCSRを作るの案外簡単でした。&lt;/p&gt;
-
-&lt;p&gt;とは言え、参考資料からコマンドをコピペしてるのに、unknown optionと言われてしまい、手打ちしなきゃならなかったり、&lt;br&gt;
-手打ちしたらしたで一文字抜けてたり、。資料どおりにやっているのにスムーズにはいかないという・・・。&lt;/p&gt;
-
-&lt;p&gt;エラーが出る度、「なぜだーー？！」とぐるぐる考えたり。&lt;/p&gt;
-
-&lt;p&gt;難しいですよね。ほんと。&lt;br&gt;
-素人からしたらもうこれだけで精一杯です。&lt;/p&gt;
-
-&lt;p&gt;周りに助けられながら無事に終わりました。&lt;br&gt;
-次回からはもうこれで大丈夫！！&lt;/p&gt;
 </content>
   </entry>
 </feed>
