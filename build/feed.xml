@@ -5,16 +5,398 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-06-06T09:00:00+09:00</updated>
+  <updated>2016-06-14T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html"/>
+    <id>http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html</id>
+    <published>2016-06-14T09:00:00+09:00</published>
+    <updated>2016-06-14T12:42:54+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;cloudstack-apiで仮想マシンの構築を行いたいと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="基本情報"&gt;基本情報&lt;/h2&gt;
+
+&lt;p&gt;ということで、今回は以下の情報をもとに仮想マシンのを作成を行います。&lt;/p&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;項目　　　　　　　&lt;/th&gt;
+&lt;th&gt;名前&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ゾーン　　　　　　　　　&lt;/td&gt;
+&lt;td&gt;radian&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;インスタンス&lt;/td&gt;
+&lt;td&gt;light.S1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;テンプレート&lt;/td&gt;
+&lt;td&gt;Ubuntu Server 14.04 LTS 64-bit&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;IP&lt;/td&gt;
+&lt;td&gt;10.13.0.50&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;所属グループ&lt;/td&gt;
+&lt;td&gt;test&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ホスト名&lt;/td&gt;
+&lt;td&gt;test-name&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ディスプレイ名&lt;/td&gt;
+&lt;td&gt;create-test&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;キーペア&lt;/td&gt;
+&lt;td&gt;hogehoge&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="事前確認"&gt;事前確認&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;仮想マシンを作成する前にまず、現在IDCFクラウドでの稼働状況を確認しておきたいと思います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listVirtualMachines -t name
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;no data found
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;現在、環境内には１台も仮想マシンが作成されていないため&lt;em&gt;no data found&lt;/em&gt;となっています。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="仮想マシンの作成"&gt;仮想マシンの作成&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;それでは仮想マシンを作成しましょう。&lt;/p&gt;
+
+&lt;p&gt;作成には&lt;code&gt;createInstanceGroup&lt;/code&gt;を利用します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api deployVirtualMachine \
+--zoneid a53ff3d3-042b-4cbd-ad16-494bb8d33e06 \
+--serviceofferingid e01a9f32-55c4-4c0d-9b7c-d49a3ccfd3f6 \
+--templateid 6eee3f7d-2193-4df7-81d5-bc2169ac3380 \
+--ipaddress 10.13.0.50 \
+--name test-host \
+--keypair hogehoge \
+--displayname create-test \
+--group test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
+  "deployvirtualmachineresponse": {
+    "id": "b1230e50-f75b-4343-8d6e-ca7a4efcf2b0",
+    "jobid": "dee8c58d-069a-408a-98c3-03ea1e4e3c50"
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;今回指定したオプションについての説明は以下のとおりです。&lt;/p&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;オプション&lt;/th&gt;
+&lt;th&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;--zoneid&lt;/td&gt;
+&lt;td&gt;ゾーン環境ID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;--serviceofferingid&lt;/td&gt;
+&lt;td&gt;インスタンスID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;--templateid&lt;/td&gt;
+&lt;td&gt;テンプレートのID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;--ipaddress&lt;/td&gt;
+&lt;td&gt;IPアドレス&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;--name&lt;/td&gt;
+&lt;td&gt;ホスト名&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;--keypair&lt;/td&gt;
+&lt;td&gt;デフォルト(root)で利用するキーペア&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;--displayname&lt;/td&gt;
+&lt;td&gt;コンソール画面で表示される名前&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;--group&lt;/td&gt;
+&lt;td&gt;仮想マシンが所属するグループ&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;簡単に説明すると、&lt;/p&gt;
+
+&lt;p&gt;・&lt;em&gt;ipaddress&lt;/em&gt;オプションで仮想マシンに&lt;code&gt;10.13.0.50&lt;/code&gt;のIPアドレスを付与&lt;br&gt;
+・SSHログインするために必要なデフォルトキーは&lt;code&gt;hogehoge&lt;/code&gt;を配置&lt;br&gt;
+・&lt;em&gt;name&lt;/em&gt;オプションでSSHログインした際に表示されるホスト名を&lt;code&gt;test-host&lt;/code&gt;に設定&lt;/p&gt;
+
+&lt;p&gt;といった内容になります。&lt;/p&gt;
+
+&lt;p&gt;また、仮想マシンに直接影響はありませんが、&lt;/p&gt;
+
+&lt;p&gt;・&lt;em&gt;group&lt;/em&gt;オプションで仮想マシンを&lt;code&gt;test&lt;/code&gt;にグルーピング&lt;br&gt;
+・&lt;em&gt;diplayname&lt;/em&gt;オプションでコンソール画面での表示を&lt;code&gt;create-test&lt;/code&gt;に設定&lt;/p&gt;
+
+&lt;p&gt;を行っています。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;確認はコンソールおよびコマンドでも可能です。&lt;/p&gt;
+
+&lt;h3 id="コンソール画面で確認"&gt;コンソール画面で確認&lt;/h3&gt;
+
+&lt;p&gt;&lt;img alt="cloudstack-api_createvm01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/39962077-6be0-39ff-bba7-87d00e4823b7.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="コマンドで確認"&gt;コマンドで確認&lt;/h3&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listVirtualMachines -t name,keypair,displayname,group
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+-----------+----------+-------------+-------+
+|    name   | keypair  | displayname | group |
++-----------+----------+-------------+-------+
+| test-host | hogehoge | create-test | test  |
++-----------+----------+-------------+-------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;今回、仮想マシンを作成しましたが、このままではグローバルIPが無いため外部との通信ができません。&lt;br&gt;
+次回は仮想マシンをグローバルIPに付与するところをcloudstack-apiコマンドで行いたいと思います。&lt;br&gt;
+&lt;a href="http://qiita.com/kooohei/items/524c1d5b4e541c695c06"&gt;&amp;gt;&amp;gt;【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>ミネラル醤(ひしお)講座</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/09/hisio-seminer.html"/>
+    <id>http://blog.url.com/2016/06/09/hisio-seminer.html</id>
+    <published>2016-06-09T09:00:00+09:00</published>
+    <updated>2016-06-14T12:33:23+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="醤(ひしお)講座を開催しました！"&gt;醤(ひしお)講座を開催しました！&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;講師は弊社COOでもあり醸せ師のあき先生！！&lt;/p&gt;
+
+&lt;p&gt;わたしは数ヶ月前に受講済みなのですが、&lt;br&gt;
+さらに知識を深めるべく参加させて頂きました。&lt;/p&gt;
+
+&lt;p&gt;醤は味噌と醤油の原型ともいえる、発酵食の基礎のようなもの。&lt;br&gt;
+火を入れずそのまま使えば醤油の味、火を通せば味噌の味！&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;醤の歴史からはじまり、麹のお話、醤の活用法、&lt;br&gt;
+などなど盛りだくさん！興味深いお話に皆さん聞き入っていました。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;そして最後はお待ちかねの醤づくり！&lt;br&gt;
+完成までは２週間かかるので、それぞれお持ち帰り頂き、&lt;br&gt;
+お家で引き続き醤さんを育てて頂きます！完成がたのしみですね！&lt;br&gt;
+今回材料の中にドテラ社のミネラルを加えました。&lt;br&gt;
+とっても贅沢です！&lt;br&gt;
+1日たってみて、前回に比べ醤の成長具合が早い気がしています。&lt;br&gt;
+やはりミネラルの力なのでしょうか。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="醤講座" src="/images/./2016/0610_hisio_seminar/hisio.jpeg" /&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;また皆さんが他に気にされていたのが普段使う調味料について。&lt;br&gt;
+お醤油、みりん、お酒、塩、砂糖...etc&lt;/p&gt;
+
+&lt;p&gt;日常的に使うものだからこそ、ちゃんとしたものを使いたい&lt;br&gt;
+という思いを皆さん持たれているようでした。&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+食は私たちの生活の中で一番基本となるもの。&lt;br&gt;
+健康にいい！！という食品や情報があふれている世の中で、&lt;br&gt;
+自分にとって家族にとって何が一番有益であるのか、&lt;br&gt;
+情報を選択する上でしっかりとした情報を得ることは&lt;br&gt;
+とても大切なこと。&lt;/p&gt;
+
+&lt;p&gt;ご興味ある方は是非一度弊社までお問い合わせください！&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>子供乗せ自転車を購入！</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/07/bicycle.html"/>
+    <id>http://blog.url.com/2016/06/07/bicycle.html</id>
+    <published>2016-06-07T09:00:00+09:00</published>
+    <updated>2016-06-14T12:33:23+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;最近、子供乗せ用の電動自転車を購入しました！&lt;br&gt;
+普段から保育園へは歩き＆抱っこで行っているんですが、近距離とは言え、&lt;br&gt;
+坂が多いのでけっこうキツイんです…&lt;br&gt;
+子供も大きくなって抱っこする手も限界。&lt;br&gt;
+歩くといってもまだまだ寄り道も多くて時間がかかる。&lt;/p&gt;
+
+&lt;p&gt;と言うことで購入に踏み切りました。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="車種選び"&gt;車種選び&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;h2 id="メーカーは？"&gt;メーカーは？&lt;/h2&gt;
+
+&lt;p&gt;子供乗せとして販売されているメーカーは主に３つ！&lt;/p&gt;
+
+&lt;p&gt;・Panasonic&lt;br&gt;
+ ・BRIDGESTONE&lt;br&gt;
+ ・YAMAHA&lt;/p&gt;
+
+&lt;p&gt;実際見てみると、どのメーカーのものもデザイン性以外目立って変わりがないです(笑)&lt;br&gt;
+自転車屋さんの店員さんにメーカーごとの違いを聞いてみるも、&lt;br&gt;
+性能については大差ないですー。とのこと。&lt;/p&gt;
+
+&lt;p&gt;特にYAMAHAとBRIDGESTONEはお互い部品供給し合っているので尚更。&lt;br&gt;
+違いをあげるとすればデザイン性。&lt;br&gt;
+性能については最初の漕ぎ出しがPanasonicが一番スムーズだ、というママの意見が多いとのこと。&lt;br&gt;
+またメーカーというより商品によりますが、乗車適用身長というものがあるので身長が低め、&lt;br&gt;
+という方はその辺りの確認も必要。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="前乗せか後ろ乗せか"&gt;前乗せか後ろ乗せか&lt;/h2&gt;
+
+&lt;p&gt;これはその時のお子さんの成長にあったものを選ぶことになります。&lt;br&gt;
+前乗せは15㌔まで。年齢としては1歳以上〜4歳未満。&lt;br&gt;
+後ろ乗せは推奨2歳〜6歳未満。&lt;/p&gt;
+
+&lt;p&gt;前乗せメリット・デメリット&lt;br&gt;
+・普通ならかごが来る位置にシートが着いているので漕いでいる時ひざ　が当たることがない。&lt;br&gt;
+・前乗せ専用シートはがっちりしていてホールド感がしっかりしている。&lt;br&gt;
+・専用シートを使える期間が短い&lt;br&gt;
+・かごがない&lt;/p&gt;
+
+&lt;p&gt;後ろ乗せメリット・デメリット&lt;br&gt;
+・前乗せする場合のオプションシートの作りが簡易的。&lt;br&gt;
+・前乗せシートをつけると、漕いでいる時足があたる可能性あり。&lt;br&gt;
+・かごがついている&lt;br&gt;
+&lt;br&gt;&lt;br&gt;
+息子は2歳2ヵ月体重12㌔なので前乗せ、後ろ乗せどちらでもいけます。&lt;br&gt;
+ただ、前乗せだとすぐに後ろ乗せをオプションで追加&lt;br&gt;
+することになりそう。。&lt;br&gt;
+あとは今後2人目を考えるなら、下の子を乗せることになる前乗せシートが&lt;br&gt;
+しっかりしてるものの方がいいかなー？と迷いました。&lt;br&gt;
+が、散々悩んで後ろ乗せにしました！&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="車輪の大きさ(車高の高さ)"&gt;車輪の大きさ(車高の高さ)&lt;/h2&gt;
+
+&lt;p&gt;車輪の大きさ、26cmと20cmがあります。&lt;br&gt;
+ママが乗ってる子供乗せって街で見かけるものは大半車輪が小さく車高が低いですよね？&lt;br&gt;
+車高が低い方が確かに子供の乗降が楽です！&lt;br&gt;
+車輪が小さいからといって漕ぎにくさや進み具合に大差はないそう。&lt;/p&gt;
+
+&lt;p&gt;ここは迷わず20cmに。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="選んだ車種は"&gt;選んだ車種は&lt;/h2&gt;
+
+&lt;p&gt;候補としては、&lt;br&gt;
+Panasonicギュットアニーズ、ギュットミニDX、YAMAHAのpas baby。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="子供の乗せ自転車" src="/images/./2016/0607_bicycle/anyys.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="子供の乗せ自転車" src="/images/./2016/0607_bicycle/miniDX.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="子供の乗せ自転車" src="/images/./2016/0607_bicycle/pasbaby.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;と言うことで我が家が選んだのは、&lt;br&gt;
+Panasonicギュットアニーズ！&lt;/p&gt;
+
+&lt;p&gt;ただこのギュットアニーズ、バッテリー容量が8Ahなんです。&lt;br&gt;
+12Ahのバッテリーを積んでいる車種もあるので、小さいかなーと&lt;br&gt;
+アニーズかpasbabyXLで悩みましたが、&lt;br&gt;
+我が家の場合保育園の送迎と、近場への買い物くらいなので、8Ahで十分だろうということに。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="迷っている人は店頭試乗もおすすめ"&gt;迷っている人は店頭試乗もおすすめ&lt;/h2&gt;
+
+&lt;p&gt;購入店では試乗はしていないのですが、以前別のお店でPanasonicのギュットミニDXと&lt;br&gt;
+BRIDGESTONEのbikkeに試乗しました。&lt;br&gt;
+この時のお店の人もPanasonicの方が漕ぎ出しのアシストがスムーズだと言っていましたが、&lt;br&gt;
+乗ってみて確かに！と実感。&lt;br&gt;
+試乗はいい検討材料になりますよ。アニーズは試乗してないですが(笑)&lt;br&gt;
+迷っている人は試乗のできるお店に行ってみるといいと思います！&lt;/p&gt;
+
+&lt;p&gt;うちの息子も一緒に試乗しましたが、意外にも全く泣かず、楽しかったようで&lt;br&gt;
+『もう一回！』と降りてくれませんでしたー。&lt;br&gt;
+　試乗をするとこんな風にお子さんの反応を見ることもできます。　&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="いざ購入へ-意外な盲点"&gt;いざ購入へ 意外な盲点&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;いざお店で取り寄せ依頼！となったのですが、なんとメーカー在庫がない！！&lt;br&gt;
+製造待ちになるので納期は8月頃になるとか、、&lt;br&gt;
+第2希望としていたpasbabyXLについては9月納期、、&lt;/p&gt;
+
+&lt;p&gt;電動自転車は毎年2月頃に新機種が発売されるそうで、やはり入園シーズンの3、4月頃が&lt;br&gt;
+1番売れる時期だそうです。&lt;br&gt;
+5月頃にはだんだん品薄になってくるのかもしれませんね。&lt;/p&gt;
+
+&lt;p&gt;今後購入を検討される方は購入時期は早めがおすすめですよー。&lt;/p&gt;
+
+&lt;p&gt;ネットではまだ在庫があるお店も多数ありましたが、ネットで自転車を購入するのも&lt;br&gt;
+ちょっと抵抗があり、、近所の自転車屋さんの系列店にあったラ&lt;br&gt;
+スト１台をなんとかゲット！！&lt;br&gt;
+念願の電動自転車ーーー！&lt;br&gt;
+実はまだ乗れてはいませんが、、今からとっても楽しみです。&lt;br&gt;
+これで快適に保育園の通園ができるはず！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>AWS S3バケットに独自ドメインを割り当てる。</title>
     <link rel="alternate" href="http://blog.url.com/2016/06/06/assign-your-own-domain-to-the-aws-s3-bucket.html"/>
     <id>http://blog.url.com/2016/06/06/assign-your-own-domain-to-the-aws-s3-bucket.html</id>
     <published>2016-06-06T09:00:00+09:00</published>
-    <updated>2016-06-06T10:49:41+09:00</updated>
+    <updated>2016-06-14T12:33:12+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -66,12 +448,12 @@
 
 &lt;p&gt;S3バケットに独自ドメインを割り当てるためには「バケット名は割り当てるドメイン名と同じにする」ということに注意が必要です。&lt;/p&gt;
 
-&lt;p&gt;もし、レコード作成時に作成したバケットが表示されない(&lt;em&gt;No Targets Available&lt;/em&gt;)場合は、&lt;br&gt;
-&lt;code&gt;&lt;br&gt;
-・作成したバケットの名前間が違う。&lt;br&gt;
-・ウェブサイトホストティングが有効になっていない。&lt;br&gt;
-&lt;/code&gt;&lt;br&gt;
-などが考えられるのでもう一度確認してみてください。&lt;/p&gt;
+&lt;p&gt;もし、レコード作成時に作成したバケットが表示されない(&lt;em&gt;No Targets Available&lt;/em&gt;)場合は、&lt;/p&gt;
+
+&lt;p&gt;・作成したバケットの名前間が違う。&lt;br&gt;
+・ウェブサイトホストティングが有効になっていない。&lt;/p&gt;
+
+&lt;p&gt;などが考えられるのでもう一度確認してみてください。&lt;/p&gt;
 
 &lt;p&gt;また、割り当てる際の作業手順は今回説明したように（S3でバケット作成 → Route53でレコード登録）で行うが良いと思います。&lt;br&gt;
 ですが、どうしても先にレコード登録をする必要がある場合は、Alias Targetに「s3-website-ap-northeast-1.amazonaws.com.」を入力すれば事前に作成しておくことが可能です。&lt;/p&gt;
@@ -82,7 +464,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/05/30/how-to-install-the-idcf-command-line-tool-for-macosx.html"/>
     <id>http://blog.url.com/2016/05/30/how-to-install-the-idcf-command-line-tool-for-macosx.html</id>
     <published>2016-05-30T09:00:00+09:00</published>
-    <updated>2016-06-06T10:40:14+09:00</updated>
+    <updated>2016-06-14T12:33:12+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -416,351 +798,6 @@ jquery-1.8.2.min.jsを読み込もうとしていました。&lt;/p&gt;
 現在のままだと、必須項目ですというチェックをすることはできてもフォームが未入力でもフォームの送信ができてしまうんです...&lt;/p&gt;
 
 &lt;p&gt;この部分についてはまた調べてみようと思います。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>第４回 AWSとIDCFをVPN接続する - 最後の仕上げ編</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/26/how-the-vpn-connection-to-AWS-and-IDCF-4.html"/>
-    <id>http://blog.url.com/2016/05/26/how-the-vpn-connection-to-AWS-and-IDCF-4.html</id>
-    <published>2016-05-26T09:00:00+09:00</published>
-    <updated>2016-05-30T20:15:50+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/f16dcb9e7280b29deee7"&gt;&amp;lt;&amp;lt; 前回：第３回 AWSとIDCFをVPN接続する - VPN接続編（全４回）&lt;/a&gt;&lt;br&gt;
-IDCFクラウドにVyOSで仮想マシンを作成して、IDCFクラウドとAWSをVPNで接続する設定を説明します。&lt;br&gt;
-&lt;img alt="idcf-vpn-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9b15d672-f654-ab05-fb61-57cf8951b58e.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;前回でIDCFのVPNゲートウェイにAWSで取得したコンフィグを流し込み、ついにIDCFとAWS間のVPN接続が完了しました。&lt;br&gt;
-&lt;img alt="idcf-vpn-7.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b290de8c-a844-3286-22e6-3e305e593004.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;とはいえ、このままではただVPN接続しただけで、サーバー間で通信を行うことはできません。&lt;/p&gt;
-
-&lt;p&gt;そこで仕上げとして、サーバー間で通信ができるようにルーティングとセキュリティグループの設定を行います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="ルーティング設定"&gt;ルーティング設定&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;h2 id="aws"&gt;AWS&lt;/h2&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn-5.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f143d7a0-9cf1-f292-da00-0cea9741299c.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ここで必要なのは「ルートテーブル」と「セキュリティグループ」の２点です。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-・ルートテーブル&lt;br&gt;
-作成した「VPN接続」の「要約」タブの内容が表示されていることを確認し「VPC」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_4_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/422d6f5e-bd8f-54f5-f59a-c1cb4a8cd7c1.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-対象の「VPC」の「概要」タブを表示し「ルートテーブル」をクリックします。&lt;br&gt;
-&lt;img alt="idcf-vpn_4_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/31fbb0e9-5aba-10ad-eb67-847d8b2fc0a9.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-対象の「ルートテーブル」の「ルート」の内容を「編集」してルーティングを追加します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;10.13.0.0/21     vgw-adsfad（仮想プライベートゲートウェイ）
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;※サブネットで別のルートテーブルも利用している場合はそちらを追加する必要があるかもしれないので注意が必要です。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn_4_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1b79aa29-30a6-d660-0a7a-f198453d97da.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・セキュリティグループの設定&lt;br&gt;
-インスタンスに紐付いているセキュリティグループに対象となるIDCF側のNWを追加します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;    タイプ        プロトコル  ポート範囲   送信元
-すべてのトラフィック    すべて    すべて   10.13.0.0 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="idcf"&gt;IDCF&lt;/h2&gt;
-
-&lt;p&gt;&lt;img alt="idcf-vpn-6.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/5da656ec-d04e-2357-0f3f-2d4df62c3d5b.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;IDCFではAWSのようなルートテーブルなどのルーティングを一括管理するものがないので各サーバに対しスタティックルートの設定を行う必要があります。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・スタティックルートの設定&lt;br&gt;
-サーバへログインします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ssh hogehoge@xxx.xxx.xxx.xxx
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-ルーティングを追加します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -net 172.31.0.0 gw 10.13.0.2 netmask 255.255.0.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;今回はコマンドによる一時的な追加ですが、永久的に追加するのであればstatic-routesに直接記載します。(Ubuntuの場合)&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;#!/bin/sh
-/sbin/route add -net 172.31.0.0 gw 10.13.0.2 netmask 255.255.0.0 dev eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;また、実行権限が必要なのでお忘れなく。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo chmod +x /etc/network/if-up.d/static-routes
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;それでは疎通ができたかpingで確認してみましょう。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="aws環境から確認"&gt;AWS環境から確認&lt;/h2&gt;
-
-&lt;p&gt;それではAWS環境にあるサーバにログインしてください。&lt;/p&gt;
-
-&lt;p&gt;まずは、ルーティングの確認です。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         10.20.0.1       0.0.0.0         UG        0 0          0 eth0
-172.31.0.0       0.0.0.0         255.255.0.0   U         0 0          0 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;とは言ってもAWSの場合はルートテーブルで管理してますので&lt;code&gt;netstat&lt;/code&gt;では確認できません。&lt;br&gt;
-ということでとりあえず疎通確認します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ping xxx.xxx.xxx.xxx
-PING xxx.xxx.xxx.xxx (xxx.xxx.xxx.xxx) 56(84) bytes of data.
-64 bytes from xxx.xxx.xxx.xxx: icmp_seq=1 ttl=63 time=11.1 ms
-64 bytes from xxx.xxx.xxx.xxx: icmp_seq=2 ttl=63 time=12.7 ms
-64 bytes from xxx.xxx.xxx.xxx: icmp_seq=3 ttl=63 time=10.4 ms
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;無事、確認できました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="idcf環境から確認"&gt;IDCF環境から確認&lt;/h2&gt;
-
-&lt;p&gt;まずはルーティングの確認です。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         10.13.0.1       0.0.0.0         UG        0 0          0 eth0
-10.13.0.0       0.0.0.0         255.255.248.0   U         0 0          0 eth0
-xxx.xxx.xxx.xxx &amp;lt;VyOSのIP&amp;gt;      255.255.0.0     UG        0 0          0 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こちらはルーティングが確認できました。(まぁ、さっき追加したので当たり前ですねw)&lt;br&gt;
-ということで疎通確認しましょう。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ping xxx.xxx.xxx.xxx
-PING xxx.xxx.xxx.xxx (xxx.xxx.xxx.xxx) 56(84) bytes of data.
-64 bytes from xxx.xxx.xxx.xxx: icmp_seq=1 ttl=63 time=11.1 ms
-64 bytes from xxx.xxx.xxx.xxx: icmp_seq=2 ttl=63 time=12.7 ms
-64 bytes from xxx.xxx.xxx.xxx: icmp_seq=3 ttl=63 time=10.4 ms
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こちらも無事、確認できました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;以上で今回はAWSの対向の環境はIDCFですが、VPN接続するために利用しているのはVyOSです。&lt;br&gt;
-なので、その他の環境であっても同様の設定(ポート許可など)ができればVyOSを利用してVPN接続が可能です。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>スクロールが必要なweb画面のスクリーンショットを撮る方法</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/18/screendhot-file.html"/>
-    <id>http://blog.url.com/2016/05/18/screendhot-file.html</id>
-    <published>2016-05-18T09:00:00+09:00</published>
-    <updated>2016-05-24T11:08:06+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;何かと便利なスクリーンショット。&lt;br&gt;
-取得したファイルを資料の添付イメージとして利用することも多いかと思います。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-ただ、画面に収まっているページしか取得できずに困ったことって&lt;br&gt;
-ありませんか？&lt;br&gt;
-本当は全部のページを一発でできたらいいのに...と何度思ったことか。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-今回、資料作りにスクリーンショットが必要になったので、調べてみました。&lt;br&gt;
-きっと何かいい方法があるはず！&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="full-page-screen-capture"&gt;Full Page Screen Capture&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回使ってみたのは、&lt;/p&gt;
-
-&lt;p&gt;Google Chromeの拡張機能「Full Page Screen Capture』&lt;/p&gt;
-
-&lt;p&gt;[追加方法]&lt;/p&gt;
-
-&lt;p&gt;・chrome ＞　環境設定　＞　詳細設定　＞　ユーザー補助機能をさら　に追加&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-・chromeウェブストアが出てくるので、そこでFull Page Screen Captureを検索！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0518_screenshot/20160518_03.png" /&gt;&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-わたしはすでに追加済みになっていますが、これをchromeに追加するだけでOK。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-該当のページを開いて、右上にあるカメラマークをぽちっとするだけ！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0518_screenshot/20160518_01.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;すると別タブで取得したファイルが開くので、そのファイルを保存するだけ。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0518_screenshot/20160518_02.png" /&gt;&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-簡単ですね〜！&lt;br&gt;
-必要に応じて、不要部分は画像編集で切り抜きすればいいだけです。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-欲を言えば該当の画面でそのままスクロールして必要なところだけ&lt;br&gt;
-スクリーンショットが取れれば尚嬉しいです。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-そんな機能ないかな。&lt;br&gt;
-また探してみます。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>第３回 AWSとIDCFをVPN接続する - VPN接続編（全４回）</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/16/how-the-vpn-connection-to-AWS-and-IDCF-3.html"/>
-    <id>http://blog.url.com/2016/05/16/how-the-vpn-connection-to-AWS-and-IDCF-3.html</id>
-    <published>2016-05-16T09:00:00+09:00</published>
-    <updated>2016-05-17T12:39:40+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/fbc6b32f5a70bf3cfa20"&gt;&amp;lt;&amp;lt; 前回：第２回 AWSとIDCFをVPN接続する - AWS準備編（全４回）&lt;/a&gt;&lt;br&gt;
-IDCFクラウドにVyOSで仮想マシンを作成して、IDCFクラウドとAWSをVPNで接続する設定を説明します。&lt;br&gt;
-&lt;img alt="idcf-vpn-1.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9b15d672-f654-ab05-fb61-57cf8951b58e.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ここまでで、IDCFとAWSの両方にVPNゲートウェイのを用意するところまで完了しました。&lt;br&gt;
-前回の「VPN接続の作成」の際に「設定のダウンロード」を行っているのであとはそのAWS側で取得したコンフィグをIDCF側で設定してあげれば接続できるようになります。&lt;br&gt;
-ということで今回はIDCFとAWS間の接続設定を行います。&lt;br&gt;
-&lt;img alt="idcf-vpn-4.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/2111d578-734d-ad00-1175-1c6bce14db14.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="vpn接続設定---idcf"&gt;VPN接続設定 - IDCF&lt;/h2&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;・VyOSへログイン&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ssh vyos@&amp;lt;サーバーIP&amp;gt; -i &amp;lt;鍵のパス&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・コンフィグの流し込み&lt;br&gt;
-前回の&lt;a href="#"&gt;第２回 AWSとIDCFをVPN接続する（全４回）&lt;/a&gt;で「VPN接続の作成」の「設定をダウンロード」した際にダウンロードしたコンフィグを流し込みます。(コピペでOK)&lt;br&gt;
-もしうまくいかない場合はコメントアウト（先頭に「!」がある行)を除いてみてください。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・VPC Tunnelのlocal-address設定&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;vyos@vyos# set vpn ipsec site-to-site peer 52.192.68.69 local-address 10.13.0.146
-[edit]
-vyos@vyos# set vpn ipsec site-to-site peer 52.193.106.189 local-address 10.13.0.146
-[edit]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・設定の保存&lt;br&gt;
-設定を保存します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;vyos@vyos# commit
-[edit]
-vyos@vyos# save
-Saving configuration to '/config/config.boot'...
-Done
-[edit]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・IPsec再起動&lt;br&gt;
-基本的には設定を保存した時点で接続されますが、一応再起動しておきます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo /etc/init.d/ipsec restart
-Restarting strongswan IPsec services: ipsecStopping strongSwan IPsec...
-Starting strongSwan 4.5.2 IPsec [starter]...
-.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-・接続確認&lt;br&gt;
-vti0とvti1がAWSと接続しているtunnelです。どちらもu/u(Up)しているのが確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ show interfaces
-Codes: S - State, L - Link, u - Up, D - Down, A - Admin Down
-Interface        IP Address                        S/L  Description
----------        ----------                        ---  -----------
-eth0             10.13.0.146/21                    u/u
-lo               127.0.0.1/8                       u/u
-                 ::1/128
-vti0             169.254.25.22/30                  u/u  VPC tunnel 1
-vti1             169.254.24.82/30                  u/u  VPC tunnel 2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ここでもvti0とvti1がconnectedと成っているが確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ show ip route
-Codes: K - kernel route, C - connected, S - static, R - RIP, O - OSPF,
-       I - ISIS, B - BGP, &amp;gt; - selected route, * - FIB route
-
-S&amp;gt;* 0.0.0.0/0 [210/0] via 10.13.0.1, eth0
-C&amp;gt;* 10.13.0.0/21 is directly connected, eth0
-C&amp;gt;* 127.0.0.0/8 is directly connected, lo
-C&amp;gt;* 169.254.24.80/30 is directly connected, vti1
-C&amp;gt;* 169.254.25.20/30 is directly connected, vti0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;「VPC tunnel 1と2」2つのvti接続が確認でき、どちらもStateがupと成っています。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ show vpn ipsec sa
-Peer ID / IP                            Local ID / IP
-------------                            -------------
-52.192.68.69                            10.13.0.146
-
-    Description: VPC tunnel 1
-
-    Tunnel  State  Bytes Out/In   Encrypt  Hash    NAT-T  A-Time  L-Time  Proto
-    ------  -----  -------------  -------  ----    -----  ------  ------  -----
-    vti     up     7.4K/6.6K      aes128   sha1    yes    1587    3600    all
-
-Peer ID / IP                            Local ID / IP
-------------                            -------------
-52.193.106.189                          10.13.0.146
-
-    Description: VPC tunnel 2
-
-    Tunnel  State  Bytes Out/In   Encrypt  Hash    NAT-T  A-Time  L-Time  Proto
-    ------  -----  -------------  -------  ----    -----  ------  ------  -----
-    vti     up     7.5K/4.9K      aes128   sha1    yes    1262    3600    all
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;また、AWS側は以下で確認できます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;以上で無事IDCF-AWS間をVPN接続できました。&lt;br&gt;
-ただ、これだけではただ繫っただけでサーバー間で通信を行うには不完全です。&lt;br&gt;
-ということで、次回は最後の仕上げとして通信を行うための設定を行います。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://qiita.com/kooohei/items/6ba28436485096100161"&gt;&amp;gt;&amp;gt; 最終回：第４回 AWSとIDCFをVPN接続する - 最後の仕上げ編（全４回）&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>
