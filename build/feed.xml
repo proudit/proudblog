@@ -5,10 +5,233 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-06-14T09:00:00+09:00</updated>
+  <updated>2016-06-20T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html"/>
+    <id>http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html</id>
+    <published>2016-06-20T09:00:00+09:00</published>
+    <updated>2016-06-20T12:09:53+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;前回、&lt;a href="http://qiita.com/kooohei/items/7690b526edf453fc15d6"&gt;【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。&lt;/a&gt;では&lt;em&gt;cloudstack-api&lt;/em&gt;コマンドで仮想マシンを作成しました。&lt;br&gt;
+今回はその続編として、作成した仮想マシンにパブリックIPを付与したいと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="事前確認"&gt;事前確認&lt;/h2&gt;
+
+&lt;p&gt;まずは現在のパブリックIPを確認します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listPublicIpAddresses -t ipaddress
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+-----------------+
+|    ipaddress    |
++-----------------+
+| ***.***.***.*** |
++-----------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="パブリックipの取得"&gt;パブリックIPの取得&lt;/h2&gt;
+
+&lt;p&gt;パブリックIPの取得は&lt;code&gt;associateIpAddress&lt;/code&gt;コマンドで行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api associateIpAddress \
+ --zoneid a53ff3d3-042b-4cbd-ad16-494bb8d33e06
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
+  "associateipaddressresponse": {
+    "id": "061c31aa-aa41-4e03-a274-83b17b58c1a3",
+    "jobid": "b32b867c-07d4-412e-b514-94a1eee62ed1"
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;オプション&lt;/th&gt;
+&lt;th&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;--zoneid&lt;/td&gt;
+&lt;td&gt;ゾーンID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;簡単に説明すると、&lt;/p&gt;
+
+&lt;p&gt;「&lt;em&gt;radian&lt;/em&gt;ゾーンにパブリックIPを割り当てる（取得する）」&lt;/p&gt;
+
+&lt;p&gt;という内容になります。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
+
+&lt;p&gt;先ほどの&lt;code&gt;listPublicIpAddresses&lt;/code&gt;コマンドで確認してみましょう。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listPublicIpAddresses -t ipaddress,id,virtualmachinename
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+--------------------------------------+--------------------+
+|   ipaddress    |                  id                  | virtualmachinename |
++----------------+--------------------------------------+--------------------+
+| 210.129.19.191 | 061c31aa-aa41-4e03-a274-83b17b58c1a3 | None               |
+| ***.***.***.***| ********-****-****-****-************ | None               |
++----------------+--------------------------------------+--------------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;210.129.19.191&lt;/code&gt; のIPが割り当てられているのが確認できました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="nat設定"&gt;NAT設定&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;取得が確認できたら次はNATの設定です。&lt;br&gt;
+パブリックIPを仮想マシンへ割り当てます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api enableStaticNat \
+--ipaddressid 061c31aa-aa41-4e03-a274-83b17b58c1a3 \
+--virtualmachineid b1230e50-f75b-4343-8d6e-ca7a4efcf2b0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
+  "enablestaticnatresponse": {
+    "success": "true"
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;オプション&lt;/th&gt;
+&lt;th&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;--ipaddressid&lt;/td&gt;
+&lt;td&gt;パブリックIPアドレスID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;--virtualmachineid&lt;/td&gt;
+&lt;td&gt;仮想マシンID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;戻り値で&lt;code&gt;&amp;quot;success&amp;quot;: &amp;quot;true&amp;quot;&lt;/code&gt;となっていれば完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
+
+&lt;p&gt;先ほど実行した戻り値でも確認はできていますが、一応&lt;code&gt;listPublicIpAddresses&lt;/code&gt;コマンドでも確認しましょう。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listPublicIpAddresses -t ipaddress,id,virtualmachinename,virtualmachinedisplayname
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+--------------------------------------+--------------------+----------+---------------------------+
+|   ipaddress    |                  id                  | virtualmachinename | hostname | virtualmachinedisplayname |
++----------------+--------------------------------------+--------------------+----------+---------------------------+
+| 210.129.19.191 | 061c31aa-aa41-4e03-a274-83b17b58c1a3 | test-host          | None     | create-test               |
+| ***.***.***.***| ********-****-****-****-************ | None               | None     | None                      |
++----------------+--------------------------------------+--------------------+----------+---------------------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ということで、先ほど取得したパブリックIPアドレスが割り当てられているのを確認できました。&lt;br&gt;
+ここで出力している項目ですが&lt;em&gt;virtualmachinename&lt;/em&gt;はサーバ自身の&lt;em&gt;hostname&lt;/em&gt;となります。コンソールで表示される「仮想マシン名」は&lt;em&gt;virtualmachinedisplayname&lt;/em&gt;です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;仮想マシンにパブリックIPが付与されたのでこれで外部との通信経路が用意されました。&lt;br&gt;
+ですが実はまだ通信はできません。。。FWで許可されていないからです。&lt;br&gt;
+ということで、次回はFWの設定をcloudstack-apiで行いたいと思います。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>JavaScript、jQueryについてまとめ</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/15/javascript&amp;jQuery.html"/>
+    <id>http://blog.url.com/2016/06/15/javascript&amp;jQuery.html</id>
+    <published>2016-06-15T09:00:00+09:00</published>
+    <updated>2016-06-20T11:54:27+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;前回の記事でvalidationを使ったフォームチェックの実装について紹介しましたが、&lt;br&gt;
+そもそもJavaScriptってなんだろうというところ、まとめました。&lt;/p&gt;
+
+&lt;p&gt;以前から耳にすることはあったし、プログラミング言語なんだろうな、くらいの認識はありましたが、詳しいことはまったく知らなかったので。&lt;/p&gt;
+
+&lt;p&gt;いい機会なので備忘録として簡単にまとめてみます。&lt;/p&gt;
+
+&lt;h1 id="javascriptとは"&gt;JavaScriptとは&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;主にWebページに組み込まれたプログラムをWebブラウザ上で実行するために用いられるプログラミング言語の一つ。&lt;br&gt;
+サイト構築で使われる多くの言語とは使用される場所が違い、クライアントサイドで動く言語です。&lt;br&gt;
+サーバサイドは、サーバの中で実行されますが、クライアントサイドはユーザのブラウザ上で、&lt;br&gt;
+ブラウザの更新の必要なく実行することができる。&lt;/p&gt;
+
+&lt;p&gt;JavaScriptはサーバサイドで利用することもできるそうです。&lt;/p&gt;
+
+&lt;p&gt;主な働きとして、webページに動きをつけるために用いられ、クリックやタップ時のページ上の挙動の制御やアニメーションの実行、フォームのエラーチェックなどで活躍します。&lt;br&gt;
+&lt;a href="http://press.share-wis.com/why-you-should-learn-javascript"&gt;http://press.share-wis.com/why-you-should-learn-javascript&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;サーバ側で処理することなくwebページに動きのある動作をつけることができるんですね。&lt;/p&gt;
+
+&lt;p&gt;現在はパソコン自体もスペックが上がってきているため、&lt;br&gt;
+ブラウザが処理を行ってもそれほど負担にもならず、むしろサーバ側の負担がかからないように、ブラウザ上でできる処理はそこで実行させてしまう、という構成が多くなってきている。&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="jqueryとは"&gt;jQueryとは&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;JavaScriptで作られたプログラムで、JavaScriptよりも扱いやすくしたファイル。&lt;br&gt;
+JavaScriptのライブラリで、&lt;br&gt;
+よく利用されるスクリプトを簡単にまとめたもの。&lt;br&gt;
+同じ動きを実現させる場合でも、複雑なJavaScriptのコードを書かなくてもライブラリを用いることによりもっと簡単にJavaScriptを使うことができるのです。&lt;/p&gt;
+
+&lt;p&gt;ライブラリを利用することにより、開発効率もあがり、時間短縮もできてしまうのでとても便利ですね。&lt;/p&gt;
+
+&lt;p&gt;jQueryの主な機能としては&lt;/p&gt;
+
+&lt;p&gt;・DOM（Document Object Model）：HTMLを操作する&lt;br&gt;
+・アニメーション：要素をアニメーションさせる&lt;br&gt;
+・Ajax：外部ファイルをダイナミックに読み込む&lt;/p&gt;
+
+&lt;p&gt;その他にも様々な機能があり、JSライブラリの中でも代表的なライブラリ。&lt;/p&gt;
+
+&lt;p&gt;先日jQuery 3.0版のリリースもありましたね！&lt;br&gt;
+3.0版ではIE8以前のものは動作しなくなっているようです。&lt;br&gt;
+&lt;a href="https://osdn.jp/magazine/16/06/13/183000"&gt;https://osdn.jp/magazine/16/06/13/183000&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;他にもJavaScriptのライブラリはたくさんあり、その年によりトレンドもあるようです。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.buildinsider.net/web/popularjslib/2016"&gt;http://www.buildinsider.net/web/popularjslib/2016&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id="終わりに"&gt;終わりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;まだまだ入り口に過ぎませんが、今まで何気なく利用していたwebサイトですがクライアントサイドだけでこんなに動きのあるものが実装されているなんて意識していませんでした。&lt;/p&gt;
+
+&lt;p&gt;これを機に少しずつ知識を深めていきたいです。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。</title>
     <link rel="alternate" href="http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html"/>
@@ -457,347 +680,6 @@ BRIDGESTONEのbikkeに試乗しました。&lt;br&gt;
 
 &lt;p&gt;また、割り当てる際の作業手順は今回説明したように（S3でバケット作成 → Route53でレコード登録）で行うが良いと思います。&lt;br&gt;
 ですが、どうしても先にレコード登録をする必要がある場合は、Alias Targetに「s3-website-ap-northeast-1.amazonaws.com.」を入力すれば事前に作成しておくことが可能です。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>IDCFクラウドのコマンドラインツールをインストールする。 - MacOSX</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/30/how-to-install-the-idcf-command-line-tool-for-macosx.html"/>
-    <id>http://blog.url.com/2016/05/30/how-to-install-the-idcf-command-line-tool-for-macosx.html</id>
-    <published>2016-05-30T09:00:00+09:00</published>
-    <updated>2016-06-14T12:33:12+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;MacOSからIDCFクラウドに対してコマンドラインツールを利用して操作できるようにします。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="事前準備"&gt;事前準備&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回インストールするにあたって、gitとpipの２つのコマンドが必要となります。&lt;br&gt;
-なので、まだインストールしていない場合は以下のコマンドでインストールしておいてください。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo brew install git
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ curl -kL https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
-$ sudo easy_install pip
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="インストール"&gt;インストール&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;事前準備が完了したら、いよいよコマンドのインストールを行います。&lt;br&gt;
-インストールはidcfのgithubリポジトリにあるcloudstack-apiをします。&lt;br&gt;
-&lt;a href="https://github.com/idcf/cloudstack-api"&gt;https://github.com/idcf/cloudstack-api&lt;/a&gt;&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo pip install git+https://github.com/idcf/cloudstack-api
-
-・・・
-    cc -fno-strict-aliasing -fno-common -dynamic -arch i386 -arch x86_64 -g -Os -pipe -fno-common -fno-strict-aliasing -fwrapv -DENABLE_DTRACE -DMACOSX -DNDEBUG -Wall -Wstrict-prototypes -Wshorten-64-to-32 -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -DENABLE_DTRACE -arch i386 -arch x86_64 -pipe -I/usr/include/libxml2 -Isrc/lxml/includes -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c src/lxml/lxml.etree.c -o build/temp.macosx-10.11-intel-2.7/src/lxml/lxml.etree.o -w -flat_namespace
-    In file included from src/lxml/lxml.etree.c:320:
-    src/lxml/includes/etree_defs.h:14:10: fatal error: 'libxml/xmlversion.h' file not found
-    #include "libxml/xmlversion.h"
-             ^
-    1 error generated.
-    Compile failed: command 'cc' failed with exit status 1
-    creating tmp
-    cc -I/usr/include/libxml2 -I/usr/include/libxml2 -c /tmp/xmlXPathInit3sJd9Z.c -o tmp/xmlXPathInit3sJd9Z.o
-    /tmp/xmlXPathInit3sJd9Z.c:1:10: fatal error: 'libxml/xpath.h' file not found
-    #include "libxml/xpath.h"
-             ^
-    1 error generated.
-    *********************************************************************************
-    Could not find function xmlCheckVersion in library libxml2. Is libxml2 installed?
-    Perhaps try: xcode-select --install
-    *********************************************************************************
-    error: command 'cc' failed with exit status 1
-
-    ----------------------------------------
-Command "/usr/bin/python -u -c "import setuptools, tokenize;__file__='/private/tmp/pip-build-GIuK3z/lxml/setup.py';exec(compile(getattr(tokenize, 'open', open)(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" install --record /tmp/pip-Mmw1r6-record/install-record.txt --single-version-externally-managed --compile" failed with error code 1 in /private/tmp/pip-build-GIuK3z/lxml
-You are using pip version 8.0.2, however version 8.1.1 is available.
-You should consider upgrading via the 'pip install --upgrade pip' command.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;なにやらインストールが失敗してしまったみたいです。。。&lt;br&gt;
-でもよく見ると、&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;*********************************************************************************
-    Could not find function xmlCheckVersion in library libxml2. Is libxml2 installed?
-    Perhaps try: xcode-select --install
-    *********************************************************************************
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;という表示が出ています。&lt;br&gt;
-インストールに必要な関数(xmlCheckVersion)が見つからないみたいです。Perhaps tryという箇所でインストール方法も教えてくれているので、とりあえずその通りに実行します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ xcode-select --install
-xcode-select: note: install requested for command line developer tools
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;再度インストールを実行します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo pip install git+https://github.com/idcf/cloudstack-api
-
-The directory '/Users/kohei/Library/Caches/pip/http' or its parent directory is not owned by the current user and the cache has been disabled. Please check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
-The directory '/Users/kohei/Library/Caches/pip' or its parent directory is not owned by the current user and caching wheels has been disabled. check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
-Collecting git+https://github.com/idcf/cloudstack-api
-  Cloning https://github.com/idcf/cloudstack-api to /tmp/pip-FkXf1Z-build
-Requirement already satisfied (use --upgrade to upgrade): setuptools in /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python (from cloudstack.compute==0.10.2)
-Requirement already satisfied (use --upgrade to upgrade): httplib2 in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
-Requirement already satisfied (use --upgrade to upgrade): simplejson in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
-Requirement already satisfied (use --upgrade to upgrade): argparse in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
-Requirement already satisfied (use --upgrade to upgrade): prettytable==0.5 in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
-Requirement already satisfied (use --upgrade to upgrade): parsedatetime==0.8.7 in /Library/Python/2.7/site-packages (from cloudstack.compute==0.10.2)
-Collecting lxml (from cloudstack.compute==0.10.2)
-  Downloading lxml-3.6.0.tar.gz (3.7MB)
-    100% |████████████████████████████████| 3.7MB 151kB/s
-Installing collected packages: lxml, cloudstack.compute
-  Running setup.py install for lxml ... done
-  Running setup.py install for cloudstack.compute ... done
-Successfully installed cloudstack.compute-0.10.2 lxml-3.6.0
-You are using pip version 8.0.2, however version 8.1.1 is available.
-You should consider upgrading via the 'pip install --upgrade pip' command.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;今度はインストールできたみたいです。&lt;br&gt;
-一応試しにコマンドを実行してみると、&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api --version
-cloudstack-api v0.10.2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ちゃんとバージョン情報の確認ができました。&lt;/p&gt;
-
-&lt;p&gt;ただ、このままではインストールしただけなので、次は環境へアクセスできるように設定を行います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="環境設定"&gt;環境設定&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;idcfヘアクセスできるようにするには&lt;code&gt;.idcfrc&lt;/code&gt;というファイルを作成し、そこに必要な情報を記載してあげる必要があります。&lt;/p&gt;
-
-&lt;p&gt;ということではじめに必要な情報の取得です。&lt;br&gt;
-情報は管理コンソールの「仮想マシン」&amp;gt;「API」から確認できます。&lt;/p&gt;
-
-&lt;p&gt;まずは、API KeyとSecret Keyは画面の「API」の項目から取得できます。ボードクリップアイコンをクリックするとコピーできます。&lt;br&gt;
-&lt;img alt="20160517-01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/145b8cb9-2357-ee5d-f9ae-c78043f9bad0.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;次にエンドポイント情報を取得します。今回は「東日本リージョン」ということで進めたいと思うので、先ほどと同じように東日本の箇所にあるクリップボードアイコンをクリックしてコピーします。&lt;br&gt;
-&lt;img alt="20160517-02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/904688ef-7cc6-e705-77c1-e69dc420fb91.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;３つの情報が取得できたらいよいよ「.idcfrc」ファイルを作成します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ vi ~/.idcfrc
-
-[account]
-host=https://compute.jp-east.idcfcloud.com/client/api
-api_key=***********************************
-secret_key=***********************************
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;hostにはエンドポイントが入ります。&lt;br&gt;
-また、アクセス権限をユーザーだけが読み書きできるように変更もしておきます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ chmod 600 ~/.idcfrc
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上で環境へアクセスできるところまで準備ができました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;環境設定まで完了したので実際にアクセスできるか確認してみましょう。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listZones
-{
-  "listzonesresponse": {
-    "count": 5,
-    "zone": [
-      {
-        "allocationstate": "Enabled",
-・・・
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;レスポンス内容は割愛しますが、ずらっとJSON形式でゾーン情報が表示されればOKです。&lt;/p&gt;
-
-&lt;p&gt;補足ですが、もし環境設定の情報が間違っていたりすると、&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listZones
-No option 'api_key' in section: 'account'
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;といった内容が表示されます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回はIDCFクラウドをAPIコマンドで操作できるようにするためのセットアップを行いました。&lt;br&gt;
-これによって仮想マシンを作成するたびに管理コンソールへいちいちログインするのではなく、コマンドで一発作成が可能となります。また、スクリプトなどを組んでおけば仮想マシンの作成からグローバルIPの付与といった一連の処理も可能です。&lt;/p&gt;
-
-&lt;p&gt;ただ、現在使えるcloudstack-apiコマンドは限られています。&lt;br&gt;
-詳しい内容は&lt;a href="http://docs.idcf.jp/cloud/api/"&gt;IDCFのAPI References&lt;/a&gt;に一覧があるので参考にしてください。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>jQuery Validationを使ってフォームチェックをしてみる</title>
-    <link rel="alternate" href="http://blog.url.com/2016/05/27/jQuery-validation-1.html"/>
-    <id>http://blog.url.com/2016/05/27/jQuery-validation-1.html</id>
-    <published>2016-05-27T09:00:00+09:00</published>
-    <updated>2016-05-30T20:15:50+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;フォーム入力をする際、必須項目を未入力のまますっ飛ばすとフォームが赤くなって「必須記入項目です」なんて言われてしまったことありませんか？&lt;br&gt;
-今回、その動作をプラウディットHPに実装することになりました。&lt;/p&gt;
-
-&lt;p&gt;プロの方なら簡単なことなんだと思いますが、なんせ無知なので...&lt;br&gt;
-とっても時間がかかりました。&lt;/p&gt;
-
-&lt;p&gt;ちなみに、本番実装はまだです。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="jqueryって？validationって？"&gt;jQueryって？Validationって？&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;まずここからです。&lt;br&gt;
-jQueryは聞いたことあるなー。Validationに関しては全く初めましてです！&lt;/p&gt;
-
-&lt;p&gt;詳しい説明は省きますが、jQueryとはJavaScriptのライブラリのこと。&lt;br&gt;
-そしてValidationとは、&lt;br&gt;
-入力フォームのバリデーション（チェック）を簡単に実装することが出来るjQueryプラグイン。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="まずサンプルを実装してみる"&gt;まずサンプルを実装してみる&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;いろんなサイトにValidationの実装の仕方が載っているので、調べて手頃なものを引っ張ってきました。&lt;/p&gt;
-
-&lt;p&gt;今回参考にしたのは&lt;br&gt;
-&lt;a href="http://www.webdesign-fan.com/jquery-validation-engine"&gt;http://www.webdesign-fan.com/jquery-validation-engine&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;一旦ローカルで実装するため、必要なファイルをダウンロードして、&lt;br&gt;
-サイト内にあったhtmlファイルを設置。&lt;/p&gt;
-
-&lt;p&gt;してみましたが、なぜか動きません。&lt;/p&gt;
-
-&lt;p&gt;jquery.validationEngine-ja.jsのファイルのパスが間違っていました。&lt;br&gt;
-js配下のlaguageフォルダの下にjquery.validationEngine-ja.jsが入ってしまっていて、&lt;br&gt;
-ファイルの読み込みができていませんでした。&lt;br&gt;
-その他のファイルと同じ階層に移動。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0527_validation/validation_test_1.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;これで解決。&lt;br&gt;
-無事に動作確認できました。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="既存のhtmlにvalidationを追加"&gt;既存のHTMLにValidationを追加&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;サンプルと同じように、ファイルを設置、コードを追加してみました！&lt;/p&gt;
-
-&lt;p&gt;あら？validation動いてない...&lt;/p&gt;
-
-&lt;p&gt;既存のhtmlには既に他のjavascriptも使われているので、何かが影響して動かないのか、&lt;br&gt;
-パスが違うのか...&lt;/p&gt;
-
-&lt;p&gt;今回追加したファイルは&lt;/p&gt;
-
-&lt;p&gt;・jquery-1.8.2.min.js (jQueryの本体)&lt;br&gt;
-・jquery.validationEngine.js (プラグインの本体)&lt;br&gt;
-・languages/jquery.validationEngine-ja.js (日本語ファイル)&lt;br&gt;
-・validationEngine.jquery.css (スタイルシート)&lt;/p&gt;
-
-&lt;p&gt;head要素内で上記ファイルが読み込めるようコードを記述。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;    &amp;lt;!-- ▼jQuery本体 --&amp;gt;
-    &amp;lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"&amp;gt;&amp;lt;/script&amp;gt;
-    &amp;lt;!-- ▼バリデーション --&amp;gt;
-    &amp;lt;link rel="stylesheet" href="css/validationEngine.jquery.css"&amp;gt;
-    &amp;lt;script src="js/jquery.validationEngine.js"&amp;gt;&amp;lt;/script&amp;gt;
-    &amp;lt;script src="js/jquery.validationEngine-ja.js"&amp;gt;&amp;lt;/script&amp;gt;
-
-    &amp;lt;script&amp;gt;
-      $(function(){
-        jQuery("#form").validationEngine();
-      });
-    &amp;lt;/script&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;フォームタグ内のチェックをしたいclass要素にvalidate[]という要素を追加&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;&amp;lt;form fole="form"&amp;gt;
-&amp;lt;div class="container"&amp;gt;
-            &amp;lt;div class="col-xs-8 col-xs-offset-2"&amp;gt;
-                &amp;lt;div class="row"&amp;gt;
-                    &amp;lt;div class="col-sm-2"&amp;gt;&amp;lt;label for="name"&amp;gt;NAME&amp;lt;/label&amp;gt;&amp;lt;/div&amp;gt;
-                        &amp;lt;div class="col-sm-10 form-group"&amp;gt;
-                            &amp;lt;input type="text" class="validate[required] form-control input_per70" name="name"  id="name" placeholder="プラウド 太郎"&amp;gt;
-                        &amp;lt;/div&amp;gt;
-
-            ----------以下省略----------
-
-             &amp;lt;div class="form-group text-center"&amp;gt;
-                     &amp;lt;!-- &amp;lt;button onClick="uploadFile();" type="submit" class="btn btn-dark"&amp;gt;Send Inquiry&amp;lt;/button&amp;gt; --&amp;gt;
-                     &amp;lt;input onClick="uploadFile();" type="button" value="Send Inquiry"  class="btn btn-dark" /&amp;gt;
-                &amp;lt;/div&amp;gt;
-        &amp;lt;/form&amp;gt;
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="今回はまってしまった原因"&gt;今回はまってしまった原因&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;①フォームチェックを行いたい対象のフォームIDがきちんと指定できていなかった&lt;/p&gt;
-
-&lt;p&gt;既存のファイルではform fole=&amp;quot;form&amp;quot;という記述になっていました。&lt;br&gt;
-ここをform id=&amp;quot;form&amp;quot;に変更しました。&lt;/p&gt;
-
-&lt;p&gt;②jQueryファイルを２つ読みこもうとしていた&lt;/p&gt;
-
-&lt;p&gt;設定を加える前に、すでにjquery.jsというフィルが存在しているところへ、&lt;br&gt;
-jquery-1.8.2.min.jsを読み込もうとしていました。&lt;/p&gt;
-
-&lt;p&gt;そのため、jquery.jsを削除。&lt;br&gt;
-こちらを削除したことで、その他の動作に影響もなさそうでした。&lt;/p&gt;
-
-&lt;p&gt;上記2点を行ったところ、しっかり動いてくれました。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="スクリーンショット" src="/images/./2016/0527_validation/validation_test_2.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;※ちなみに、jquery.jsとjquery.min.jsの違いとして、ファイルサイズの大きさ、&lt;br&gt;
-コードの見やすさがあるようです。&lt;br&gt;
-.minの方がサイズを小さくするために改行も削除され変数名も簡略化されていて読みにくく&lt;br&gt;
-なっているようですが。&lt;/p&gt;
-
-&lt;p&gt;自分でカスタマイズしたい人には圧縮されていない方がおすすめ、とのこと。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;p&gt;簡単にまとめましたが、ここに辿り着くまでコードを何度も読んだり、コードの順番を変えてみたり、ファイルの階層を変えてみたり、、&lt;br&gt;
-解決する気が全くしない...なんて思いながら。&lt;br&gt;
-本当に根気のいる作業だなと思いましたが、自分で解決できると楽しいですね！&lt;/p&gt;
-
-&lt;p&gt;ただ、まだこれで終わりではありません。&lt;br&gt;
-現在のままだと、必須項目ですというチェックをすることはできてもフォームが未入力でもフォームの送信ができてしまうんです...&lt;/p&gt;
-
-&lt;p&gt;この部分についてはまた調べてみようと思います。&lt;/p&gt;
 </content>
   </entry>
 </feed>
