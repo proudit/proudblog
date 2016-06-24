@@ -8,12 +8,6 @@ html
       = ' - ' + current_article.title unless current_article.nil?
     = feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed"
     = stylesheet_link_tag "all"
-
-    meta content="”ページのタイトル”" property="”og:title”" /
-    meta content="”ページの簡単な説明”" property="”og:description”" /
-    meta content="”ページのURL”" property="”og:url”" /
-    meta content="”サムネイル画像のURL”" property="”og:image”" /
-
   body
     header
       = partial "partials/header"
