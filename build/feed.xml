@@ -5,16 +5,16 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-06-20T09:00:00+09:00</updated>
+  <updated>2016-06-27T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
-    <title>IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html"/>
-    <id>http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html</id>
-    <published>2016-06-20T09:00:00+09:00</published>
-    <updated>2016-06-20T12:09:53+09:00</updated>
+    <title>【IDCFクラウド】cloudstack-apiでFWの設定をする。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/27/setting-the-fw-in-the-cloudstack-api.html"/>
+    <id>http://blog.url.com/2016/06/27/setting-the-fw-in-the-cloudstack-api.html</id>
+    <published>2016-06-27T09:00:00+09:00</published>
+    <updated>2016-06-27T14:16:43+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -22,7 +22,271 @@
 
 &lt;hr&gt;
 
-&lt;p&gt;前回、&lt;a href="http://qiita.com/kooohei/items/7690b526edf453fc15d6"&gt;【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。&lt;/a&gt;では&lt;em&gt;cloudstack-api&lt;/em&gt;コマンドで仮想マシンを作成しました。&lt;br&gt;
+&lt;p&gt;前回&lt;a href="http://qiita.com/kooohei/items/524c1d5b4e541c695c06"&gt;【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。&lt;/a&gt;を行いました。&lt;br&gt;
+さらにその前の回(前々回)では&lt;a href="http://blog.proudit.jp/2016/06/14/make-virtual-machine-by-cloudstack-api.html"&gt;【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。&lt;/a&gt;を行いました。&lt;br&gt;
+これよって「仮想マシンを作成し、パブリックIPの付与」まで完了しました。&lt;br&gt;
+ただ、これでは外部との通信ができません。IDCFクラウドのFWはホワイトリスト方式のため、必要なポートを指定して開けてあげる必要があります。&lt;br&gt;
+ということで、今回は&lt;em&gt;cloudstack-api&lt;/em&gt;コマンドでFWの設定を行います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="事前確認"&gt;事前確認&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;まずは現在のFW状況を確認します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e -t ipaddress,startport,endport,protocol,ciderlist,id
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;no data found
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: center"&gt;オプション&lt;/th&gt;
+&lt;th style="text-align: center"&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;--ipaddressid&lt;/td&gt;
+&lt;td style="text-align: center"&gt;パブリックIPアドレス&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;指定したパブリックIPに何もFWの設定がないため&lt;code&gt;no data found&lt;/code&gt;となっています。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="fwルールの作成"&gt;FWルールの作成&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;FWルールの作成は&lt;code&gt;createFirewallRule&lt;/code&gt;コマンドで行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api createFirewallRule --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e --protocol TCP --startport 80 --endport 80
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
+  "createfirewallruleresponse": {
+    "id": "f47780b8-0507-4b10-9c8c-0ff08d0456ac",
+    "jobid": "61c80d83-6e0b-4302-b004-738dbc40ba59"
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;それではもう一度FWの設定を確認してみましょう。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e -t ipaddress,startport,endport,protocol,ciderlist,id
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+-----------+---------+----------+-----------+--------------------------------------+
+|   ipaddress    | startport | endport | protocol | ciderlist |                  id                  |
++----------------+-----------+---------+----------+-----------+--------------------------------------+
+| 210.129.22.172 | 80        | 80      | tcp      | None      | f47780b8-0507-4b10-9c8c-0ff08d0456ac |
++----------------+-----------+---------+----------+-----------+--------------------------------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;80番ポートが解放されたのが確認できました。&lt;/p&gt;
+
+&lt;p&gt;FWの解放は範囲を指定して行うことができます。その場合は&lt;em&gt;--startport&lt;/em&gt;の値に始まりとなるポート番号、&lt;em&gt;--endport&lt;/em&gt;に終わりとなるポート番号を指定します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api createFirewallRule --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e --protocol TCP --startport 8000 --endport 8100
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
+  "createfirewallruleresponse": {
+    "id": "a3d25f8c-ebd0-458c-b86b-49cfcb6592d1",
+    "jobid": "aeaa1a60-a754-40bb-8bc0-142fa7eee3a5"
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e -t ipaddress,startport,endport,protocol,ciderlist,id
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+-----------+---------+----------+-----------+--------------------------------------+
+|   ipaddress    | startport | endport | protocol | ciderlist |                  id                  |
++----------------+-----------+---------+----------+-----------+--------------------------------------+
+| 210.129.22.172 | 80        | 80      | tcp      | None      | f47780b8-0507-4b10-9c8c-0ff08d0456ac |
+| 210.129.22.172 | 8000      | 8100    | tcp      | None      | a3d25f8c-ebd0-458c-b86b-49cfcb6592d1 |
++----------------+-----------+---------+----------+-----------+--------------------------------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;また、特定IPのみを許可する場合は&lt;em&gt;--cidrlist&lt;/em&gt;を使います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api createFirewallRule --ipaddressid e72d0249-b3e1-4841-9463-2f56ee9964f5 --protocol TCP --startport 22 --endport 22 --***.***.***.***/32
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
+  "createfirewallruleresponse": {
+    "id": "2fa54ca1-0ed9-4bd3-a977-a0b1bb5f19cc",
+    "jobid": "109e9497-36bc-4250-84ca-bb9a8d89796c"
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid e72d0249-b3e1-4841-9463-2f56ee9964f5 -t ipaddress,startport,endport,protocol,ciderlist,id
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+-----------+---------+----------+-----------+--------------------------------------+
+|   ipaddress    | startport | endport | protocol | ciderlist |                  id                  |
++----------------+-----------+---------+----------+-----------+--------------------------------------+
+| 210.129.22.172 | 22        | 22      | tcp      | None      | 2fa54ca1-0ed9-4bd3-a977-a0b1bb5f19cc |
+| 210.129.22.172 | 80        | 80      | tcp      | None      | f47780b8-0507-4b10-9c8c-0ff08d0456ac |
+| 210.129.22.172 | 8000      | 8100    | tcp      | None      | a3d25f8c-ebd0-458c-b86b-49cfcb6592d1 |
++----------------+-----------+---------+----------+-----------+--------------------------------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以下、利用したオプションについてです。&lt;/p&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: center"&gt;オプション&lt;/th&gt;
+&lt;th style="text-align: center"&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;--ipaddressid&lt;/td&gt;
+&lt;td style="text-align: center"&gt;パブリックIPアドレスID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;--protocol&lt;/td&gt;
+&lt;td style="text-align: center"&gt;プロトコル(TCP/UDP)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;--startport&lt;/td&gt;
+&lt;td style="text-align: center"&gt;スタートポート&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;--endport&lt;/td&gt;
+&lt;td style="text-align: center"&gt;エンドポート&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;--cidrlist&lt;/td&gt;
+&lt;td style="text-align: center"&gt;許可IP及びNW&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="fwルールの削除"&gt;FWルールの削除&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;作成したFWルールの削除は&lt;code&gt;deleteFirewallRule&lt;/code&gt;コマンドで行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api deleteFirewallRule --id a3d25f8c-ebd0-458c-b86b-49cfcb6592d1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
+  "deletefirewallruleresponse": {
+    "jobid": "cf419432-24dc-404c-a4bf-8b478cfdf9ff"
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: center"&gt;オプション&lt;/th&gt;
+&lt;th style="text-align: center"&gt;内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: center"&gt;--id&lt;/td&gt;
+&lt;td style="text-align: center"&gt;FWルールID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e -t ipaddress,startport,endport,protocol,ciderlist,id
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+-----------+---------+----------+-----------+--------------------------------------+
+|   ipaddress    | startport | endport | protocol | ciderlist |                  id                  |
++----------------+-----------+---------+----------+-----------+--------------------------------------+
+| 210.129.22.172 | 22        | 22      | tcp      | None      | 2fa54ca1-0ed9-4bd3-a977-a0b1bb5f19cc |
+| 210.129.22.172 | 80        | 80      | tcp      | None      | f47780b8-0507-4b10-9c8c-0ff08d0456ac |
++----------------+-----------+---------+----------+-----------+--------------------------------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;削除されました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;　FWルールはあくまでも&lt;strong&gt;パブリックIPアドレス&lt;/strong&gt;に対して行う設定です。なのでプライベートIPに対しては行えません。&lt;br&gt;
+もしプライベートネットワーク間での設定を行いたい場合は各サーバでiptablesの設定を行う必要があります。&lt;br&gt;
+　また、今回設定したFWルールは&lt;strong&gt;「仮想マシンにNAT接続している限り有効」&lt;/strong&gt;という点にも注意が必要です。&lt;br&gt;
+一旦、IPの割り当てを解除してしまうと、そのパブリックIPに設定したFWルールは全て消えてしまいます。&lt;br&gt;
+そのためFW設定を行う際は&lt;strong&gt;「IPは使いまわせても、FWルールは使い回せない」&lt;/strong&gt;ということに気をつけておきましょう。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>facebookへのシェアができない！？〜アプリ設定の方法〜</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/24/facebookSARE1.html"/>
+    <id>http://blog.url.com/2016/06/24/facebookSARE1.html</id>
+    <published>2016-06-24T09:00:00+09:00</published>
+    <updated>2016-06-24T16:16:08+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;このPloudBlogについていたfacebookへのシェア機能、実は今までちゃんと&lt;br&gt;
+機能していませんでした(汗)&lt;/p&gt;
+
+&lt;p&gt;どういう状態だったかというと...シェアをクリックすると！&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;アプリが設定されていません: This app is still in development mode, and you don't have access to it. Switch to a registered test user or ask an app admin for permissions.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;というエラーが出ていたんです...(´°ω°)ﾁｰﾝ&lt;/p&gt;
+
+&lt;p&gt;実は、サイトをシェアするには、サイト側のコードにfacebookで取得したコードを書き込むことに加え、サイトとfacebookをリンクさせる必要があるのです！&lt;/p&gt;
+
+&lt;h1 id="アプリ設定の仕方"&gt;アプリ設定の仕方&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;まず、以下サイトへアクセス。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://developers.facebook.com/apps"&gt;https://developers.facebook.com/apps&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;右上の登録ボタンからfacebook開発者への登録を許可する&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_02.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_03.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;開発者への登録が完了すると、Add a New Appのページが出てくるので、&lt;br&gt;
+ここからリンクさせたいサイトの設定を行います。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_04.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;該当のサイト名等を画面に従って入力していきます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_05.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_06.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;設定が完了すると下記のように、該当サイトの設定ページが出てきます。&lt;br&gt;
+現在、ploudblogは公開ステータスとなっていますが、この部分は初期の段階では&lt;br&gt;
+一般に対しては未公開となっているので、ここを公開ステータスへ変更。&lt;br&gt;
+公開ステータスへの変更は画面左のメニューバー、アプリレビューより。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_07.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;公開しますか？→はいに変更して、完了です！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_08.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;これで無事ブログのシェア機能が使えるようになりました〜！&lt;br&gt;
+ただ、今の状態だとどのページでシェアをしても、同じ記事内容＆画像が出てきてしまうのです...&lt;/p&gt;
+
+&lt;p&gt;恐らくOGP（Open Graph protocol）の設定する必要があるので、&lt;br&gt;
+これについてはまた別途進めていこうと思います。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html"/>
+    <id>http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html</id>
+    <published>2016-06-20T09:00:00+09:00</published>
+    <updated>2016-06-27T14:08:56+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;前回、&lt;a href="http://blog.proudit.jp/2016/06/14/make-virtual-machine-by-cloudstack-api.html"&gt;【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。&lt;/a&gt;では&lt;em&gt;cloudstack-api&lt;/em&gt;コマンドで仮想マシンを作成しました。&lt;br&gt;
 今回はその続編として、作成した仮想マシンにパブリックIPを付与したいと思います。&lt;/p&gt;
 
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
@@ -153,7 +417,8 @@
 
 &lt;p&gt;仮想マシンにパブリックIPが付与されたのでこれで外部との通信経路が用意されました。&lt;br&gt;
 ですが実はまだ通信はできません。。。FWで許可されていないからです。&lt;br&gt;
-ということで、次回はFWの設定をcloudstack-apiで行いたいと思います。&lt;/p&gt;
+ということで、次回はFWの設定をcloudstack-apiで行いたいと思います。&lt;br&gt;
+&lt;a href="http://blog.proudit.jp/2016/06/27/setting-the-fw-in-the-cloudstack-api.html"&gt;&amp;gt;&amp;gt;【IDCFクラウド】cloudstack-apiでFWの設定をする。&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -161,7 +426,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/06/15/javascript&amp;jQuery.html"/>
     <id>http://blog.url.com/2016/06/15/javascript&amp;jQuery.html</id>
     <published>2016-06-15T09:00:00+09:00</published>
-    <updated>2016-06-20T11:54:27+09:00</updated>
+    <updated>2016-06-23T15:32:57+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -237,7 +502,7 @@ JavaScriptのライブラリで、&lt;br&gt;
     <link rel="alternate" href="http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html"/>
     <id>http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html</id>
     <published>2016-06-14T09:00:00+09:00</published>
-    <updated>2016-06-14T12:42:54+09:00</updated>
+    <updated>2016-06-27T14:07:09+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -423,7 +688,7 @@ JavaScriptのライブラリで、&lt;br&gt;
 
 &lt;p&gt;今回、仮想マシンを作成しましたが、このままではグローバルIPが無いため外部との通信ができません。&lt;br&gt;
 次回は仮想マシンをグローバルIPに付与するところをcloudstack-apiコマンドで行いたいと思います。&lt;br&gt;
-&lt;a href="http://qiita.com/kooohei/items/524c1d5b4e541c695c06"&gt;&amp;gt;&amp;gt;【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。&lt;/a&gt;&lt;/p&gt;
+&lt;a href="http://blog.proudit.jp/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html"&gt;&amp;gt;&amp;gt;【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -476,210 +741,6 @@ JavaScriptのライブラリで、&lt;br&gt;
 とても大切なこと。&lt;/p&gt;
 
 &lt;p&gt;ご興味ある方は是非一度弊社までお問い合わせください！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>子供乗せ自転車を購入！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/07/bicycle.html"/>
-    <id>http://blog.url.com/2016/06/07/bicycle.html</id>
-    <published>2016-06-07T09:00:00+09:00</published>
-    <updated>2016-06-14T12:33:23+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;最近、子供乗せ用の電動自転車を購入しました！&lt;br&gt;
-普段から保育園へは歩き＆抱っこで行っているんですが、近距離とは言え、&lt;br&gt;
-坂が多いのでけっこうキツイんです…&lt;br&gt;
-子供も大きくなって抱っこする手も限界。&lt;br&gt;
-歩くといってもまだまだ寄り道も多くて時間がかかる。&lt;/p&gt;
-
-&lt;p&gt;と言うことで購入に踏み切りました。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="車種選び"&gt;車種選び&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;h2 id="メーカーは？"&gt;メーカーは？&lt;/h2&gt;
-
-&lt;p&gt;子供乗せとして販売されているメーカーは主に３つ！&lt;/p&gt;
-
-&lt;p&gt;・Panasonic&lt;br&gt;
- ・BRIDGESTONE&lt;br&gt;
- ・YAMAHA&lt;/p&gt;
-
-&lt;p&gt;実際見てみると、どのメーカーのものもデザイン性以外目立って変わりがないです(笑)&lt;br&gt;
-自転車屋さんの店員さんにメーカーごとの違いを聞いてみるも、&lt;br&gt;
-性能については大差ないですー。とのこと。&lt;/p&gt;
-
-&lt;p&gt;特にYAMAHAとBRIDGESTONEはお互い部品供給し合っているので尚更。&lt;br&gt;
-違いをあげるとすればデザイン性。&lt;br&gt;
-性能については最初の漕ぎ出しがPanasonicが一番スムーズだ、というママの意見が多いとのこと。&lt;br&gt;
-またメーカーというより商品によりますが、乗車適用身長というものがあるので身長が低め、&lt;br&gt;
-という方はその辺りの確認も必要。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="前乗せか後ろ乗せか"&gt;前乗せか後ろ乗せか&lt;/h2&gt;
-
-&lt;p&gt;これはその時のお子さんの成長にあったものを選ぶことになります。&lt;br&gt;
-前乗せは15㌔まで。年齢としては1歳以上〜4歳未満。&lt;br&gt;
-後ろ乗せは推奨2歳〜6歳未満。&lt;/p&gt;
-
-&lt;p&gt;前乗せメリット・デメリット&lt;br&gt;
-・普通ならかごが来る位置にシートが着いているので漕いでいる時ひざ　が当たることがない。&lt;br&gt;
-・前乗せ専用シートはがっちりしていてホールド感がしっかりしている。&lt;br&gt;
-・専用シートを使える期間が短い&lt;br&gt;
-・かごがない&lt;/p&gt;
-
-&lt;p&gt;後ろ乗せメリット・デメリット&lt;br&gt;
-・前乗せする場合のオプションシートの作りが簡易的。&lt;br&gt;
-・前乗せシートをつけると、漕いでいる時足があたる可能性あり。&lt;br&gt;
-・かごがついている&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-息子は2歳2ヵ月体重12㌔なので前乗せ、後ろ乗せどちらでもいけます。&lt;br&gt;
-ただ、前乗せだとすぐに後ろ乗せをオプションで追加&lt;br&gt;
-することになりそう。。&lt;br&gt;
-あとは今後2人目を考えるなら、下の子を乗せることになる前乗せシートが&lt;br&gt;
-しっかりしてるものの方がいいかなー？と迷いました。&lt;br&gt;
-が、散々悩んで後ろ乗せにしました！&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="車輪の大きさ(車高の高さ)"&gt;車輪の大きさ(車高の高さ)&lt;/h2&gt;
-
-&lt;p&gt;車輪の大きさ、26cmと20cmがあります。&lt;br&gt;
-ママが乗ってる子供乗せって街で見かけるものは大半車輪が小さく車高が低いですよね？&lt;br&gt;
-車高が低い方が確かに子供の乗降が楽です！&lt;br&gt;
-車輪が小さいからといって漕ぎにくさや進み具合に大差はないそう。&lt;/p&gt;
-
-&lt;p&gt;ここは迷わず20cmに。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="選んだ車種は"&gt;選んだ車種は&lt;/h2&gt;
-
-&lt;p&gt;候補としては、&lt;br&gt;
-Panasonicギュットアニーズ、ギュットミニDX、YAMAHAのpas baby。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="子供の乗せ自転車" src="/images/./2016/0607_bicycle/anyys.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="子供の乗せ自転車" src="/images/./2016/0607_bicycle/miniDX.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="子供の乗せ自転車" src="/images/./2016/0607_bicycle/pasbaby.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;と言うことで我が家が選んだのは、&lt;br&gt;
-Panasonicギュットアニーズ！&lt;/p&gt;
-
-&lt;p&gt;ただこのギュットアニーズ、バッテリー容量が8Ahなんです。&lt;br&gt;
-12Ahのバッテリーを積んでいる車種もあるので、小さいかなーと&lt;br&gt;
-アニーズかpasbabyXLで悩みましたが、&lt;br&gt;
-我が家の場合保育園の送迎と、近場への買い物くらいなので、8Ahで十分だろうということに。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="迷っている人は店頭試乗もおすすめ"&gt;迷っている人は店頭試乗もおすすめ&lt;/h2&gt;
-
-&lt;p&gt;購入店では試乗はしていないのですが、以前別のお店でPanasonicのギュットミニDXと&lt;br&gt;
-BRIDGESTONEのbikkeに試乗しました。&lt;br&gt;
-この時のお店の人もPanasonicの方が漕ぎ出しのアシストがスムーズだと言っていましたが、&lt;br&gt;
-乗ってみて確かに！と実感。&lt;br&gt;
-試乗はいい検討材料になりますよ。アニーズは試乗してないですが(笑)&lt;br&gt;
-迷っている人は試乗のできるお店に行ってみるといいと思います！&lt;/p&gt;
-
-&lt;p&gt;うちの息子も一緒に試乗しましたが、意外にも全く泣かず、楽しかったようで&lt;br&gt;
-『もう一回！』と降りてくれませんでしたー。&lt;br&gt;
-　試乗をするとこんな風にお子さんの反応を見ることもできます。　&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="いざ購入へ-意外な盲点"&gt;いざ購入へ 意外な盲点&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;いざお店で取り寄せ依頼！となったのですが、なんとメーカー在庫がない！！&lt;br&gt;
-製造待ちになるので納期は8月頃になるとか、、&lt;br&gt;
-第2希望としていたpasbabyXLについては9月納期、、&lt;/p&gt;
-
-&lt;p&gt;電動自転車は毎年2月頃に新機種が発売されるそうで、やはり入園シーズンの3、4月頃が&lt;br&gt;
-1番売れる時期だそうです。&lt;br&gt;
-5月頃にはだんだん品薄になってくるのかもしれませんね。&lt;/p&gt;
-
-&lt;p&gt;今後購入を検討される方は購入時期は早めがおすすめですよー。&lt;/p&gt;
-
-&lt;p&gt;ネットではまだ在庫があるお店も多数ありましたが、ネットで自転車を購入するのも&lt;br&gt;
-ちょっと抵抗があり、、近所の自転車屋さんの系列店にあったラ&lt;br&gt;
-スト１台をなんとかゲット！！&lt;br&gt;
-念願の電動自転車ーーー！&lt;br&gt;
-実はまだ乗れてはいませんが、、今からとっても楽しみです。&lt;br&gt;
-これで快適に保育園の通園ができるはず！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>AWS S3バケットに独自ドメインを割り当てる。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/06/assign-your-own-domain-to-the-aws-s3-bucket.html"/>
-    <id>http://blog.url.com/2016/06/06/assign-your-own-domain-to-the-aws-s3-bucket.html</id>
-    <published>2016-06-06T09:00:00+09:00</published>
-    <updated>2016-06-14T12:33:12+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;AWS S3に作成したバケットに対して独自ドメインの割り当てを行います。&lt;/p&gt;
-
-&lt;p&gt;これによって静的サイトであればS3のみで完結するため、そこら辺のサーバーを動かすよりも低コストで高安定なサイト運営が可能となります。&lt;/p&gt;
-
-&lt;h2 id="前提条件"&gt;前提条件&lt;/h2&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;今回利用する独自ドメインがRoute53にてドメイン管理できることを前提に行います。
-また、今回割り当てるドメインは「hogehoge.hengjiu.jp」で行います。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="バケットの作成---s3"&gt;バケットの作成 - S3&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;・S3の「バケットを作成」で新規にバケットを作成します。&lt;br&gt;
-&lt;img alt="s3_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/72f93b5a-c551-b7bc-7bb9-bf2423206291.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;・作成したバケットのプロパティで「ウェブサイトのホスティングを有効にする」に変更して保存します。&lt;br&gt;
-&lt;img alt="s3_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1251fb2c-2e53-a280-36c8-77361267f69f.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="ドメイン登録---route53"&gt;ドメイン登録 - Route53&lt;/h1&gt;
-
-&lt;p&gt;・Route 53のHosted zones で対象のDomain Nameをクリックします。&lt;br&gt;
-&lt;img alt="route53_01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/1214fea9-685d-02f7-5fd5-8c249b676388.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;・Create Record Setをクリックします。&lt;br&gt;
-&lt;img alt="route53_02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ea7ff1e8-4f73-dd82-360f-007c955afd1e.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;・Nameにサブドメイン(hogehoge)を入力し、AliasをYesにしてAlias Target入力状態にするとS3で作成したバケット名「hogehoge.hengjiu.jp」が表示されるので、それを選択して「Create」をします。&lt;br&gt;
-&lt;img alt="route53_03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a6859d8d-4df8-a564-f4f2-939aee13ba24.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上で完了です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;S3バケットに独自ドメインを割り当てるためには「バケット名は割り当てるドメイン名と同じにする」ということに注意が必要です。&lt;/p&gt;
-
-&lt;p&gt;もし、レコード作成時に作成したバケットが表示されない(&lt;em&gt;No Targets Available&lt;/em&gt;)場合は、&lt;/p&gt;
-
-&lt;p&gt;・作成したバケットの名前間が違う。&lt;br&gt;
-・ウェブサイトホストティングが有効になっていない。&lt;/p&gt;
-
-&lt;p&gt;などが考えられるのでもう一度確認してみてください。&lt;/p&gt;
-
-&lt;p&gt;また、割り当てる際の作業手順は今回説明したように（S3でバケット作成 → Route53でレコード登録）で行うが良いと思います。&lt;br&gt;
-ですが、どうしても先にレコード登録をする必要がある場合は、Alias Targetに「s3-website-ap-northeast-1.amazonaws.com.」を入力すれば事前に作成しておくことが可能です。&lt;/p&gt;
 </content>
   </entry>
 </feed>
