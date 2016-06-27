@@ -129,5 +129,5 @@ $ cloudstack-api listVirtualMachines -t name,keypair,displayname,group
 ---
 今回、仮想マシンを作成しましたが、このままではグローバルIPが無いため外部との通信ができません。
 次回は仮想マシンをグローバルIPに付与するところをcloudstack-apiコマンドで行いたいと思います。
-[>>【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。](http://qiita.com/kooohei/items/524c1d5b4e541c695c06)
+[>>【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。](http://blog.proudit.jp/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html)
 

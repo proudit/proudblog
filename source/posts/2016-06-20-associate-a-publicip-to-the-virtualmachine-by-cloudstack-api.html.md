@@ -1,5 +1,5 @@
 ---
-title: IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。
+title: 【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。
 date: 2016-06-20
 tags: IDCFクラウド
 author: kohei
@@ -7,7 +7,7 @@ author: kohei
 
 # はじめに
 ---
-前回、[【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。](http://qiita.com/kooohei/items/7690b526edf453fc15d6)では_cloudstack-api_コマンドで仮想マシンを作成しました。
+前回、[【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。](http://blog.proudit.jp/2016/06/14/make-virtual-machine-by-cloudstack-api.html)では_cloudstack-api_コマンドで仮想マシンを作成しました。
 今回はその続編として、作成した仮想マシンにパブリックIPを付与したいと思います。
 
 
@@ -132,4 +132,4 @@ $ cloudstack-api listPublicIpAddresses -t ipaddress,id,virtualmachinename,virtua
 仮想マシンにパブリックIPが付与されたのでこれで外部との通信経路が用意されました。
 ですが実はまだ通信はできません。。。FWで許可されていないからです。
 ということで、次回はFWの設定をcloudstack-apiで行いたいと思います。
-
+[>>【IDCFクラウド】cloudstack-apiでFWの設定をする。](http://blog.proudit.jp/2016/06/27/setting-the-fw-in-the-cloudstack-api.html)
