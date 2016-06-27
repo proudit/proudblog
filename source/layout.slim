@@ -3,6 +3,9 @@ html
   head
     meta[charset="utf-8"]
     meta[http-equiv="X-UA-Compatible" content="IE=edge;chrome=1"]
+    meta content="”current_article.title”" property="”og:title”" /
+    meta content="”article.summary”" property="”og:description”" /
+    meta content="”/images/authors/proudcloud.png”" property="”og:image”" /
     title
       = site_title
       = ' - ' + current_article.title unless current_article.nil?
