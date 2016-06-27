@@ -3,6 +3,10 @@ html
   head
     meta[charset="utf-8"]
     meta[http-equiv="X-UA-Compatible" content="IE=edge;chrome=1"]
+    meta content="current_article.title" property="og:title" /
+    meta content="http://blog.proudit.jp/images/OGPimage.jpeg" property="og:image" /
+    meta content="site_title" property="og:site_name" /
+    meta content="article.summary" property="og:description" /
     title
       = site_title
       = ' - ' + current_article.title unless current_article.nil?
