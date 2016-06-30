@@ -3,15 +3,16 @@ html
   head
     meta[charset="utf-8"]
     meta[http-equiv="X-UA-Compatible" content="IE=edge;chrome=1"]
-    meta content=("Proud Blog") property="og:title" /
-    meta content="http://blog.proudit.jp/images/OGPimage.jpg" property="og:image" /
-    meta content=("<% article.summary %>") property="og:description" /
-    meta content=("<% current_article.title %>") property="og:site_name" /
+
     title
       = site_title
       = ' - ' + current_article.title unless current_article.nil?
     = feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed"
     = stylesheet_link_tag "all"
+
+    - ogp_tags do|name, value|
+      meta property=name content=value
+
   body
     header
       = partial "partials/header"
