@@ -36,3 +36,5 @@ gem 'rails-assets-font-awesome', :require => false
 gem 'font-awesome-middleman', :require => false
 
 gem 'jquery-middleman', :require => false
+
+gem 'middleman-ogp'

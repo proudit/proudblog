@@ -5,6 +5,13 @@
 
 # Time.zone = "UTC"
 
+activate :ogp do |ogp|
+  ogp.namespaces = {
+    og: data.ogp.og
+  }
+  ogp.blog = true
+end
+
 activate :blog do |blog|
   # This will add a prefix to all links, template references and source paths
   # blog.prefix = "blog"
@@ -153,3 +160,4 @@ ready do
 end
 
 ignore "/.html"
+

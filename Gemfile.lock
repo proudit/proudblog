@@ -95,6 +95,8 @@ GEM
       middleman-core (>= 3.0.2)
       multi_json (~> 1.0)
       rack-livereload
+    middleman-ogp (1.0.4)
+      middleman-core (~> 3.2)
     middleman-rouge (0.0.1)
       middleman-core (>= 3.0.0)
       redcarpet (>= 2.2.0)
@@ -174,6 +176,7 @@ DEPENDENCIES
   middleman (~> 3.4.0)
   middleman-blog (~> 3.5.3)
   middleman-livereload (~> 3.1.1)
+  middleman-ogp
   middleman-rouge (~> 0.0.1)
   middleman-syntax (~> 2.0.0)
   neat
