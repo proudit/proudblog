@@ -3,6 +3,9 @@ title: OGPの設定
 date: 2016-06-29
 tags: facebook,OGP,Open Graph protocol
 author: ayako
+ogp:
+  og:
+    description: 'OGPとは、OGPの設定について調べてみました。'
 ---
 
 #OGPとは&設定方法
