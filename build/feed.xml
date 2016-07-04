@@ -5,16 +5,108 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-06-27T09:00:00+09:00</updated>
+  <updated>2016-06-29T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>OGPの設定</title>
+    <link rel="alternate" href="http://blog.url.com/2016/06/29/facebookSARE2.html"/>
+    <id>http://blog.url.com/2016/06/29/facebookSARE2.html</id>
+    <published>2016-06-29T09:00:00+09:00</published>
+    <updated>2016-07-01T16:37:39+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="ogpとは&amp;amp;設定方法"&gt;OGPとは&amp;amp;設定方法&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;前回の記事で、facebookシェア機能がとりあえず実行できるようになりましたが、シェアする際のOGP設定がまだできていないため、&lt;br&gt;
+シェアをするときに出てくる情報が、こちらの意図しないものになっています。&lt;/p&gt;
+
+&lt;p&gt;OGP設定前↓&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_1.png" /&gt;&lt;/p&gt;
+
+&lt;h2 id="ogpとは？"&gt;OGPとは？&lt;/h2&gt;
+
+&lt;p&gt;OGPとはOpen Graph protocolの略で、「このウェブページは何について書かれていいるのか」という情報を、プログラムから読める形で HTMLに付加する記述方法のこと。&lt;br&gt;
+このOGPの設定がされていないと、せっかくシェアしてもらった記事も意図しない内容や画像でアップされてしまい、せっかくシェアしてもらってもきちんとした情報が伝わらないので効果が薄くなってしまいます...&lt;/p&gt;
+
+&lt;p&gt;OGPの設定をしない場合、facebookのシステムが勝手に判断した内容を表示してしまいます。&lt;/p&gt;
+
+&lt;p&gt;設定の仕方は、HTMLファイルにMETAタグを追記するだけ。&lt;/p&gt;
+
+&lt;p&gt;例えば以下のような感じ。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;&amp;lt;meta property=”og:title” content=”記事のタイトル” /&amp;gt;
+&amp;lt;meta property=”og:description” content=”記事の説明” /&amp;gt;
+&amp;lt;meta property=”og:url” content=”記事のURL” /&amp;gt;
+&amp;lt;meta property=”og:image” content=”画像のURL” /&amp;gt;
+&amp;lt;meta property=”og:site_name” content=”サイトのタイトル” /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id="注意するべき画像の仕様"&gt;注意するべき画像の仕様&lt;/h2&gt;
+
+&lt;p&gt;OGPに設定する画像についてはいくつかおさえておきたい仕様があります。&lt;br&gt;
+適切な画像を指定してより目にとまりやすくなるようにしたいですよね。&lt;br&gt;
+　&lt;br&gt;
+・画像サイズ&lt;br&gt;
+　推奨サイズ　1200×630ピクセル&lt;br&gt;
+　最低でも600×315ピクセル必要&lt;/p&gt;
+
+&lt;p&gt;・縦横比率&lt;br&gt;
+　1.91：1&lt;/p&gt;
+
+&lt;p&gt;・画像の指定は相対パスではなく絶対パスで記述&lt;/p&gt;
+
+&lt;p&gt;指定した画像がどのように表示されるのか、事前に確認することもできます。&lt;/p&gt;
+
+&lt;p&gt;OGP画像シュミレータ&lt;br&gt;
+&lt;a href="http://ogimage.tsmallfield.com/"&gt;http://ogimage.tsmallfield.com/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id="ogpのキャッシュをクリアする"&gt;OGPのキャッシュをクリアする&lt;/h1&gt;
+
+&lt;p&gt;METAタグを追加してもなぜか、情報が更新されません。&lt;/p&gt;
+
+&lt;p&gt;OGPの設定がされているかfacebookのデバッガーで確認をしてみます。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://developers.facebook.com/tools/debug/"&gt;https://developers.facebook.com/tools/debug/&lt;/a&gt;&lt;br&gt;
+&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_2.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;情報更新されていないです...タグの設定ミスかな�...なんて思いながら、調べてみると&lt;br&gt;
+facebookのデバッガーからキャッシュをクリアすることができるそうで、&lt;br&gt;
+早速やってみました！&lt;/p&gt;
+
+&lt;p&gt;Open Graph Object Debugger&lt;br&gt;
+&lt;a href="https://developers.facebook.com/tools/debug/og/object/"&gt;https://developers.facebook.com/tools/debug/og/object/&lt;/a&gt;&lt;br&gt;
+&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_3.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_5.png" /&gt;&lt;br&gt;
+ちゃんと画像も指定したものが表示されていて、サイト名もPloudBlogの表示が！&lt;br&gt;
+実際にブログサイトからシェアしてみると...&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_4.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;こちらも情報が更新されていますね。&lt;br&gt;
+ただ、、一部おかしなところがあります...(汗)&lt;/p&gt;
+
+&lt;p&gt;この部分は、記事ごとに内容が変わるように設定しかったので、変数を入れてみたのですが、きちんとデータの取得ができていないですね。&lt;/p&gt;
+
+&lt;p&gt;多くのサイトではおそらくPHPを使ってデータ取得の設定をしているようですが、、JavaScriptあたりで同じことができないか今模索中です。。&lt;/p&gt;
+
+&lt;p&gt;wordpressはプラグインでこう言った設定ができるようです&lt;/p&gt;
+
+&lt;p&gt;ここは引き続き調べていきます！&lt;br&gt;
+facebookの設定けっこう難しいです...&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>【IDCFクラウド】cloudstack-apiでFWの設定をする。</title>
     <link rel="alternate" href="http://blog.url.com/2016/06/27/setting-the-fw-in-the-cloudstack-api.html"/>
     <id>http://blog.url.com/2016/06/27/setting-the-fw-in-the-cloudstack-api.html</id>
     <published>2016-06-27T09:00:00+09:00</published>
-    <updated>2016-06-27T14:16:43+09:00</updated>
+    <updated>2016-06-30T23:38:44+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -278,7 +370,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html"/>
     <id>http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html</id>
     <published>2016-06-20T09:00:00+09:00</published>
-    <updated>2016-06-27T14:08:56+09:00</updated>
+    <updated>2016-06-30T23:38:44+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -502,7 +594,7 @@ JavaScriptのライブラリで、&lt;br&gt;
     <link rel="alternate" href="http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html"/>
     <id>http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html</id>
     <published>2016-06-14T09:00:00+09:00</published>
-    <updated>2016-06-27T14:07:09+09:00</updated>
+    <updated>2016-06-30T23:38:44+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -689,58 +781,6 @@ JavaScriptのライブラリで、&lt;br&gt;
 &lt;p&gt;今回、仮想マシンを作成しましたが、このままではグローバルIPが無いため外部との通信ができません。&lt;br&gt;
 次回は仮想マシンをグローバルIPに付与するところをcloudstack-apiコマンドで行いたいと思います。&lt;br&gt;
 &lt;a href="http://blog.proudit.jp/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html"&gt;&amp;gt;&amp;gt;【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>ミネラル醤(ひしお)講座</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/09/hisio-seminer.html"/>
-    <id>http://blog.url.com/2016/06/09/hisio-seminer.html</id>
-    <published>2016-06-09T09:00:00+09:00</published>
-    <updated>2016-06-14T12:33:23+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="醤(ひしお)講座を開催しました！"&gt;醤(ひしお)講座を開催しました！&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;講師は弊社COOでもあり醸せ師のあき先生！！&lt;/p&gt;
-
-&lt;p&gt;わたしは数ヶ月前に受講済みなのですが、&lt;br&gt;
-さらに知識を深めるべく参加させて頂きました。&lt;/p&gt;
-
-&lt;p&gt;醤は味噌と醤油の原型ともいえる、発酵食の基礎のようなもの。&lt;br&gt;
-火を入れずそのまま使えば醤油の味、火を通せば味噌の味！&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;醤の歴史からはじまり、麹のお話、醤の活用法、&lt;br&gt;
-などなど盛りだくさん！興味深いお話に皆さん聞き入っていました。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;そして最後はお待ちかねの醤づくり！&lt;br&gt;
-完成までは２週間かかるので、それぞれお持ち帰り頂き、&lt;br&gt;
-お家で引き続き醤さんを育てて頂きます！完成がたのしみですね！&lt;br&gt;
-今回材料の中にドテラ社のミネラルを加えました。&lt;br&gt;
-とっても贅沢です！&lt;br&gt;
-1日たってみて、前回に比べ醤の成長具合が早い気がしています。&lt;br&gt;
-やはりミネラルの力なのでしょうか。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="醤講座" src="/images/./2016/0610_hisio_seminar/hisio.jpeg" /&gt;&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;また皆さんが他に気にされていたのが普段使う調味料について。&lt;br&gt;
-お醤油、みりん、お酒、塩、砂糖...etc&lt;/p&gt;
-
-&lt;p&gt;日常的に使うものだからこそ、ちゃんとしたものを使いたい&lt;br&gt;
-という思いを皆さん持たれているようでした。&lt;br&gt;
-&lt;br&gt;&lt;br&gt;
-食は私たちの生活の中で一番基本となるもの。&lt;br&gt;
-健康にいい！！という食品や情報があふれている世の中で、&lt;br&gt;
-自分にとって家族にとって何が一番有益であるのか、&lt;br&gt;
-情報を選択する上でしっかりとした情報を得ることは&lt;br&gt;
-とても大切なこと。&lt;/p&gt;
-
-&lt;p&gt;ご興味ある方は是非一度弊社までお問い合わせください！&lt;/p&gt;
 </content>
   </entry>
 </feed>
