@@ -11,6 +11,7 @@ activate :ogp do |ogp|
     og: data.ogp.og
   }
   ogp.blog = true
+  ogp.base_url = "http://blog.proudit.jp/"
 end
 
 activate :blog do |blog|
