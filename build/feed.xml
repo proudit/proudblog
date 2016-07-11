@@ -5,10 +5,432 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-06-29T09:00:00+09:00</updated>
+  <updated>2016-07-11T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>CentOS HVM方式のルートボリュームを拡張する。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/11/to-expand-the-root-volume-of-centos-hvm-system.html"/>
+    <id>http://blog.url.com/2016/07/11/to-expand-the-root-volume-of-centos-hvm-system.html</id>
+    <published>2016-07-11T09:00:00+09:00</published>
+    <updated>2016-07-11T11:15:54+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;AWS Marketplaceにある&lt;strong&gt;「CentOS 6 (x86_64) - with Updates HVM」&lt;/strong&gt;を利用してインスタンスを作成する際、インスタンス作成時の「ストレージの追加」でルートボリュームを増やしたとしてもOSから見えるボリュームは変わりません。&lt;/p&gt;
+
+&lt;p&gt;今回、ルートボリュームサイズを30GiBに拡張したいと思います。&lt;br&gt;
+&lt;img alt="2016-06-20.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/644e1a43-3062-087f-7e9f-41cbab1b9833.png" /&gt;&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1      7.8G  666M  6.7G   9% /
+tmpfs           498M     0  498M   0% /dev/shm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ただ、アタッチされているボリュームサイズについて確認してみると、&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ lsblk 
+NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+xvda    202:0    0  30G  0 disk 
+└─xvda1 202:1    0   8G  0 part /
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;割り当てられてはいるけどパーティションの拡張ができていない状態のようです。&lt;br&gt;
+AMIがHVM方式のを選択すると、このように自動的に拡張されない場合があるようです。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;hr&gt;
+
+&lt;h2 id="hvmとは"&gt;HVMとは&lt;/h2&gt;
+
+&lt;p&gt;HVMとは「Hardware-assited VM」の略で、日本語では完全仮想化と言われています。&lt;br&gt;
+EC2ユーザーガイドの説明には以下のように記載されています。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;HVM AMI&lt;/strong&gt;&lt;br&gt;
+HVM AMI は、完全に仮想化された一連のハードウェアを備えており、イメージのルートブロックデバイスのマスターブートレコードを実行することによって起動します。この仮想化タイプでは、ベアメタルハードウェア上でオペレーティングシステムが動作するのと同様に、修正を行わなくても仮想マシン上でオペレーティングシステムを直接実行することができます。Amazon EC2 ホストシステムでは、ゲストに提供されている基盤となるハードウェアの一部またはすべてがエミュレートされます。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;ということでパーティションの拡張をしたいと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="準備"&gt;準備&lt;/h1&gt;
+
+&lt;p&gt;まずはじめに、&lt;em&gt;dracut-modules-growroot&lt;/em&gt;と&lt;em&gt;cloud-utils-growpart&lt;/em&gt;この２つのパッケージをインストールします。&lt;/p&gt;
+
+&lt;p&gt;ただ、これらのパッケージはデフォルトのリポジトリからは取得できないのでリポジトリを追加します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo yum install wget
+
+$ wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
+$ sudo rpm -i epel-release-6-8.noarch.rpm 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここでは&lt;code&gt;wget&lt;/code&gt;コマンドがインストールされていなかったので、初めにインストールしています。&lt;/p&gt;
+
+&lt;p&gt;それでは今回の作業に必要なパッケージをインストールします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo yum install dracut-modules-growroot
+
+・・・省略・・・
+Installed:
+  dracut-modules-growroot.noarch 0:0.20-2.el6                                                                       
+
+Dependency Installed:
+  cloud-utils-growpart.x86_64 0:0.27-10.el6                                                                         
+
+Complete!
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上で準備完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="拡張"&gt;拡張&lt;/h1&gt;
+
+&lt;p&gt;それでは拡張作業を行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo dracut --force --add growroot /boot/initramfs-$(uname -r).img
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここで行っているのは&lt;em&gt;--add&lt;/em&gt;オプションを使って&lt;em&gt;initramfs-2.6.32-573.18.1.el6.x86_64.img&lt;/em&gt;のイメージファイルにgrowrootモジュールを追加しています。&lt;br&gt;
+2.6.32-573.18.1.el6.x86_64は&lt;code&gt;uname -r&lt;/code&gt;コマンドで取得される値です。&lt;/p&gt;
+
+&lt;p&gt;少し間がありプロンプトが返ってきたら完了です。それではサーバーを再起動します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo reboot
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;hr&gt;
+
+&lt;h2 id="dracutとは"&gt;dracutとは&lt;/h2&gt;
+
+&lt;p&gt;dracutなんて普段見慣れない方が多いかと思います。ということで&lt;a href="https://dracut.wiki.kernel.org/index.php/Main_Page"&gt;Dracut Wiki（by The Linux Kernel Organization）&lt;/a&gt;によると、、、&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;h2 id="dracut"&gt;dracut&lt;/h2&gt;
+
+&lt;p&gt;dracut is an event driven initramfs infrastructure. dracut (the tool) is used to create an initramfs image by copying tools and files from an installed system and combining it with the dracut framework, usually found in /usr/lib/dracut/modules.d. .....&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;つまりは「initramfsを作成するコマンド」みたいです。（かなりざっくりですみません。。。）&lt;br&gt;
+今回の場合&lt;em&gt;--add&lt;/em&gt;オプションでdraucutモジュールのgrowrootをイメージに追加しています。&lt;br&gt;
+&lt;em&gt;--force&lt;/em&gt;オプションはすでに存在しているinitramfsに対して上書きする場合に指定します。&lt;/p&gt;
+
+&lt;p&gt;その他にdracutについて知りたい場合は以下を参考にしてください。&lt;br&gt;
+・&lt;a href="http://linux.die.net/man/8/dracut"&gt;dracut(8) - Linux man page&lt;/a&gt;：コマンドオプションについて色々説明しています。&lt;br&gt;
+・&lt;a href="https://www.kernel.org/pub/linux/utils/boot/dracut/dracut.html"&gt;dracut - www.kernel.org&lt;/a&gt;：利用例などについて説明しています。&lt;/p&gt;
+
+&lt;hr&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
+
+&lt;p&gt;それではボリュームを確認してみます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1      985G  735M  934G   1% /
+tmpfs           498M     0  498M   0% /dev/shm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;OSから無事認識されているのが確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ lsblk 
+NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+xvda    202:0    0 1000G  0 disk 
+└─xvda1 202:1    0 1000G  0 part /
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;lsblk&lt;/code&gt;コマンドでもパーティションが割り当てたボリュームまで拡張されているのが確認できました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;今回の拡張作業で&lt;code&gt;dracut&lt;/code&gt;コマンドを利用していますが、実際は&lt;code&gt;dracut&lt;/code&gt;コマンドが拡張するコマンドではありません。&lt;br&gt;
+ボリュームの拡張は&lt;code&gt;growpart&lt;/code&gt;によって行われています。それを&lt;code&gt;yum&lt;/code&gt;でインストールし&lt;code&gt;dracut&lt;/code&gt;で追加した&lt;code&gt;growroot&lt;/code&gt;をイメージに追加することで、起動時に&lt;code&gt;growpart&lt;/code&gt;が実行され、パーティションが割り当てたボリュームまで拡張されます。&lt;br&gt;
+また、&lt;code&gt;growpart&lt;/code&gt;コマンドも今回はインストールされていなかったのですが、&lt;code&gt;yum&lt;/code&gt;を使うと&lt;em&gt;dracut-modules-growroot&lt;/em&gt;の依存関係で&lt;em&gt;cloud-utils-growpart&lt;/em&gt;もインストールしてくれるため利用できるようになります。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>ミネラル甘酒講座</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/08/amazakekouza.html"/>
+    <id>http://blog.url.com/2016/07/08/amazakekouza.html</id>
+    <published>2016-07-08T09:00:00+09:00</published>
+    <updated>2016-07-11T10:39:41+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="ミネラル甘酒講座を開催しました！"&gt;ミネラル甘酒講座を開催しました！&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;先日、醸せ師あき先生によるミネラル甘酒講座が開催されました！&lt;br&gt;
+沢山の方にお越し頂き大盛況の講座でした。&lt;br&gt;
+皆様ありがとうございました。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="甘酒講座" src="/images/./2016/0708_amazakekouza/amazakekouza7.jpg" /&gt;&lt;br&gt;
+&lt;img alt="甘酒講座" src="/images/./2016/0708_amazakekouza/amazakekouza4.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;甘酒と言っても、よくお正月に神社で配られている酒粕を使った甘酒ではなく、&lt;br&gt;
+米麹を使った甘酒です！&lt;br&gt;
+もちろんアルコールは入っていないので、小さなお子様でも大丈夫。&lt;/p&gt;
+
+&lt;p&gt;私は以前、甘酒とフルーツを合わせたフルーツ甘酒を頂いたことがあるのですが、&lt;br&gt;
+本当においしかったです！&lt;/p&gt;
+
+&lt;p&gt;今回は試食として、&lt;br&gt;
+・３種の甘酒シャーベット&lt;br&gt;
+・ノンシュガーの発酵スイートポテト&lt;br&gt;
+をあき先生がご用意してくださったそうです。&lt;br&gt;
+とっても美味しそうですね〜〜♪&lt;/p&gt;
+
+&lt;p&gt;わたしも参加したかったです...(涙)&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="甘酒講座" src="/images/./2016/0708_amazakekouza/amazakekouza5.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="甘酒講座" src="/images/./2016/0708_amazakekouza/amazakekouza3.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;次回は9月にお味噌の講座を開催予定です！&lt;br&gt;
+気になる方は是非お問い合わせください〜！&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>13本の薬箱講座</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/06/kusuribako.html"/>
+    <id>http://blog.url.com/2016/07/06/kusuribako.html</id>
+    <published>2016-07-06T09:00:00+09:00</published>
+    <updated>2016-07-11T10:39:41+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="植物エッセンスの薬箱®13本講座"&gt;植物エッセンスの薬箱®13本講座&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;先日弊社新宿オフィスにて、あき先生による13本の薬箱講座が開催されました！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0706_kusuribako/kusuribako_02.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;利用するオイルはドテラ社のエッセンシャルオイル♪&lt;br&gt;
+ドテラのエッセンシャルオイルはCPTG（認定純粋セラピー等級）の基準をクリアした、とても質の高いオイルです。&lt;br&gt;
+だからこそ、香る、塗る、飲む色々な方法で活用できます！&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.doterraeveryday.jp/training/cptg/"&gt;CPTGとは&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;上記写真のようにドテラのオイルはたくさんあるのですが、&lt;br&gt;
+このたくさんあるオイルの中でもこの講座では使いやすい13本のオイルについてご紹介しています。&lt;br&gt;
+実際にオイルを香ってみたり、塗ってみたり、体験しながら学ぶことができるので、&lt;br&gt;
+これからエッセンシャルオイル使ってみようかな？興味がある、という方にオススメの講座です。&lt;/p&gt;
+
+&lt;p&gt;また自分でお好きな香りを選んで、香るクリームも作れちゃいます！&lt;br&gt;
+たくさんのエッセンシャルオイルの中から自分好みの香りを作り出す...とっても楽しいですよ〜♪&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0706_kusuribako/kusuribako_0629_1.jpg" /&gt;&lt;br&gt;
+&lt;img alt="薬箱講座" src="/images/./2016/0706_kusuribako/kusuribako_0629_2.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;素敵な香りに癒されて、エッセンシャルオイルに魅了されてしまいます！&lt;br&gt;
+今後も定期的に開催予定なので、気になる方はぜひお問い合わせ下さい！&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>【IDCFクラウド】s3cmdでオブジェクトストレージへアクセスする</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/04/access-to-object-storage-by-s3cmd.html"/>
+    <id>http://blog.url.com/2016/07/04/access-to-object-storage-by-s3cmd.html</id>
+    <published>2016-07-04T09:00:00+09:00</published>
+    <updated>2016-07-11T10:39:41+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;IDCFクラウドのオブジェクトストレージにコマンドでバケットを作成したりファイルをアップロードしたりするには&lt;code&gt;s3cmd&lt;/code&gt;コマンドで行えます。&lt;br&gt;
+今回、その&lt;code&gt;s3cmd&lt;/code&gt;のインストールと簡単な操作(バケットの作成・削除)を行いたいと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="s3cmdインストール"&gt;s3cmdインストール&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;まずはじめに&lt;code&gt;s3cmd&lt;/code&gt;のインストールを行いたいと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="macosの場合"&gt;MacOSの場合&lt;/h2&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo brew install s3cmd
+==&amp;gt; Downloading https://homebrew.bintray.com/bottles/s3cmd-1.6.0.el_capitan.bottle.tar.gz
+######################################################################## 100.0%
+==&amp;gt; Pouring s3cmd-1.6.0.el_capitan.bottle.tar.gz
+🍺  /usr/local/Cellar/s3cmd/1.6.0: 55 files, 738.3K
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="ubuntuの場合"&gt;Ubuntuの場合&lt;/h2&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo  apt-get install s3cmd
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following NEW packages will be installed:
+  s3cmd
+0 upgraded, 1 newly installed, 0 to remove and 202 not upgraded.
+Need to get 67.6 kB of archives.
+After this operation, 295 kB of additional disk space will be used.
+Get:1 http://jp.archive.ubuntu.com/ubuntu/ trusty/universe s3cmd all 1.1.0~beta3-2 [67.6 kB]
+Fetched 67.6 kB in 0s (1,018 kB/s)
+Selecting previously unselected package s3cmd.
+(Reading database ... 91433 files and directories currently installed.)
+Preparing to unpack .../s3cmd_1.1.0~beta3-2_all.deb ...
+Unpacking s3cmd (1.1.0~beta3-2) ...
+Processing triggers for man-db (2.6.7.1-1) ...
+Setting up s3cmd (1.1.0~beta3-2) ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd --version
+s3cmd version 1.6.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;インストールが確認できました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id=".s3cfgの作成"&gt;.s3cfgの作成&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;code&gt;s3cmd&lt;/code&gt;コマンドのインストールができたので、次は設定ファイルの&lt;code&gt;.s3cfg&lt;/code&gt;を作成します。&lt;br&gt;
+作成は以下のコマンドで行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd --configure
+
+Enter new values or accept defaults in brackets with Enter.
+Refer to user manual for detailed description of all options.
+
+Access key and Secret key are your identifiers for Amazon S3
+Access Key: ********************
+Secret Key: ****************************************
+
+Encryption password is used to protect your files from reading
+by unauthorized persons while in transfer to S3
+Encryption password:
+Path to GPG program [/usr/bin/gpg]:
+
+When using secure HTTPS protocol all communication with Amazon S3
+servers is protected from 3rd party eavesdropping. This method is
+slower than plain HTTP and can't be used if you're behind a proxy
+Use HTTPS protocol [No]:
+
+On some networks all internet access must go through a HTTP proxy.
+Try setting it here if you can't conect to S3 directly
+HTTP Proxy server name:
+
+New settings:
+  Access Key: ********************
+  Secret Key: ****************************************
+  Encryption password:
+  Path to GPG program: /usr/bin/gpg
+  Use HTTPS protocol: False
+  HTTP Proxy server name:
+  HTTP Proxy server port: 0
+
+Test access with supplied credentials? [Y/n] n
+
+Save settings? [y/N] y
+Configuration saved to '/root/.s3cfg'
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="設定の修正"&gt;設定の修正&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;code&gt;.s3cfg&lt;/code&gt;の&lt;em&gt;host_base&lt;/em&gt;と&lt;em&gt;host_bucket&lt;/em&gt;の値をIDCFのエンドポイントに変更します。&lt;br&gt;
+エンドポイントは&lt;br&gt;
+「IDCF管理画面 &amp;gt; オブジェクトストレージ &amp;gt; APIユーザー」で対象となるAPIユーザー名をクリックすると確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cd ~/
+$ vi .s3cfg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;[変更前]
+host_base = s3.amazonaws.com
+host_bucket = %(bucket)s.s3.amazonaws.com
+
+[変更後]
+host_base = ds.jp-east.idcfcloud.com
+host_bucket = %(bucket)s.ds.jp-east.idcfcloud.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケット参照"&gt;バケット参照&lt;/h1&gt;
+
+&lt;hr&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;はじめはバケットがないため、コマンドを実行しても何も返ってきません。&lt;br&gt;
+ただ、もし&lt;code&gt;.s3cfg&lt;/code&gt;を変更せずにバケット参照すると以下のように&lt;em&gt;ERROR&lt;/em&gt;となります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
+ERROR: S3 error: 403 (InvalidAccessKeyId): The AWS Access Key Id you provided does not exist in our records.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケットの作成"&gt;バケットの作成&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;ということで、バケットを作成してみましょう。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd mb s3://proudit-test
+Bucket 's3://proudit-test/' created
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再度バケットを参照してみるとちゃんと作成できているのが確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
+2016-04-13 05:01  s3://proudit-test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケットの削除"&gt;バケットの削除&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;とりあえず今回は作成まで確認できたので削除します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd rb s3://proudit-test
+Bucket 's3://proudit-test/' removed
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;参照すると何も返ってこないので削除されたのが確認できます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;今回、オブジェクトストレージへアクセスしオブジェクトの作成や削除といった一般的な操作を行いました。&lt;br&gt;
+ですが、もしプライベートコネクトを利用してオブジェクトストレージへアクセスを行いたい場合、プライベートコネクトの申請やルーティングの追加、&lt;code&gt;.s3cfg&lt;/code&gt;の修正などが必要になるので注意してください。&lt;br&gt;
+そこらへんの設定についてはまた時間があるときに紹介しようと思います。&lt;/p&gt;
+
+&lt;p&gt;以上で完了です。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>OGPの設定</title>
     <link rel="alternate" href="http://blog.url.com/2016/06/29/facebookSARE2.html"/>
@@ -296,491 +718,6 @@ facebookの設定けっこう難しいです...&lt;/p&gt;
 　また、今回設定したFWルールは&lt;strong&gt;「仮想マシンにNAT接続している限り有効」&lt;/strong&gt;という点にも注意が必要です。&lt;br&gt;
 一旦、IPの割り当てを解除してしまうと、そのパブリックIPに設定したFWルールは全て消えてしまいます。&lt;br&gt;
 そのためFW設定を行う際は&lt;strong&gt;「IPは使いまわせても、FWルールは使い回せない」&lt;/strong&gt;ということに気をつけておきましょう。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>facebookへのシェアができない！？〜アプリ設定の方法〜</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/24/facebookSARE1.html"/>
-    <id>http://blog.url.com/2016/06/24/facebookSARE1.html</id>
-    <published>2016-06-24T09:00:00+09:00</published>
-    <updated>2016-06-24T16:16:08+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;このPloudBlogについていたfacebookへのシェア機能、実は今までちゃんと&lt;br&gt;
-機能していませんでした(汗)&lt;/p&gt;
-
-&lt;p&gt;どういう状態だったかというと...シェアをクリックすると！&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;アプリが設定されていません: This app is still in development mode, and you don't have access to it. Switch to a registered test user or ask an app admin for permissions.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;というエラーが出ていたんです...(´°ω°)ﾁｰﾝ&lt;/p&gt;
-
-&lt;p&gt;実は、サイトをシェアするには、サイト側のコードにfacebookで取得したコードを書き込むことに加え、サイトとfacebookをリンクさせる必要があるのです！&lt;/p&gt;
-
-&lt;h1 id="アプリ設定の仕方"&gt;アプリ設定の仕方&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;まず、以下サイトへアクセス。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="https://developers.facebook.com/apps"&gt;https://developers.facebook.com/apps&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;右上の登録ボタンからfacebook開発者への登録を許可する&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_02.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_03.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;開発者への登録が完了すると、Add a New Appのページが出てくるので、&lt;br&gt;
-ここからリンクさせたいサイトの設定を行います。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_04.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;該当のサイト名等を画面に従って入力していきます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_05.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_06.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;設定が完了すると下記のように、該当サイトの設定ページが出てきます。&lt;br&gt;
-現在、ploudblogは公開ステータスとなっていますが、この部分は初期の段階では&lt;br&gt;
-一般に対しては未公開となっているので、ここを公開ステータスへ変更。&lt;br&gt;
-公開ステータスへの変更は画面左のメニューバー、アプリレビューより。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_07.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;公開しますか？→はいに変更して、完了です！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="アプリ設定" src="/images/./2016/0624_facebookSARE/appConfiguration_08.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;これで無事ブログのシェア機能が使えるようになりました〜！&lt;br&gt;
-ただ、今の状態だとどのページでシェアをしても、同じ記事内容＆画像が出てきてしまうのです...&lt;/p&gt;
-
-&lt;p&gt;恐らくOGP（Open Graph protocol）の設定する必要があるので、&lt;br&gt;
-これについてはまた別途進めていこうと思います。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html"/>
-    <id>http://blog.url.com/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html</id>
-    <published>2016-06-20T09:00:00+09:00</published>
-    <updated>2016-06-30T23:38:44+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;前回、&lt;a href="http://blog.proudit.jp/2016/06/14/make-virtual-machine-by-cloudstack-api.html"&gt;【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。&lt;/a&gt;では&lt;em&gt;cloudstack-api&lt;/em&gt;コマンドで仮想マシンを作成しました。&lt;br&gt;
-今回はその続編として、作成した仮想マシンにパブリックIPを付与したいと思います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="事前確認"&gt;事前確認&lt;/h2&gt;
-
-&lt;p&gt;まずは現在のパブリックIPを確認します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listPublicIpAddresses -t ipaddress
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+-----------------+
-|    ipaddress    |
-+-----------------+
-| ***.***.***.*** |
-+-----------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="パブリックipの取得"&gt;パブリックIPの取得&lt;/h2&gt;
-
-&lt;p&gt;パブリックIPの取得は&lt;code&gt;associateIpAddress&lt;/code&gt;コマンドで行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api associateIpAddress \
- --zoneid a53ff3d3-042b-4cbd-ad16-494bb8d33e06
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
-  "associateipaddressresponse": {
-    "id": "061c31aa-aa41-4e03-a274-83b17b58c1a3",
-    "jobid": "b32b867c-07d4-412e-b514-94a1eee62ed1"
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;オプション&lt;/th&gt;
-&lt;th&gt;内容&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;--zoneid&lt;/td&gt;
-&lt;td&gt;ゾーンID&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
-
-&lt;p&gt;簡単に説明すると、&lt;/p&gt;
-
-&lt;p&gt;「&lt;em&gt;radian&lt;/em&gt;ゾーンにパブリックIPを割り当てる（取得する）」&lt;/p&gt;
-
-&lt;p&gt;という内容になります。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
-
-&lt;p&gt;先ほどの&lt;code&gt;listPublicIpAddresses&lt;/code&gt;コマンドで確認してみましょう。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listPublicIpAddresses -t ipaddress,id,virtualmachinename
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+--------------------------------------+--------------------+
-|   ipaddress    |                  id                  | virtualmachinename |
-+----------------+--------------------------------------+--------------------+
-| 210.129.19.191 | 061c31aa-aa41-4e03-a274-83b17b58c1a3 | None               |
-| ***.***.***.***| ********-****-****-****-************ | None               |
-+----------------+--------------------------------------+--------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;210.129.19.191&lt;/code&gt; のIPが割り当てられているのが確認できました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="nat設定"&gt;NAT設定&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;取得が確認できたら次はNATの設定です。&lt;br&gt;
-パブリックIPを仮想マシンへ割り当てます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api enableStaticNat \
---ipaddressid 061c31aa-aa41-4e03-a274-83b17b58c1a3 \
---virtualmachineid b1230e50-f75b-4343-8d6e-ca7a4efcf2b0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
-  "enablestaticnatresponse": {
-    "success": "true"
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;オプション&lt;/th&gt;
-&lt;th&gt;内容&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;--ipaddressid&lt;/td&gt;
-&lt;td&gt;パブリックIPアドレスID&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;--virtualmachineid&lt;/td&gt;
-&lt;td&gt;仮想マシンID&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
-
-&lt;p&gt;戻り値で&lt;code&gt;&amp;quot;success&amp;quot;: &amp;quot;true&amp;quot;&lt;/code&gt;となっていれば完了です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
-
-&lt;p&gt;先ほど実行した戻り値でも確認はできていますが、一応&lt;code&gt;listPublicIpAddresses&lt;/code&gt;コマンドでも確認しましょう。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listPublicIpAddresses -t ipaddress,id,virtualmachinename,virtualmachinedisplayname
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+--------------------------------------+--------------------+----------+---------------------------+
-|   ipaddress    |                  id                  | virtualmachinename | hostname | virtualmachinedisplayname |
-+----------------+--------------------------------------+--------------------+----------+---------------------------+
-| 210.129.19.191 | 061c31aa-aa41-4e03-a274-83b17b58c1a3 | test-host          | None     | create-test               |
-| ***.***.***.***| ********-****-****-****-************ | None               | None     | None                      |
-+----------------+--------------------------------------+--------------------+----------+---------------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ということで、先ほど取得したパブリックIPアドレスが割り当てられているのを確認できました。&lt;br&gt;
-ここで出力している項目ですが&lt;em&gt;virtualmachinename&lt;/em&gt;はサーバ自身の&lt;em&gt;hostname&lt;/em&gt;となります。コンソールで表示される「仮想マシン名」は&lt;em&gt;virtualmachinedisplayname&lt;/em&gt;です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;仮想マシンにパブリックIPが付与されたのでこれで外部との通信経路が用意されました。&lt;br&gt;
-ですが実はまだ通信はできません。。。FWで許可されていないからです。&lt;br&gt;
-ということで、次回はFWの設定をcloudstack-apiで行いたいと思います。&lt;br&gt;
-&lt;a href="http://blog.proudit.jp/2016/06/27/setting-the-fw-in-the-cloudstack-api.html"&gt;&amp;gt;&amp;gt;【IDCFクラウド】cloudstack-apiでFWの設定をする。&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>JavaScript、jQueryについてまとめ</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/15/javascript&amp;jQuery.html"/>
-    <id>http://blog.url.com/2016/06/15/javascript&amp;jQuery.html</id>
-    <published>2016-06-15T09:00:00+09:00</published>
-    <updated>2016-06-23T15:32:57+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;前回の記事でvalidationを使ったフォームチェックの実装について紹介しましたが、&lt;br&gt;
-そもそもJavaScriptってなんだろうというところ、まとめました。&lt;/p&gt;
-
-&lt;p&gt;以前から耳にすることはあったし、プログラミング言語なんだろうな、くらいの認識はありましたが、詳しいことはまったく知らなかったので。&lt;/p&gt;
-
-&lt;p&gt;いい機会なので備忘録として簡単にまとめてみます。&lt;/p&gt;
-
-&lt;h1 id="javascriptとは"&gt;JavaScriptとは&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;主にWebページに組み込まれたプログラムをWebブラウザ上で実行するために用いられるプログラミング言語の一つ。&lt;br&gt;
-サイト構築で使われる多くの言語とは使用される場所が違い、クライアントサイドで動く言語です。&lt;br&gt;
-サーバサイドは、サーバの中で実行されますが、クライアントサイドはユーザのブラウザ上で、&lt;br&gt;
-ブラウザの更新の必要なく実行することができる。&lt;/p&gt;
-
-&lt;p&gt;JavaScriptはサーバサイドで利用することもできるそうです。&lt;/p&gt;
-
-&lt;p&gt;主な働きとして、webページに動きをつけるために用いられ、クリックやタップ時のページ上の挙動の制御やアニメーションの実行、フォームのエラーチェックなどで活躍します。&lt;br&gt;
-&lt;a href="http://press.share-wis.com/why-you-should-learn-javascript"&gt;http://press.share-wis.com/why-you-should-learn-javascript&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;サーバ側で処理することなくwebページに動きのある動作をつけることができるんですね。&lt;/p&gt;
-
-&lt;p&gt;現在はパソコン自体もスペックが上がってきているため、&lt;br&gt;
-ブラウザが処理を行ってもそれほど負担にもならず、むしろサーバ側の負担がかからないように、ブラウザ上でできる処理はそこで実行させてしまう、という構成が多くなってきている。&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="jqueryとは"&gt;jQueryとは&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;JavaScriptで作られたプログラムで、JavaScriptよりも扱いやすくしたファイル。&lt;br&gt;
-JavaScriptのライブラリで、&lt;br&gt;
-よく利用されるスクリプトを簡単にまとめたもの。&lt;br&gt;
-同じ動きを実現させる場合でも、複雑なJavaScriptのコードを書かなくてもライブラリを用いることによりもっと簡単にJavaScriptを使うことができるのです。&lt;/p&gt;
-
-&lt;p&gt;ライブラリを利用することにより、開発効率もあがり、時間短縮もできてしまうのでとても便利ですね。&lt;/p&gt;
-
-&lt;p&gt;jQueryの主な機能としては&lt;/p&gt;
-
-&lt;p&gt;・DOM（Document Object Model）：HTMLを操作する&lt;br&gt;
-・アニメーション：要素をアニメーションさせる&lt;br&gt;
-・Ajax：外部ファイルをダイナミックに読み込む&lt;/p&gt;
-
-&lt;p&gt;その他にも様々な機能があり、JSライブラリの中でも代表的なライブラリ。&lt;/p&gt;
-
-&lt;p&gt;先日jQuery 3.0版のリリースもありましたね！&lt;br&gt;
-3.0版ではIE8以前のものは動作しなくなっているようです。&lt;br&gt;
-&lt;a href="https://osdn.jp/magazine/16/06/13/183000"&gt;https://osdn.jp/magazine/16/06/13/183000&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;他にもJavaScriptのライブラリはたくさんあり、その年によりトレンドもあるようです。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://www.buildinsider.net/web/popularjslib/2016"&gt;http://www.buildinsider.net/web/popularjslib/2016&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1 id="終わりに"&gt;終わりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;まだまだ入り口に過ぎませんが、今まで何気なく利用していたwebサイトですがクライアントサイドだけでこんなに動きのあるものが実装されているなんて意識していませんでした。&lt;/p&gt;
-
-&lt;p&gt;これを機に少しずつ知識を深めていきたいです。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html"/>
-    <id>http://blog.url.com/2016/06/14/make-virtual-machine-by-cloudstack-api.html</id>
-    <published>2016-06-14T09:00:00+09:00</published>
-    <updated>2016-06-30T23:38:44+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;cloudstack-apiで仮想マシンの構築を行いたいと思います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="基本情報"&gt;基本情報&lt;/h2&gt;
-
-&lt;p&gt;ということで、今回は以下の情報をもとに仮想マシンのを作成を行います。&lt;/p&gt;
-
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;項目　　　　　　　&lt;/th&gt;
-&lt;th&gt;名前&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;ゾーン　　　　　　　　　&lt;/td&gt;
-&lt;td&gt;radian&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;インスタンス&lt;/td&gt;
-&lt;td&gt;light.S1&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;テンプレート&lt;/td&gt;
-&lt;td&gt;Ubuntu Server 14.04 LTS 64-bit&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;IP&lt;/td&gt;
-&lt;td&gt;10.13.0.50&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;所属グループ&lt;/td&gt;
-&lt;td&gt;test&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;ホスト名&lt;/td&gt;
-&lt;td&gt;test-name&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;ディスプレイ名&lt;/td&gt;
-&lt;td&gt;create-test&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;キーペア&lt;/td&gt;
-&lt;td&gt;hogehoge&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="事前確認"&gt;事前確認&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;仮想マシンを作成する前にまず、現在IDCFクラウドでの稼働状況を確認しておきたいと思います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listVirtualMachines -t name
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;no data found
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;現在、環境内には１台も仮想マシンが作成されていないため&lt;em&gt;no data found&lt;/em&gt;となっています。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="仮想マシンの作成"&gt;仮想マシンの作成&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;それでは仮想マシンを作成しましょう。&lt;/p&gt;
-
-&lt;p&gt;作成には&lt;code&gt;createInstanceGroup&lt;/code&gt;を利用します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api deployVirtualMachine \
---zoneid a53ff3d3-042b-4cbd-ad16-494bb8d33e06 \
---serviceofferingid e01a9f32-55c4-4c0d-9b7c-d49a3ccfd3f6 \
---templateid 6eee3f7d-2193-4df7-81d5-bc2169ac3380 \
---ipaddress 10.13.0.50 \
---name test-host \
---keypair hogehoge \
---displayname create-test \
---group test
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
-  "deployvirtualmachineresponse": {
-    "id": "b1230e50-f75b-4343-8d6e-ca7a4efcf2b0",
-    "jobid": "dee8c58d-069a-408a-98c3-03ea1e4e3c50"
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;今回指定したオプションについての説明は以下のとおりです。&lt;/p&gt;
-
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;オプション&lt;/th&gt;
-&lt;th&gt;内容&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;--zoneid&lt;/td&gt;
-&lt;td&gt;ゾーン環境ID&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;--serviceofferingid&lt;/td&gt;
-&lt;td&gt;インスタンスID&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;--templateid&lt;/td&gt;
-&lt;td&gt;テンプレートのID&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;--ipaddress&lt;/td&gt;
-&lt;td&gt;IPアドレス&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;--name&lt;/td&gt;
-&lt;td&gt;ホスト名&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;--keypair&lt;/td&gt;
-&lt;td&gt;デフォルト(root)で利用するキーペア&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;--displayname&lt;/td&gt;
-&lt;td&gt;コンソール画面で表示される名前&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;--group&lt;/td&gt;
-&lt;td&gt;仮想マシンが所属するグループ&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
-
-&lt;p&gt;簡単に説明すると、&lt;/p&gt;
-
-&lt;p&gt;・&lt;em&gt;ipaddress&lt;/em&gt;オプションで仮想マシンに&lt;code&gt;10.13.0.50&lt;/code&gt;のIPアドレスを付与&lt;br&gt;
-・SSHログインするために必要なデフォルトキーは&lt;code&gt;hogehoge&lt;/code&gt;を配置&lt;br&gt;
-・&lt;em&gt;name&lt;/em&gt;オプションでSSHログインした際に表示されるホスト名を&lt;code&gt;test-host&lt;/code&gt;に設定&lt;/p&gt;
-
-&lt;p&gt;といった内容になります。&lt;/p&gt;
-
-&lt;p&gt;また、仮想マシンに直接影響はありませんが、&lt;/p&gt;
-
-&lt;p&gt;・&lt;em&gt;group&lt;/em&gt;オプションで仮想マシンを&lt;code&gt;test&lt;/code&gt;にグルーピング&lt;br&gt;
-・&lt;em&gt;diplayname&lt;/em&gt;オプションでコンソール画面での表示を&lt;code&gt;create-test&lt;/code&gt;に設定&lt;/p&gt;
-
-&lt;p&gt;を行っています。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;確認はコンソールおよびコマンドでも可能です。&lt;/p&gt;
-
-&lt;h3 id="コンソール画面で確認"&gt;コンソール画面で確認&lt;/h3&gt;
-
-&lt;p&gt;&lt;img alt="cloudstack-api_createvm01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/39962077-6be0-39ff-bba7-87d00e4823b7.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="コマンドで確認"&gt;コマンドで確認&lt;/h3&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listVirtualMachines -t name,keypair,displayname,group
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+-----------+----------+-------------+-------+
-|    name   | keypair  | displayname | group |
-+-----------+----------+-------------+-------+
-| test-host | hogehoge | create-test | test  |
-+-----------+----------+-------------+-------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回、仮想マシンを作成しましたが、このままではグローバルIPが無いため外部との通信ができません。&lt;br&gt;
-次回は仮想マシンをグローバルIPに付与するところをcloudstack-apiコマンドで行いたいと思います。&lt;br&gt;
-&lt;a href="http://blog.proudit.jp/2016/06/20/associate-a-publicip-to-the-virtualmachine-by-cloudstack-api.html"&gt;&amp;gt;&amp;gt;【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>
