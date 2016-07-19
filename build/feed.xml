@@ -5,16 +5,118 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-07-11T09:00:00+09:00</updated>
+  <updated>2016-07-19T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>AmazonLinuxにswapを作成する。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/19/how-to-make-a-swap-for-the-amazonlinux.html"/>
+    <id>http://blog.url.com/2016/07/19/how-to-make-a-swap-for-the-amazonlinux.html</id>
+    <published>2016-07-19T09:00:00+09:00</published>
+    <updated>2016-07-19T10:57:21+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;&lt;em&gt;Amazon Linux&lt;/em&gt;に2048MBのスワップを作成する作業を行います。&lt;/p&gt;
+
+&lt;p&gt;その前にまずスワップとは、&lt;br&gt;
+| スワップとは、ハードディスクなどの補助記憶装置を利用して使用可能なメモリ容量を増やすOSの機能の一つ。－ IT用語辞典(e-Words)より抜粋&lt;/p&gt;
+
+&lt;p&gt;つまり今回で言うとEBSボリュームの一部をメモリとして扱えるようにした領域のことです。&lt;/p&gt;
+
+&lt;p&gt;ということで作成してみます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="事前確認"&gt;事前確認&lt;/h1&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ free -m
+             total       used       free     shared    buffers     cached
+Mem:           491        353        138          0          8        294
+-/+ buffers/cache:         49        442
+Swap:            0          0          0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ swapon -s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="スワップ領域の作成"&gt;スワップ領域の作成&lt;/h1&gt;
+
+&lt;p&gt;まず、&lt;code&gt;dd&lt;/code&gt;コマンドでスワップ用の領域を確保します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo dd if=/dev/zero of=/swapfile bs=1024 count=2048k
+2097152+0 レコード入力
+2097152+0 レコード出力
+2147483648 バイト (2.1 GB) コピーされました、 32.0676 秒、 67.0 MB/秒
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo chmod 600 /swapfile 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;作成したら&lt;code&gt;mkswap&lt;/code&gt;でスワップを作成します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo mkswap /swapfile 
+mkswap: /swapfile: warning: wiping old swap signature.
+スワップ空間バージョン1を設定します、サイズ = 2097148 KiB
+ラベルはありません, UUID=88c217dc-d8e0-42f9-b2bc-eb814505b5e3
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上で作成が完了しました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="スワップ領域の有効化"&gt;スワップ領域の有効化&lt;/h1&gt;
+
+&lt;p&gt;&lt;code&gt;mkswap&lt;/code&gt;で作成しただけでは利用できません。スワップの作成ができたら&lt;code&gt;swapon&lt;/code&gt;でスワップ領域の有効化をします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo swapon /swapfile 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ free -m
+             total       used       free     shared    buffers     cached
+Mem:           491        485          6          0          4        421
+-/+ buffers/cache:         59        432
+Swap:         2047          0       2047
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ swapon -s
+Filename                Type        Size    Used    Priority
+/swapfile                               file    2097148 0   -1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="スワップ領域の無効化"&gt;スワップ領域の無効化&lt;/h1&gt;
+
+&lt;p&gt;スワップ領域の有効化は&lt;code&gt;swapon&lt;/code&gt;ですが、無効化は&lt;code&gt;swapoff&lt;/code&gt;で行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo swapoff /swapfile 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="自動マウント設定"&gt;自動マウント設定&lt;/h1&gt;
+
+&lt;p&gt;毎回コマンドでスワップを有効化するのは大変ですので、起動時に自動マウントするように&lt;em&gt;/etc/fstab&lt;/em&gt;に追記しておきます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo vi /etc/fstab
+/swapfile   none        swap    defaults        0   0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;参考：&lt;a href="https://wiki.archlinuxjp.org/index.php/Fstab"&gt;Arch Linux - fstab&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;以上で完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;かつての物理サーバでは、コストや仕様などの理由で利用出来るメモリに制限がありました。&lt;br&gt;
+ただ、今ではクラウドを利用することによって&lt;strong&gt;swapを作成するならそれ以上にメモリを積む&lt;/strong&gt;であったり、&lt;strong&gt;一台あたりのパワーを求めるよりスケールアウト&lt;/strong&gt;という発想の方が効率的になってきたこともありswapの利用する場面が少なくなっています。&lt;br&gt;
+とはいえ、&lt;strong&gt;いざという時のswap&lt;/strong&gt;はあっても損じゃないかなと個人的には思います。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>CentOS HVM方式のルートボリュームを拡張する。</title>
     <link rel="alternate" href="http://blog.url.com/2016/07/11/to-expand-the-root-volume-of-centos-hvm-system.html"/>
     <id>http://blog.url.com/2016/07/11/to-expand-the-root-volume-of-centos-hvm-system.html</id>
     <published>2016-07-11T09:00:00+09:00</published>
-    <updated>2016-07-11T11:15:54+09:00</updated>
+    <updated>2016-07-19T10:39:43+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -521,203 +623,6 @@ facebookのデバッガーからキャッシュをクリアすることができ
 
 &lt;p&gt;ここは引き続き調べていきます！&lt;br&gt;
 facebookの設定けっこう難しいです...&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>【IDCFクラウド】cloudstack-apiでFWの設定をする。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/27/setting-the-fw-in-the-cloudstack-api.html"/>
-    <id>http://blog.url.com/2016/06/27/setting-the-fw-in-the-cloudstack-api.html</id>
-    <published>2016-06-27T09:00:00+09:00</published>
-    <updated>2016-06-30T23:38:44+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;前回&lt;a href="http://qiita.com/kooohei/items/524c1d5b4e541c695c06"&gt;【IDCFクラウド】cloudstack-apiで仮想マシンにパブリックIPを付与する。&lt;/a&gt;を行いました。&lt;br&gt;
-さらにその前の回(前々回)では&lt;a href="http://blog.proudit.jp/2016/06/14/make-virtual-machine-by-cloudstack-api.html"&gt;【IDCFクラウド】cloudstack-apiで仮想マシンを作成する。&lt;/a&gt;を行いました。&lt;br&gt;
-これよって「仮想マシンを作成し、パブリックIPの付与」まで完了しました。&lt;br&gt;
-ただ、これでは外部との通信ができません。IDCFクラウドのFWはホワイトリスト方式のため、必要なポートを指定して開けてあげる必要があります。&lt;br&gt;
-ということで、今回は&lt;em&gt;cloudstack-api&lt;/em&gt;コマンドでFWの設定を行います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="事前確認"&gt;事前確認&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;まずは現在のFW状況を確認します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e -t ipaddress,startport,endport,protocol,ciderlist,id
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;no data found
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th style="text-align: center"&gt;オプション&lt;/th&gt;
-&lt;th style="text-align: center"&gt;内容&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td style="text-align: center"&gt;--ipaddressid&lt;/td&gt;
-&lt;td style="text-align: center"&gt;パブリックIPアドレス&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
-
-&lt;p&gt;指定したパブリックIPに何もFWの設定がないため&lt;code&gt;no data found&lt;/code&gt;となっています。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="fwルールの作成"&gt;FWルールの作成&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;FWルールの作成は&lt;code&gt;createFirewallRule&lt;/code&gt;コマンドで行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api createFirewallRule --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e --protocol TCP --startport 80 --endport 80
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
-  "createfirewallruleresponse": {
-    "id": "f47780b8-0507-4b10-9c8c-0ff08d0456ac",
-    "jobid": "61c80d83-6e0b-4302-b004-738dbc40ba59"
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;それではもう一度FWの設定を確認してみましょう。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e -t ipaddress,startport,endport,protocol,ciderlist,id
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+-----------+---------+----------+-----------+--------------------------------------+
-|   ipaddress    | startport | endport | protocol | ciderlist |                  id                  |
-+----------------+-----------+---------+----------+-----------+--------------------------------------+
-| 210.129.22.172 | 80        | 80      | tcp      | None      | f47780b8-0507-4b10-9c8c-0ff08d0456ac |
-+----------------+-----------+---------+----------+-----------+--------------------------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;80番ポートが解放されたのが確認できました。&lt;/p&gt;
-
-&lt;p&gt;FWの解放は範囲を指定して行うことができます。その場合は&lt;em&gt;--startport&lt;/em&gt;の値に始まりとなるポート番号、&lt;em&gt;--endport&lt;/em&gt;に終わりとなるポート番号を指定します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api createFirewallRule --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e --protocol TCP --startport 8000 --endport 8100
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
-  "createfirewallruleresponse": {
-    "id": "a3d25f8c-ebd0-458c-b86b-49cfcb6592d1",
-    "jobid": "aeaa1a60-a754-40bb-8bc0-142fa7eee3a5"
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e -t ipaddress,startport,endport,protocol,ciderlist,id
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+-----------+---------+----------+-----------+--------------------------------------+
-|   ipaddress    | startport | endport | protocol | ciderlist |                  id                  |
-+----------------+-----------+---------+----------+-----------+--------------------------------------+
-| 210.129.22.172 | 80        | 80      | tcp      | None      | f47780b8-0507-4b10-9c8c-0ff08d0456ac |
-| 210.129.22.172 | 8000      | 8100    | tcp      | None      | a3d25f8c-ebd0-458c-b86b-49cfcb6592d1 |
-+----------------+-----------+---------+----------+-----------+--------------------------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;また、特定IPのみを許可する場合は&lt;em&gt;--cidrlist&lt;/em&gt;を使います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api createFirewallRule --ipaddressid e72d0249-b3e1-4841-9463-2f56ee9964f5 --protocol TCP --startport 22 --endport 22 --***.***.***.***/32
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
-  "createfirewallruleresponse": {
-    "id": "2fa54ca1-0ed9-4bd3-a977-a0b1bb5f19cc",
-    "jobid": "109e9497-36bc-4250-84ca-bb9a8d89796c"
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid e72d0249-b3e1-4841-9463-2f56ee9964f5 -t ipaddress,startport,endport,protocol,ciderlist,id
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+-----------+---------+----------+-----------+--------------------------------------+
-|   ipaddress    | startport | endport | protocol | ciderlist |                  id                  |
-+----------------+-----------+---------+----------+-----------+--------------------------------------+
-| 210.129.22.172 | 22        | 22      | tcp      | None      | 2fa54ca1-0ed9-4bd3-a977-a0b1bb5f19cc |
-| 210.129.22.172 | 80        | 80      | tcp      | None      | f47780b8-0507-4b10-9c8c-0ff08d0456ac |
-| 210.129.22.172 | 8000      | 8100    | tcp      | None      | a3d25f8c-ebd0-458c-b86b-49cfcb6592d1 |
-+----------------+-----------+---------+----------+-----------+--------------------------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以下、利用したオプションについてです。&lt;/p&gt;
-
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th style="text-align: center"&gt;オプション&lt;/th&gt;
-&lt;th style="text-align: center"&gt;内容&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td style="text-align: center"&gt;--ipaddressid&lt;/td&gt;
-&lt;td style="text-align: center"&gt;パブリックIPアドレスID&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="text-align: center"&gt;--protocol&lt;/td&gt;
-&lt;td style="text-align: center"&gt;プロトコル(TCP/UDP)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="text-align: center"&gt;--startport&lt;/td&gt;
-&lt;td style="text-align: center"&gt;スタートポート&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="text-align: center"&gt;--endport&lt;/td&gt;
-&lt;td style="text-align: center"&gt;エンドポート&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="text-align: center"&gt;--cidrlist&lt;/td&gt;
-&lt;td style="text-align: center"&gt;許可IP及びNW&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="fwルールの削除"&gt;FWルールの削除&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;作成したFWルールの削除は&lt;code&gt;deleteFirewallRule&lt;/code&gt;コマンドで行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api deleteFirewallRule --id a3d25f8c-ebd0-458c-b86b-49cfcb6592d1
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;{
-  "deletefirewallruleresponse": {
-    "jobid": "cf419432-24dc-404c-a4bf-8b478cfdf9ff"
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th style="text-align: center"&gt;オプション&lt;/th&gt;
-&lt;th style="text-align: center"&gt;内容&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td style="text-align: center"&gt;--id&lt;/td&gt;
-&lt;td style="text-align: center"&gt;FWルールID&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cloudstack-api listFirewallRules --ipaddressid 8ac2bf54-e238-43b2-89be-4bec101d694e -t ipaddress,startport,endport,protocol,ciderlist,id
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;+----------------+-----------+---------+----------+-----------+--------------------------------------+
-|   ipaddress    | startport | endport | protocol | ciderlist |                  id                  |
-+----------------+-----------+---------+----------+-----------+--------------------------------------+
-| 210.129.22.172 | 22        | 22      | tcp      | None      | 2fa54ca1-0ed9-4bd3-a977-a0b1bb5f19cc |
-| 210.129.22.172 | 80        | 80      | tcp      | None      | f47780b8-0507-4b10-9c8c-0ff08d0456ac |
-+----------------+-----------+---------+----------+-----------+--------------------------------------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;削除されました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;　FWルールはあくまでも&lt;strong&gt;パブリックIPアドレス&lt;/strong&gt;に対して行う設定です。なのでプライベートIPに対しては行えません。&lt;br&gt;
-もしプライベートネットワーク間での設定を行いたい場合は各サーバでiptablesの設定を行う必要があります。&lt;br&gt;
-　また、今回設定したFWルールは&lt;strong&gt;「仮想マシンにNAT接続している限り有効」&lt;/strong&gt;という点にも注意が必要です。&lt;br&gt;
-一旦、IPの割り当てを解除してしまうと、そのパブリックIPに設定したFWルールは全て消えてしまいます。&lt;br&gt;
-そのためFW設定を行う際は&lt;strong&gt;「IPは使いまわせても、FWルールは使い回せない」&lt;/strong&gt;ということに気をつけておきましょう。&lt;/p&gt;
 </content>
   </entry>
 </feed>
