@@ -3,6 +3,9 @@ title: OGPの設定 Part2
 date: 2016-07-21
 tags: facebook,OGP,Open Graph protocol
 author: ayako
+ogp:
+  og:
+    description:'ProudBlogのシェア機能が利用可能になりました！気になる記事があった方、ぜひシェアをお願いします！'
 ---
 
 #はじめに
