@@ -5,7 +5,7 @@ tags: facebook,OGP,Open Graph protocol
 author: ayako
 ogp:
   og:
-    description:'ProudBlogのシェア機能が利用可能になりました！気になる記事があった方、ぜひシェアをお願いします！'
+    description: 'ProudBlogのシェア機能が利用可能になりました！気になる記事があった方、ぜひシェアをお願いします！'
 ---
 
 #はじめに
