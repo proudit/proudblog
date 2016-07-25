@@ -5,16 +5,324 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-07-19T09:00:00+09:00</updated>
+  <updated>2016-07-25T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>静的ルーティングの設定 - Linux</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/25/static-route.html"/>
+    <id>http://blog.url.com/2016/07/25/static-route.html</id>
+    <published>2016-07-25T09:00:00+09:00</published>
+    <updated>2016-07-25T11:01:26+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;AWSではルートテーブルがあるので設定することはないですが、そう言ったルーティングを管理する機能がない場合は自分で設定を行わなければなりません。&lt;br&gt;
+ということでルーティングの設定についてまとめてみました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="事前確認"&gt;事前確認&lt;/h1&gt;
+
+&lt;p&gt;とりあえず&lt;code&gt;netstat&lt;/code&gt;コマンドで現在のルーティングの状態を確認しておきます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.13.0.1       0.0.0.0         UG        0 0          0 eth0
+10.13.0.0       0.0.0.0         255.255.248.0   U         0 0          0 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="ルーティングの追加"&gt;ルーティングの追加&lt;/h1&gt;
+
+&lt;p&gt;ルーティングの追加には一時的または永続的の２通りあります。コマンドでの追加、設定ファイルへ記載しての追加です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="一時的な追加"&gt;一時的な追加&lt;/h2&gt;
+
+&lt;p&gt;一時的な追加はコマンドでの追加となります。ここでは&lt;code&gt;route&lt;/code&gt;コマンドと&lt;code&gt;ip&lt;/code&gt;コマンドの２通りを紹介します。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="routeコマンド"&gt;routeコマンド&lt;/h3&gt;
+
+&lt;h4 id="・networkの追加"&gt;・networkの追加&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -net 172.31.0.0 gw 10.13.0.145 netmask 255.255.0.0 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="・hostの追加"&gt;・hostの追加&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -host 172.31.0.10 gw 10.13.0.145 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;network&lt;/em&gt;に比べて&lt;em&gt;host&lt;/em&gt;は&lt;code&gt;-net&lt;/code&gt;が&lt;code&gt;-host&lt;/code&gt;になるのと、&lt;code&gt;netmask&lt;/code&gt;が不要になります。&lt;br&gt;
+また、&lt;code&gt;eth0&lt;/code&gt; は無くても大丈夫です。その場合は任意でルーティングが設定できる&lt;em&gt;eth&lt;/em&gt;で設定されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="ipコマンド"&gt;ipコマンド&lt;/h3&gt;
+
+&lt;h5 id="・networkの追加"&gt;・networkの追加&lt;/h5&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo ip route add 172.31.0.0/16 via 10.13.0.145 dev eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h5 id="・hostの追加"&gt;・hostの追加&lt;/h5&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo ip route add 172.31.0.10/32 via 10.13.0.145 dev eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここでの&lt;em&gt;network&lt;/em&gt;と&lt;em&gt;host&lt;/em&gt;の違いは&lt;em&gt;netmask&lt;/em&gt;だけです。&lt;em&gt;host&lt;/em&gt;の場合は&lt;code&gt;/32&lt;/code&gt;にするだけです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="永続的な追加"&gt;永続的な追加&lt;/h2&gt;
+
+&lt;p&gt;コマンドで一時的に追加しただけではサーバー再起動などをしてしまうと消えてしまいます。&lt;br&gt;
+そこで再起動してもルーティングが消えない設定を紹介します。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="ubuntu-の場合"&gt;Ubuntu の場合&lt;/h3&gt;
+
+&lt;h4 id="・その１"&gt;・その１&lt;/h4&gt;
+
+&lt;p&gt;ひとつ目は&lt;code&gt;/etc/network/if-up.d/static-routes&lt;/code&gt;で設定する方法です。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo vi /etc/network/if-up.d/static-routes
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;#!/bin/sh
+/sbin/route add -net 172.31.0.0 gw 10.13.0.145 netmask 255.255.0.0 dev eth0 // networkの場合
+/sbin/route add -host 172.31.0.10 gw 10.13.0.145 eth0 // hostの場合
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo chmod +x /etc/network/if-up.d/static-routes
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo /etc/network/if-up.d/static-routes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="・その２"&gt;・その２&lt;/h4&gt;
+
+&lt;p&gt;もう一つの方法は&lt;code&gt;/etc/network/interfaces&lt;/code&gt;に設定する方法です。&lt;br&gt;
+&lt;code&gt;post-up&lt;/code&gt;を使うと任意のコマンドが実行できるようになります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cat /etc/network/interfaces
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+iface eth0 inet dhcp
+    post-up route add -net 172.31.0.0/16 gw 10.13.0.145  // networkの場合
+    post-up route add -host 172.31.0.10/32 gw 10.13.0.145  // hostの場合
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="centos-の場合"&gt;CentOS の場合&lt;/h3&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cat /etc/sysconfig/network-scripts/route-eth0 
+# Static route for metadata service
+172.31.0.0/16 via 10.13.0.145 dev eth0 // networkの場合
+172.31.0.10/32 via 10.13.0.145 dev eth0 // hostの場合
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo /etc/init.d/network restart
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;もし&lt;code&gt;route-eth0&lt;/code&gt;の&lt;code&gt;0&lt;/code&gt;の部分は設定したい&lt;em&gt;eth&lt;/em&gt;によって変えてください。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
+
+&lt;p&gt;ということで追加した後の設定は以下の状態になります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.13.0.1       0.0.0.0         UG        0 0          0 eth0
+10.13.0.0       0.0.0.0         255.255.248.0   U         0 0          0 eth0
+172.31.0.0      10.13.0.145     255.255.0.0     UG        0 0          0 eth0
+172.31.0.10     10.13.0.145     255.255.255.255 UGH       0 0          0 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="ルーティングの削除"&gt;ルーティングの削除&lt;/h1&gt;
+
+&lt;p&gt;ルーティングの削除にも一時的または永続的の２通りあります。コマンドでの削除は一時的なものですが。永続的に削除をしたい場合は設定ファイルの記載から削除してあげる必要があります。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="一時的な削除"&gt;一時的な削除&lt;/h2&gt;
+
+&lt;p&gt;一時的な削除は追加の時と同じでコマンドで行います。ここでも&lt;code&gt;route&lt;/code&gt;コマンドと&lt;code&gt;ip&lt;/code&gt;コマンドの２通りを紹介します。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="routeコマンド"&gt;routeコマンド&lt;/h3&gt;
+
+&lt;h4 id="・networkの削除"&gt;・networkの削除&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -net 172.31.0.0 gw 10.13.0.145 netmask 255.255.0.0 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="・hostの削除"&gt;・hostの削除&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -host 172.31.0.10 gw 10.13.0.145 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;追加の時と同じで、&lt;em&gt;network&lt;/em&gt;と&lt;em&gt;host&lt;/em&gt;の違いは&lt;code&gt;-net&lt;/code&gt;が&lt;code&gt;-host&lt;/code&gt;になるのと、&lt;code&gt;netmask&lt;/code&gt;が不要になるところです。&lt;code&gt;eth0&lt;/code&gt;の箇所も無くても大丈夫です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="ipコマンド"&gt;ipコマンド&lt;/h3&gt;
+
+&lt;h4 id="・networkの削除"&gt;・networkの削除&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo ip route del 172.31.0.0/16
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id="・hostの削除"&gt;・hostの削除&lt;/h4&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo ip route del 172.31.0.10/32
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こちらも追加と同じで&lt;em&gt;host&lt;/em&gt;の場合は&lt;em&gt;netmask&lt;/em&gt;を&lt;code&gt;/32&lt;/code&gt;にするだけです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="永続的な削除"&gt;永続的な削除&lt;/h2&gt;
+
+&lt;p&gt;ただ、追加した箇所を削除するだけですので割愛します。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
+
+&lt;p&gt;永続的な設定の場合も&lt;code&gt;netstat&lt;/code&gt;で確認するとコマンドで追加した場合と同様の状態と取ります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.13.0.1       0.0.0.0         UG        0 0          0 eth0
+10.13.0.0       0.0.0.0         255.255.248.0   U         0 0          0 eth0
+172.31.0.0      10.13.0.145     255.255.0.0     UG        0 0          0 eth0
+172.31.0.10     10.13.0.145     255.255.255.255 UGH       0 0          0 eth0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;今までのルーティングの設定は各サーバーに設定しなければならないので、台数が多くなればなるほど大変でした。&lt;br&gt;
+そういった煩雑さを軽くしてくれたAWSのルートテーブルは本当に便利だなと思います。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>OGPの設定 Part2</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/21/facebookSARE3.html"/>
+    <id>http://blog.url.com/2016/07/21/facebookSARE3.html</id>
+    <published>2016-07-21T09:00:00+09:00</published>
+    <updated>2016-07-25T10:55:41+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;前回から引き続きfacebookのOGP設定についてです。&lt;br&gt;
+前回、大方設定したOGP情報が反映されるところまでいきましたが、、&lt;br&gt;
+記事ごとのOGPデータの設定がうまくいかない。という所でつまずきました。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0721_facebookSHARE3/OGP_5.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回はなんとかして記事ごとにOGPの取得をしてもらえるように設定したい！&lt;/p&gt;
+
+&lt;h1 id="middleman-ogpを使う"&gt;Middleman-OGPを使う&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;突然ですが、、&lt;br&gt;
+実はこのProudBlog、middlemanのブログ機能を使って作られています。&lt;/p&gt;
+
+&lt;p&gt;そのため、色々と調べてみた結果、今回はMiddleman-OGPというプラグインを利用しました。&lt;br&gt;
+プラグインを入れて、の作業なったので、社長に設定をしてもらいました！&lt;br&gt;
+なので、すみません、、詳細な設定内容は省きます＞＜&lt;br&gt;
+(ここが一番気になりますよね。汗)&lt;/p&gt;
+
+&lt;p&gt;内容についてはこの辺りのサイトを参考にしています。&lt;br&gt;
+&lt;a href="http://whiskers.nukos.kitchen/2015/04/10/middleman-ogp.html"&gt;http://whiskers.nukos.kitchen/2015/04/10/middleman-ogp.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;ただ上記プラグイン導入の他にも色々と手を加えて、加えて、、、&lt;br&gt;
+設定をしてもらい、ようやく理想通りの形ができあがりましたー！！&lt;/p&gt;
+
+&lt;p&gt;肝心な手順部分の内容が薄くなってしまいました...&lt;br&gt;
+せっかくなのでMiddlemanと静的サイトについて備忘録としてまとめておきます。&lt;/p&gt;
+
+&lt;h1 id="middlemanとは"&gt;Middlemanとは&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0721_facebookSHARE3/middleman_1.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;Middlemanとはruby製の静的サイトジェネレーター。&lt;br&gt;
+静的なwebサイトを構築する際に便利なコマンドラインツール。&lt;/p&gt;
+
+&lt;p&gt;日本語のドキュメントもあります。&lt;br&gt;
+&lt;a href="https://middlemanapp.com/jp/"&gt;https://middlemanapp.com/jp/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;日本語ドキュメントがあるのはありがたいですね！&lt;/p&gt;
+
+&lt;p&gt;この他にmiddlemanのメリットが書かれたサイトを見つけました。&lt;br&gt;
+&lt;a href="http://www.mdesign-works.com/blog/web/static-site-genareter/"&gt;http://www.mdesign-works.com/blog/web/static-site-genareter/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;・開発用サーバがある&lt;br&gt;
+・共通のレイアウト設定やファイルをパーツ化できる&lt;br&gt;
+・変数が使える&lt;/p&gt;
+
+&lt;p&gt;※上記はサイトから抜粋したものです&lt;/p&gt;
+
+&lt;h2 id="静的サイトジェネレーター（static-site-generator）とは"&gt;静的サイトジェネレーター（Static Site Generator）とは&lt;/h2&gt;
+
+&lt;p&gt;記事を書いたテキストファイルを元に、HTMLを生成してくれる、&lt;br&gt;
+静的サイトを効率的に制作するためのツール。&lt;/p&gt;
+
+&lt;p&gt;middlemanの他にも&lt;br&gt;
+Hugo、jekllyといったものが有名どころのようです。&lt;/p&gt;
+
+&lt;p&gt;静的サイトは、指定したパスに設置してあるhtmlファイルを表示させ、&lt;br&gt;
+何度読み込んでも同じ内容を表示させます。&lt;br&gt;
+まさに動きのない、静的なサイト。&lt;/p&gt;
+
+&lt;p&gt;HTMLファイルを表示させるだけなので、表示速度も高速。&lt;br&gt;
+尚且つサーバ負荷も最小限で済みます。&lt;br&gt;
+構成がシンプルで、更新頻度の少ないサイトには向いています。&lt;/p&gt;
+
+&lt;p&gt;サイトを簡単に作る上で多く利用されているのが、CMS(content management system)。&lt;br&gt;
+なかでもwordpressは代表的なCMS。&lt;br&gt;
+CMSは静的サイトと異なり、DBサーバも必要になるので、前述したようにシンプルな&lt;br&gt;
+構成のサイトは静的サイトで構築するほうが色々とメリットがあるかもしれません。&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;実際に自分がmiddlemanを一から設定する作業をやったわけではないのですが、&lt;br&gt;
+このブログを更新する上で一つ一つの作業はいたってシンプル。&lt;br&gt;
+一定の規則に従って記事を書いてアップするだけ！&lt;br&gt;
+ただ、中の構成がどうなっているのかわからないので、ブログのトップ画像を変えたい、今回のようにfacebookのogp設定をしたいとった時は&lt;br&gt;
+分かる人に聞いたり、やってもらったりしないといけないので、&lt;br&gt;
+社内向け、個人利用が主になってしまうのかな。&lt;br&gt;
+お客さん向けに提供するには難しいかもしれません。&lt;/p&gt;
+
+&lt;p&gt;とは言え、サーバレスも注目されている中でmiddlemanのようなツールを&lt;br&gt;
+使ったサイトはこれからどんどん増えていくかも！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>AmazonLinuxにswapを作成する。</title>
     <link rel="alternate" href="http://blog.url.com/2016/07/19/how-to-make-a-swap-for-the-amazonlinux.html"/>
     <id>http://blog.url.com/2016/07/19/how-to-make-a-swap-for-the-amazonlinux.html</id>
     <published>2016-07-19T09:00:00+09:00</published>
-    <updated>2016-07-19T10:57:21+09:00</updated>
+    <updated>2016-07-19T10:58:10+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -22,8 +330,11 @@
 
 &lt;p&gt;&lt;em&gt;Amazon Linux&lt;/em&gt;に2048MBのスワップを作成する作業を行います。&lt;/p&gt;
 
-&lt;p&gt;その前にまずスワップとは、&lt;br&gt;
-| スワップとは、ハードディスクなどの補助記憶装置を利用して使用可能なメモリ容量を増やすOSの機能の一つ。－ IT用語辞典(e-Words)より抜粋&lt;/p&gt;
+&lt;p&gt;その前にまずスワップとは、&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;スワップとは、ハードディスクなどの補助記憶装置を利用して使用可能なメモリ容量を増やすOSの機能の一つ。－ IT用語辞典(e-Words)より抜粋&lt;/p&gt;
+&lt;/blockquote&gt;
 
 &lt;p&gt;つまり今回で言うとEBSボリュームの一部をメモリとして扱えるようにした領域のことです。&lt;/p&gt;
 
@@ -341,288 +652,6 @@ xvda    202:0    0 1000G  0 disk
 
 &lt;p&gt;素敵な香りに癒されて、エッセンシャルオイルに魅了されてしまいます！&lt;br&gt;
 今後も定期的に開催予定なので、気になる方はぜひお問い合わせ下さい！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>【IDCFクラウド】s3cmdでオブジェクトストレージへアクセスする</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/04/access-to-object-storage-by-s3cmd.html"/>
-    <id>http://blog.url.com/2016/07/04/access-to-object-storage-by-s3cmd.html</id>
-    <published>2016-07-04T09:00:00+09:00</published>
-    <updated>2016-07-11T10:39:41+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;IDCFクラウドのオブジェクトストレージにコマンドでバケットを作成したりファイルをアップロードしたりするには&lt;code&gt;s3cmd&lt;/code&gt;コマンドで行えます。&lt;br&gt;
-今回、その&lt;code&gt;s3cmd&lt;/code&gt;のインストールと簡単な操作(バケットの作成・削除)を行いたいと思います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="s3cmdインストール"&gt;s3cmdインストール&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;まずはじめに&lt;code&gt;s3cmd&lt;/code&gt;のインストールを行いたいと思います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="macosの場合"&gt;MacOSの場合&lt;/h2&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo brew install s3cmd
-==&amp;gt; Downloading https://homebrew.bintray.com/bottles/s3cmd-1.6.0.el_capitan.bottle.tar.gz
-######################################################################## 100.0%
-==&amp;gt; Pouring s3cmd-1.6.0.el_capitan.bottle.tar.gz
-🍺  /usr/local/Cellar/s3cmd/1.6.0: 55 files, 738.3K
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="ubuntuの場合"&gt;Ubuntuの場合&lt;/h2&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo  apt-get install s3cmd
-Reading package lists... Done
-Building dependency tree
-Reading state information... Done
-The following NEW packages will be installed:
-  s3cmd
-0 upgraded, 1 newly installed, 0 to remove and 202 not upgraded.
-Need to get 67.6 kB of archives.
-After this operation, 295 kB of additional disk space will be used.
-Get:1 http://jp.archive.ubuntu.com/ubuntu/ trusty/universe s3cmd all 1.1.0~beta3-2 [67.6 kB]
-Fetched 67.6 kB in 0s (1,018 kB/s)
-Selecting previously unselected package s3cmd.
-(Reading database ... 91433 files and directories currently installed.)
-Preparing to unpack .../s3cmd_1.1.0~beta3-2_all.deb ...
-Unpacking s3cmd (1.1.0~beta3-2) ...
-Processing triggers for man-db (2.6.7.1-1) ...
-Setting up s3cmd (1.1.0~beta3-2) ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd --version
-s3cmd version 1.6.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;インストールが確認できました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id=".s3cfgの作成"&gt;.s3cfgの作成&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;&lt;code&gt;s3cmd&lt;/code&gt;コマンドのインストールができたので、次は設定ファイルの&lt;code&gt;.s3cfg&lt;/code&gt;を作成します。&lt;br&gt;
-作成は以下のコマンドで行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd --configure
-
-Enter new values or accept defaults in brackets with Enter.
-Refer to user manual for detailed description of all options.
-
-Access key and Secret key are your identifiers for Amazon S3
-Access Key: ********************
-Secret Key: ****************************************
-
-Encryption password is used to protect your files from reading
-by unauthorized persons while in transfer to S3
-Encryption password:
-Path to GPG program [/usr/bin/gpg]:
-
-When using secure HTTPS protocol all communication with Amazon S3
-servers is protected from 3rd party eavesdropping. This method is
-slower than plain HTTP and can't be used if you're behind a proxy
-Use HTTPS protocol [No]:
-
-On some networks all internet access must go through a HTTP proxy.
-Try setting it here if you can't conect to S3 directly
-HTTP Proxy server name:
-
-New settings:
-  Access Key: ********************
-  Secret Key: ****************************************
-  Encryption password:
-  Path to GPG program: /usr/bin/gpg
-  Use HTTPS protocol: False
-  HTTP Proxy server name:
-  HTTP Proxy server port: 0
-
-Test access with supplied credentials? [Y/n] n
-
-Save settings? [y/N] y
-Configuration saved to '/root/.s3cfg'
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="設定の修正"&gt;設定の修正&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;&lt;code&gt;.s3cfg&lt;/code&gt;の&lt;em&gt;host_base&lt;/em&gt;と&lt;em&gt;host_bucket&lt;/em&gt;の値をIDCFのエンドポイントに変更します。&lt;br&gt;
-エンドポイントは&lt;br&gt;
-「IDCF管理画面 &amp;gt; オブジェクトストレージ &amp;gt; APIユーザー」で対象となるAPIユーザー名をクリックすると確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cd ~/
-$ vi .s3cfg
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;[変更前]
-host_base = s3.amazonaws.com
-host_bucket = %(bucket)s.s3.amazonaws.com
-
-[変更後]
-host_base = ds.jp-east.idcfcloud.com
-host_bucket = %(bucket)s.ds.jp-east.idcfcloud.com
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="バケット参照"&gt;バケット参照&lt;/h1&gt;
-
-&lt;hr&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;はじめはバケットがないため、コマンドを実行しても何も返ってきません。&lt;br&gt;
-ただ、もし&lt;code&gt;.s3cfg&lt;/code&gt;を変更せずにバケット参照すると以下のように&lt;em&gt;ERROR&lt;/em&gt;となります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
-ERROR: S3 error: 403 (InvalidAccessKeyId): The AWS Access Key Id you provided does not exist in our records.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="バケットの作成"&gt;バケットの作成&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;ということで、バケットを作成してみましょう。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd mb s3://proudit-test
-Bucket 's3://proudit-test/' created
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;再度バケットを参照してみるとちゃんと作成できているのが確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
-2016-04-13 05:01  s3://proudit-test
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="バケットの削除"&gt;バケットの削除&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;とりあえず今回は作成まで確認できたので削除します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd rb s3://proudit-test
-Bucket 's3://proudit-test/' removed
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;参照すると何も返ってこないので削除されたのが確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ s3cmd ls
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回、オブジェクトストレージへアクセスしオブジェクトの作成や削除といった一般的な操作を行いました。&lt;br&gt;
-ですが、もしプライベートコネクトを利用してオブジェクトストレージへアクセスを行いたい場合、プライベートコネクトの申請やルーティングの追加、&lt;code&gt;.s3cfg&lt;/code&gt;の修正などが必要になるので注意してください。&lt;br&gt;
-そこらへんの設定についてはまた時間があるときに紹介しようと思います。&lt;/p&gt;
-
-&lt;p&gt;以上で完了です。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>OGPの設定</title>
-    <link rel="alternate" href="http://blog.url.com/2016/06/29/facebookSARE2.html"/>
-    <id>http://blog.url.com/2016/06/29/facebookSARE2.html</id>
-    <published>2016-06-29T09:00:00+09:00</published>
-    <updated>2016-07-01T16:37:39+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="ogpとは&amp;amp;設定方法"&gt;OGPとは&amp;amp;設定方法&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;前回の記事で、facebookシェア機能がとりあえず実行できるようになりましたが、シェアする際のOGP設定がまだできていないため、&lt;br&gt;
-シェアをするときに出てくる情報が、こちらの意図しないものになっています。&lt;/p&gt;
-
-&lt;p&gt;OGP設定前↓&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_1.png" /&gt;&lt;/p&gt;
-
-&lt;h2 id="ogpとは？"&gt;OGPとは？&lt;/h2&gt;
-
-&lt;p&gt;OGPとはOpen Graph protocolの略で、「このウェブページは何について書かれていいるのか」という情報を、プログラムから読める形で HTMLに付加する記述方法のこと。&lt;br&gt;
-このOGPの設定がされていないと、せっかくシェアしてもらった記事も意図しない内容や画像でアップされてしまい、せっかくシェアしてもらってもきちんとした情報が伝わらないので効果が薄くなってしまいます...&lt;/p&gt;
-
-&lt;p&gt;OGPの設定をしない場合、facebookのシステムが勝手に判断した内容を表示してしまいます。&lt;/p&gt;
-
-&lt;p&gt;設定の仕方は、HTMLファイルにMETAタグを追記するだけ。&lt;/p&gt;
-
-&lt;p&gt;例えば以下のような感じ。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;&amp;lt;meta property=”og:title” content=”記事のタイトル” /&amp;gt;
-&amp;lt;meta property=”og:description” content=”記事の説明” /&amp;gt;
-&amp;lt;meta property=”og:url” content=”記事のURL” /&amp;gt;
-&amp;lt;meta property=”og:image” content=”画像のURL” /&amp;gt;
-&amp;lt;meta property=”og:site_name” content=”サイトのタイトル” /&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id="注意するべき画像の仕様"&gt;注意するべき画像の仕様&lt;/h2&gt;
-
-&lt;p&gt;OGPに設定する画像についてはいくつかおさえておきたい仕様があります。&lt;br&gt;
-適切な画像を指定してより目にとまりやすくなるようにしたいですよね。&lt;br&gt;
-　&lt;br&gt;
-・画像サイズ&lt;br&gt;
-　推奨サイズ　1200×630ピクセル&lt;br&gt;
-　最低でも600×315ピクセル必要&lt;/p&gt;
-
-&lt;p&gt;・縦横比率&lt;br&gt;
-　1.91：1&lt;/p&gt;
-
-&lt;p&gt;・画像の指定は相対パスではなく絶対パスで記述&lt;/p&gt;
-
-&lt;p&gt;指定した画像がどのように表示されるのか、事前に確認することもできます。&lt;/p&gt;
-
-&lt;p&gt;OGP画像シュミレータ&lt;br&gt;
-&lt;a href="http://ogimage.tsmallfield.com/"&gt;http://ogimage.tsmallfield.com/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1 id="ogpのキャッシュをクリアする"&gt;OGPのキャッシュをクリアする&lt;/h1&gt;
-
-&lt;p&gt;METAタグを追加してもなぜか、情報が更新されません。&lt;/p&gt;
-
-&lt;p&gt;OGPの設定がされているかfacebookのデバッガーで確認をしてみます。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="https://developers.facebook.com/tools/debug/"&gt;https://developers.facebook.com/tools/debug/&lt;/a&gt;&lt;br&gt;
-&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_2.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;情報更新されていないです...タグの設定ミスかな�...なんて思いながら、調べてみると&lt;br&gt;
-facebookのデバッガーからキャッシュをクリアすることができるそうで、&lt;br&gt;
-早速やってみました！&lt;/p&gt;
-
-&lt;p&gt;Open Graph Object Debugger&lt;br&gt;
-&lt;a href="https://developers.facebook.com/tools/debug/og/object/"&gt;https://developers.facebook.com/tools/debug/og/object/&lt;/a&gt;&lt;br&gt;
-&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_3.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_5.png" /&gt;&lt;br&gt;
-ちゃんと画像も指定したものが表示されていて、サイト名もPloudBlogの表示が！&lt;br&gt;
-実際にブログサイトからシェアしてみると...&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0629_facebookSARE_2/OGP_4.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;こちらも情報が更新されていますね。&lt;br&gt;
-ただ、、一部おかしなところがあります...(汗)&lt;/p&gt;
-
-&lt;p&gt;この部分は、記事ごとに内容が変わるように設定しかったので、変数を入れてみたのですが、きちんとデータの取得ができていないですね。&lt;/p&gt;
-
-&lt;p&gt;多くのサイトではおそらくPHPを使ってデータ取得の設定をしているようですが、、JavaScriptあたりで同じことができないか今模索中です。。&lt;/p&gt;
-
-&lt;p&gt;wordpressはプラグインでこう言った設定ができるようです&lt;/p&gt;
-
-&lt;p&gt;ここは引き続き調べていきます！&lt;br&gt;
-facebookの設定けっこう難しいです...&lt;/p&gt;
 </content>
   </entry>
 </feed>
