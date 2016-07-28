@@ -1,5 +1,5 @@
 ---
-title: エンジニアじゃなくても簡単にAWSでWordPressが使えます！
+title: AWS初心者でも簡単にAWSでWordPressが使えます！
 date: 2016-07-28
 tags: AWS,WordPress,
 author: ayako
@@ -89,7 +89,7 @@ SSHログインをする際に必要になる設定です。ここではキー�
 
 ![AWS_WordPress](./2016/0728_WordPress/aws_wp_13.png)
 
-管理画面(URL:パブリックIP/admin ex.54.192.32.144/admin)にアクセスし、username:user/PW:システムログで取得したもの
+管理画面(URL:パブリックIP/admin  ex.54.192.32.144/admin)にアクセスし、username:user/PW:システムログで取得したもの
 
 を入力するとログインできます！
 
@@ -102,6 +102,8 @@ Settings＞Site Languageを日本語に変更＞Save ChangesすればOKです。
 ---
 参考にした手順通り、そのままでした。簡単でした。
 AWSを使ったことがないって人でも大丈夫！
+以前、サクラのレンタルサーバでwordpressを利用したことがありますが、その時の設定よりも簡単でした。
+
 
 [参考サイト：WordPress Webサイトの起動](https://aws.amazon.com/jp/getting-started/launch-a-wordpress-website/)
 
