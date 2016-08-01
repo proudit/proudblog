@@ -5,16 +5,435 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-07-25T09:00:00+09:00</updated>
+  <updated>2016-08-01T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>goofysを使ってAmazon LinuxにS3をマウントする。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/01/use-the-goofys-to-mount-the-s3-to-amazon-linux.html"/>
+    <id>http://blog.url.com/2016/08/01/use-the-goofys-to-mount-the-s3-to-amazon-linux.html</id>
+    <published>2016-08-01T09:00:00+09:00</published>
+    <updated>2016-08-01T11:41:11+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;AWSを利用していて、S3をサーバーマウントする技術として&lt;code&gt;s3fs&lt;/code&gt;が有名だと思います。&lt;br&gt;
+ですが、&lt;strong&gt;s3fsは遅い&lt;/strong&gt;と感じる人は少なくないかと思います。&lt;br&gt;
+そこで他に何かないかなと思って調べたところ、&lt;strong&gt;&lt;a href="https://github.com/kahing/goofys"&gt;goofys&lt;/a&gt;&lt;/strong&gt;というのがあるみたいです。&lt;/p&gt;
+
+&lt;p&gt;goofysのREADMEに、以下のBenchmarkが載っていました。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="goofys-benchmark" src="https://github.com/kahing/goofys/blob/master/bench/bench.png?raw=true" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ということで、とりあえず&lt;code&gt;goofys&lt;/code&gt;を使ってS3をマウントしたいと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="goとfuseのインストール"&gt;goとfuseのインストール&lt;/h1&gt;
+
+&lt;p&gt;まず、goofysを利用するにあたり、goとfuseが必要となるためパッケージをインストールします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo yum install golang fuse
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;golang&lt;/em&gt;をインストールする際に依存関係がたくさんあるため&lt;em&gt;yum&lt;/em&gt;で一気にインストールしてしまいましょう。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="aws-cliの設定"&gt;AWS CLIの設定&lt;/h1&gt;
+
+&lt;p&gt;&lt;em&gt;aws cli&lt;/em&gt;環境を設定します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws configure
+AWS Access Key ID [None]: ********************
+AWS Secret Access Key [None]: ****************************************
+Default region name [None]: ap-northeast-1
+Default output format [None]:
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="バケットの作成"&gt;バケットの作成&lt;/h1&gt;
+
+&lt;p&gt;&lt;em&gt;aws cli&lt;/em&gt;環境の設定ができたらマウントするためのバケットを作成します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws s3 mb s3://kohei-goofys
+make_bucket: s3://kohei-goofys/
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws s3 ls s3://kohei-goofys
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;作成したばかりだとバケットには何も無いので&lt;code&gt;aws s3 ls&lt;/code&gt;しても戻り値はありません。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="goofysインストール"&gt;goofysインストール&lt;/h1&gt;
+
+&lt;p&gt;まず、GOPATHを設定します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ export GOPATH=$HOME/go
+$ echo $GOPATH
+/home/ec2-user/go
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;今回は&lt;em&gt;ec2-user&lt;/em&gt;のホームディレクトリにインストールするようにしています。&lt;br&gt;
+設定ができたらインストールです。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ go get github.com/kahing/goofys
+$ go install github.com/kahing/goofys
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;*getもinstallもプロンプトが戻ってくるまでに若干時間がかかる可能性があります。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="s3マウント"&gt;S3マウント&lt;/h1&gt;
+
+&lt;p&gt;インストールができたらいよいよマウントです。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ mkdir ~/mount-goofys
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ./go/bin/goofys kohei-goofys ~/mount-goofys
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;プロンプトが帰ってきたら完了です。&lt;br&gt;
+マウントに成功してもしなくても、何も戻ってこないので実際に確認してみます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
+
+&lt;p&gt;確認ポイントは幾つかあります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ps auxf |grep goofys
+ec2-user  3030  0.0  0.4 110472  2144 pts/0    S+   03:08   0:00              \_ grep --color=auto goofys
+ec2-user  3022  0.3  2.7 197876 13668 ?        Ssl  03:08   0:00 /home/ec2-user/go/bin/goofys kohei-goofys /home/ec2-user/mount-goofys
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo grep goofys /var/log/messages
+Jul  1 03:08:50 ip-172-31-3-125 /home/ec2-user/go/bin/goofys[3022]: s3.ERROR code=incorrect region, the bucket is not in 'us-west-2' region msg=301 request=#012
+Jul  1 03:08:51 ip-172-31-3-125 /home/ec2-user/go/bin/goofys[3022]: s3.INFO Switching from region 'us-west-2' to 'ap-northeast-1'
+Jul  1 03:08:51 ip-172-31-3-125 /home/ec2-user/go/bin/goofys[3022]: main.INFO File system has been successfully mounted.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ df -h
+ファイルシス   サイズ  使用  残り 使用% マウント位置
+/dev/xvda1       7.8G  1.6G  6.1G   21% /
+devtmpfs         238M   56K  238M    1% /dev
+tmpfs            246M     0  246M    0% /dev/shm
+kohei-goofys     1.0P     0  1.0P    0% /home/ec2-user/mount-goofys
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;無事マウントができたようです。&lt;br&gt;
+では、ファイルの作成を行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ touch ~/mount-goofys/test
+$ ls ~/mount-goofys/
+test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;作成できたら&lt;code&gt;aws s3&lt;/code&gt;コマンドでバケット内を直接確認してみます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws s3 ls s3://kohei-goofys
+2016-07-01 03:14:44          0 test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;先ほど作成されたコマンドがこちらからでも確認できました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="自動マウント設定"&gt;自動マウント設定&lt;/h1&gt;
+
+&lt;p&gt;マウントはできるようになりましたが、毎回手動でマウントするのは大変です。&lt;br&gt;
+なので&lt;em&gt;/etc/fstab&lt;/em&gt;にサーバー起動時にマウントされるように設定します。&lt;/p&gt;
+
+&lt;p&gt;ただ、ここでポイントは&lt;strong&gt;サーバー起動時は&lt;em&gt;root&lt;/em&gt;&lt;/strong&gt;で処理が実行されます。&lt;br&gt;
+ということは&lt;em&gt;aws cli&lt;/em&gt;の設定もrootで行う必要があります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo aws configure
+AWS Access Key ID [None]: ********************
+AWS Secret Access Key [None]: ****************************************
+Default region name [None]: ap-northeast-1
+Default output format [None]:
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;設定ができたら&lt;em&gt;fstab&lt;/em&gt;を修正します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo vi /etc/fstab
+$ cat /etc/fstab
+#
+LABEL=/     /           ext4    defaults,noatime  1   1
+tmpfs       /dev/shm    tmpfs   defaults        0   0
+devpts      /dev/pts    devpts  gid=5,mode=620  0   0
+sysfs       /sys        sysfs   defaults        0   0
+proc        /proc       proc    defaults        0   0
+/home/ec2-user/go/bin/goofys#kohei-goofys /home/ec2-user/mount-goofys fuse _netdev,allow_other,--file-mode=0666,--uid=500,--gid=500 0 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここでとても重要なのがオプションで&lt;em&gt;allow_other&lt;/em&gt;が指定されていることです。&lt;br&gt;
+このオプションがないとroot以外のユーザーからは見えなくなってしまいます。&lt;br&gt;
+また、&lt;em&gt;--file-mode&lt;/em&gt;と&lt;em&gt;--uid&lt;/em&gt;、&lt;em&gt;--gid&lt;/em&gt;はファイルやディレクトリが作成された際のデフォルト権限/所有者の設定になります。&lt;/p&gt;
+
+&lt;p&gt;今回の場合は&lt;em&gt;ec2-user&lt;/em&gt;がUID、GIDともに500でした。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ id
+uid=500(ec2-user) gid=500(ec2-user) groups=500(ec2-user),10(wheel)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;修正が完了したら自動マウントを確認します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo mount -a
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ df -h
+ファイルシス   サイズ  使用  残り 使用% マウント位置
+/dev/xvda1       7.8G  1.6G  6.1G   21% /
+devtmpfs         238M   56K  238M    1% /dev
+tmpfs            246M     0  246M    0% /dev/shm
+kohei-goofys     1.0P     0  1.0P    0% /home/ec2-user/mount-goofys
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ちゃんとマウントができたのが確認できます。&lt;br&gt;
+もし、ここでマウントが見えなかったら&lt;code&gt;sudo df -h&lt;/code&gt;を試してみてください。&lt;br&gt;
+それで見える場合は権限周りがうまくできてない可能性があります。&lt;/p&gt;
+
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left"&gt;オプション&lt;/th&gt;
+&lt;th style="text-align: left"&gt;説明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left"&gt;_netdev&lt;/td&gt;
+&lt;td style="text-align: left"&gt;ネットワークが有効になるまでマウントを待つためのオプション。&lt;br&gt;ネットワーク経由のデバイスを起動時にマウントさせたい場合などに指定する。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left"&gt;allow_other&lt;/td&gt;
+&lt;td style="text-align: left"&gt;他のユーザーでも利用できるようにする。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left"&gt;--file-mode&lt;/td&gt;
+&lt;td style="text-align: left"&gt;マウントする際のファイル権限を設定する。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left"&gt;--uid&lt;/td&gt;
+&lt;td style="text-align: left"&gt;マウントするユーザーIDを指定する。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left"&gt;--gid&lt;/td&gt;
+&lt;td style="text-align: left"&gt;マウントするグループIDを指定する。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;また、上記は今回使ったオプションの説明となるので参考にしてもらえればと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;とりあえず&lt;strong&gt;&lt;em&gt;goofys&lt;/em&gt;&lt;/strong&gt;がどんな感じかを試したくて行いましたが、導入はとても簡単でした。&lt;br&gt;
+ただ、自動マウント設定の際のアクセス権限周りの挙動を確認するのに少々時間かかったかなという感じです。&lt;br&gt;
+GitHubの&lt;a href="https://github.com/kahing/goofys#benchmark"&gt;Benchmark&lt;/a&gt;ではs3fsよりかなり優秀な感じですが、実際比較はまだしてないのでそっちの方もできたらなと思っています。&lt;br&gt;
+また、実際に利用している方がいましたらそこらへんの情報についてコメントいただけると嬉しいです。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>AWS初心者でも簡単にAWSでWordPressが使えます！</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/28/AWS-WordPress.html"/>
+    <id>http://blog.url.com/2016/07/28/AWS-WordPress.html</id>
+    <published>2016-07-28T09:00:00+09:00</published>
+    <updated>2016-07-29T12:45:37+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;AWS上でWordPressを使ってみたいなとふと思い立ちました。勉強もかねて。&lt;br&gt;
+とは言え、やっぱり自分でサーバにインストールするのは...&lt;br&gt;
+簡単に素人でもできる方法はないかなと、調べてみると。&lt;br&gt;
+既にWordPressがインストールされたAMIがあるようです！&lt;/p&gt;
+
+&lt;p&gt;インストールする必要がないので、一気にハードルは下がりますね！&lt;br&gt;
+AWSのページにきちんと設定手順もあります！&lt;/p&gt;
+
+&lt;h1 id="手順は？"&gt;手順は？&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;既にアカウントがある場合は、そのままサインアップ。&lt;br&gt;
+まだアカウントを持っていない方はアカウント作成をします。&lt;br&gt;
+12ヶ月間無料利用枠を利用できるお試し枠を利用することができます。&lt;br&gt;
+もちろん無料利用枠内で、WprdPressインストール済みのAMIが使えます。&lt;/p&gt;
+
+&lt;p&gt;サインアップすると、画面上にサービスアイコンがずらり。&lt;br&gt;
+その一番左上AmazonEC2のインスタンスを起動し、インスタンスの作成へ。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_01.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;AWSMarketplaceへ移動し、WordPressで検索をかけると、&lt;br&gt;
+ずらりと出てきます。&lt;br&gt;
+この中からWordPress powered by BitNami (HVM) を選択します。&lt;br&gt;
+&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_02.png" /&gt;&lt;br&gt;
+&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_03.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;次はインスタンスタイプの選択です。&lt;br&gt;
+無料利用枠を利用している方は、t2.maicroを選択。&lt;br&gt;
+今回利用しているアカウントは無料利用枠対象期間は過ぎてしまっているので、一番小さいnanoで。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_04.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;インスタンスの詳細設定。&lt;br&gt;
+特に手を加えることなくそのままそのまま進みます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_05.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;次は、ストレージの設定。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_06.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;インスタンスのタグ付け。&lt;br&gt;
+インスタンスの名前の設定をします。&lt;br&gt;
+値の部分は任意のものを入力。今回はwordpressと入力。確認と作成をポチッと。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_07.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;インスタンス作成の確認を行い、作成。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_08.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;キーペア設定画面が出てきます。&lt;br&gt;
+SSHログインをする際に必要になる設定です。ここではキーペアなしで続行をして、インスタンスの作成へ。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_09.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;インスタンスの作成をしています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_10.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;無事、インスタンスの作成が完了しました。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_11.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;インスタンスが作成できたら、実際にサーバにインストールされている&lt;br&gt;
+サイトの確認をしてみます。&lt;br&gt;
+作成したインスタンスの情報から、パブリックIPを参照し、サイトにアクセスしてみます。&lt;/p&gt;
+
+&lt;p&gt;サイトのカスタマイズをするため、まずは管理画面へアクセスします。&lt;/p&gt;
+
+&lt;p&gt;管理画面にアクセスするためのパスワードを確認します。&lt;br&gt;
+アクション＞インスタンスの設定＞システムログの取得&lt;br&gt;
+&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_12.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;システムログのウィンドウが出てくるので、下の方までスクロール。&lt;br&gt;
+ハッシュマークで囲まれているので見つけやすいです。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_13.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;管理画面(URL:パブリックIP/admin  ex.54.192.32.144/admin)にアクセスし、username:user/PW:システムログで取得したもの&lt;/p&gt;
+
+&lt;p&gt;を入力するとログインできます！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_14.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;デフォルトの設定は英語になっているので、管理画面にログイン後&lt;br&gt;
+Settings＞Site Languageを日本語に変更＞Save ChangesすればOKです。&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;参考にした手順通り、そのままでした。簡単でした。&lt;br&gt;
+AWSを使ったことがないって人でも大丈夫！&lt;br&gt;
+以前、サクラのレンタルサーバでwordpressを利用したことがありますが、その時の設定よりも簡単でした。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://aws.amazon.com/jp/getting-started/launch-a-wordpress-website/"&gt;参考サイト：WordPress Webサイトの起動&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>13本の薬箱講座＆体験談</title>
+    <link rel="alternate" href="http://blog.url.com/2016/07/26/kusuribako-syoukai.html"/>
+    <id>http://blog.url.com/2016/07/26/kusuribako-syoukai.html</id>
+    <published>2016-07-26T09:00:00+09:00</published>
+    <updated>2016-07-26T12:25:59+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="植物エッセンスの薬箱®13本講座　13本のオイルはどんなオイル？"&gt;植物エッセンスの薬箱®13本講座　13本のオイルはどんなオイル？&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;先日ご紹介した13本の薬箱講座、内容についてちらっとご紹介。&lt;/p&gt;
+
+&lt;p&gt;講座で使用する13本のエッセンシャルオイルは・・・&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0726_kusuribako/kusuribako_0726_1.jpg" /&gt;&lt;/p&gt;
+
+&lt;h2 id="★シングルオイル"&gt;★シングルオイル&lt;/h2&gt;
+
+&lt;p&gt;ラベンダー&lt;br&gt;
+レモン&lt;br&gt;
+ペパーミント&lt;br&gt;
+ティートゥリー&lt;br&gt;
+オレガノ&lt;br&gt;
+フランキンセンス&lt;br&gt;
+ワイルドオレンジ&lt;/p&gt;
+
+&lt;h2 id="★ブレンドオイル"&gt;★ブレンドオイル&lt;/h2&gt;
+
+&lt;p&gt;イージーエアー&lt;br&gt;
+オンガード&lt;br&gt;
+ディープブルー&lt;br&gt;
+ゼンジェスト&lt;br&gt;
+アースリズム&lt;br&gt;
+アロマタッチ&lt;/p&gt;
+
+&lt;p&gt;どのオイルも手軽に使えることができ、色々な場面で使用することができるので使用頻度がかなり高いオイルばかり。&lt;/p&gt;
+
+&lt;p&gt;香る、飲用、塗布、使い方も色々！&lt;/p&gt;
+
+&lt;p&gt;オイルの特性から、具体的な使い方まで盛り沢山の内容です。講座を受けたらすぐにお家で実践してみたくなります！&lt;/p&gt;
+
+&lt;h1 id="講座を受けて早速実践"&gt;講座を受けて早速実践&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;私が講座を受けて早速実践したのは、子供の汗疹対策にラベンダーとティートゥリー。&lt;/p&gt;
+
+&lt;p&gt;小さな子供なので、ココナッツオイルで希釈して、汗疹でプツプツしている部分に毎日塗り続けました。&lt;/p&gt;
+
+&lt;p&gt;すると、一ヶ月ほどで汗疹は消失。&lt;/p&gt;
+
+&lt;p&gt;今でも予防のために利用しています。&lt;br&gt;
+子供の肌は繊細なので汗疹対策に保湿は大事。&lt;br&gt;
+去年、汗疹で皮膚科を受診した際に、保湿を目的としてヒロドイドをもらって&lt;br&gt;
+塗っていました。&lt;br&gt;
+今は、シアバターとみつろうで、保湿クリームを作りそこにラベンダーとティートゥリー、プラスでフランキンセンスを入れたものを塗り塗りしています！&lt;/p&gt;
+
+&lt;h1 id="ちょっぴり体験談"&gt;ちょっぴり体験談&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;13本のエッセンシャルオイルはどのオイルも本当に活躍の場が多いのですが、&lt;br&gt;
+中でも利用頻度が高いものの一つはペパーミント！&lt;br&gt;
+手の平に一滴オイルを垂らし、こめかみや痛みを感じるところに塗布しています。&lt;br&gt;
+スーッとスッキリして次第に痛みも無くなっていきます★&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0726_kusuribako/peppermint.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;以前から偏頭痛もちで、頭痛がある時は決まってロキソニンを服用していました。&lt;br&gt;
+ただ、ロキソニンの服用は消化器系に副作用が伴います。&lt;br&gt;
+病院でロキソニンが処方されると必ずあわせて服用するようにと、胃を守るための胃薬も処方されます。&lt;/p&gt;
+
+&lt;p&gt;これに加えて厚生労働省から、腸閉塞などの重大な副作用のリスクがあると呼びかけがありました。&lt;/p&gt;
+
+&lt;p&gt;薬を全く飲まない、というわけではありませんが、&lt;br&gt;
+薬の代替手段として、&lt;br&gt;
+エッセンシャルオイルの様に副作用のない自然由来のものを&lt;br&gt;
+生活に取り入れることができるといいな、と思います。&lt;/p&gt;
+
+&lt;p&gt;エッセンシャルオイルの活用方法は無限大！&lt;br&gt;
+今後お家のお掃除にもオイルを活用していきたいなと、実践中です。&lt;/p&gt;
+
+&lt;p&gt;※上記の使い方は、CPTG(認定純粋セラピー等級)エッセンシャルオイル純度100%のドテラのオイルを利用した場合の一例です。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.doterraeveryday.jp/training/cptg/"&gt;CPTGとは&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>静的ルーティングの設定 - Linux</title>
     <link rel="alternate" href="http://blog.url.com/2016/07/25/static-route.html"/>
     <id>http://blog.url.com/2016/07/25/static-route.html</id>
     <published>2016-07-25T09:00:00+09:00</published>
-    <updated>2016-07-25T11:01:26+09:00</updated>
+    <updated>2016-07-26T12:25:59+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -220,7 +639,7 @@ Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
     <link rel="alternate" href="http://blog.url.com/2016/07/21/facebookSARE3.html"/>
     <id>http://blog.url.com/2016/07/21/facebookSARE3.html</id>
     <published>2016-07-21T09:00:00+09:00</published>
-    <updated>2016-07-25T10:55:41+09:00</updated>
+    <updated>2016-07-26T12:25:59+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -322,7 +741,7 @@ CMSは静的サイトと異なり、DBサーバも必要になるので、前述
     <link rel="alternate" href="http://blog.url.com/2016/07/19/how-to-make-a-swap-for-the-amazonlinux.html"/>
     <id>http://blog.url.com/2016/07/19/how-to-make-a-swap-for-the-amazonlinux.html</id>
     <published>2016-07-19T09:00:00+09:00</published>
-    <updated>2016-07-19T10:58:10+09:00</updated>
+    <updated>2016-07-26T12:25:59+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -420,238 +839,6 @@ Filename                Type        Size    Used    Priority
 &lt;p&gt;かつての物理サーバでは、コストや仕様などの理由で利用出来るメモリに制限がありました。&lt;br&gt;
 ただ、今ではクラウドを利用することによって&lt;strong&gt;swapを作成するならそれ以上にメモリを積む&lt;/strong&gt;であったり、&lt;strong&gt;一台あたりのパワーを求めるよりスケールアウト&lt;/strong&gt;という発想の方が効率的になってきたこともありswapの利用する場面が少なくなっています。&lt;br&gt;
 とはいえ、&lt;strong&gt;いざという時のswap&lt;/strong&gt;はあっても損じゃないかなと個人的には思います。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>CentOS HVM方式のルートボリュームを拡張する。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/11/to-expand-the-root-volume-of-centos-hvm-system.html"/>
-    <id>http://blog.url.com/2016/07/11/to-expand-the-root-volume-of-centos-hvm-system.html</id>
-    <published>2016-07-11T09:00:00+09:00</published>
-    <updated>2016-07-19T10:39:43+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;AWS Marketplaceにある&lt;strong&gt;「CentOS 6 (x86_64) - with Updates HVM」&lt;/strong&gt;を利用してインスタンスを作成する際、インスタンス作成時の「ストレージの追加」でルートボリュームを増やしたとしてもOSから見えるボリュームは変わりません。&lt;/p&gt;
-
-&lt;p&gt;今回、ルートボリュームサイズを30GiBに拡張したいと思います。&lt;br&gt;
-&lt;img alt="2016-06-20.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/644e1a43-3062-087f-7e9f-41cbab1b9833.png" /&gt;&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ df -h
-Filesystem      Size  Used Avail Use% Mounted on
-/dev/xvda1      7.8G  666M  6.7G   9% /
-tmpfs           498M     0  498M   0% /dev/shm
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ただ、アタッチされているボリュームサイズについて確認してみると、&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ lsblk 
-NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-xvda    202:0    0  30G  0 disk 
-└─xvda1 202:1    0   8G  0 part /
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;割り当てられてはいるけどパーティションの拡張ができていない状態のようです。&lt;br&gt;
-AMIがHVM方式のを選択すると、このように自動的に拡張されない場合があるようです。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;hr&gt;
-
-&lt;h2 id="hvmとは"&gt;HVMとは&lt;/h2&gt;
-
-&lt;p&gt;HVMとは「Hardware-assited VM」の略で、日本語では完全仮想化と言われています。&lt;br&gt;
-EC2ユーザーガイドの説明には以下のように記載されています。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;&lt;strong&gt;HVM AMI&lt;/strong&gt;&lt;br&gt;
-HVM AMI は、完全に仮想化された一連のハードウェアを備えており、イメージのルートブロックデバイスのマスターブートレコードを実行することによって起動します。この仮想化タイプでは、ベアメタルハードウェア上でオペレーティングシステムが動作するのと同様に、修正を行わなくても仮想マシン上でオペレーティングシステムを直接実行することができます。Amazon EC2 ホストシステムでは、ゲストに提供されている基盤となるハードウェアの一部またはすべてがエミュレートされます。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;hr&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;ということでパーティションの拡張をしたいと思います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="準備"&gt;準備&lt;/h1&gt;
-
-&lt;p&gt;まずはじめに、&lt;em&gt;dracut-modules-growroot&lt;/em&gt;と&lt;em&gt;cloud-utils-growpart&lt;/em&gt;この２つのパッケージをインストールします。&lt;/p&gt;
-
-&lt;p&gt;ただ、これらのパッケージはデフォルトのリポジトリからは取得できないのでリポジトリを追加します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo yum install wget
-
-$ wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-
-$ sudo rpm -i epel-release-6-8.noarch.rpm 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ここでは&lt;code&gt;wget&lt;/code&gt;コマンドがインストールされていなかったので、初めにインストールしています。&lt;/p&gt;
-
-&lt;p&gt;それでは今回の作業に必要なパッケージをインストールします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo yum install dracut-modules-growroot
-
-・・・省略・・・
-Installed:
-  dracut-modules-growroot.noarch 0:0.20-2.el6                                                                       
-
-Dependency Installed:
-  cloud-utils-growpart.x86_64 0:0.27-10.el6                                                                         
-
-Complete!
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上で準備完了です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="拡張"&gt;拡張&lt;/h1&gt;
-
-&lt;p&gt;それでは拡張作業を行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo dracut --force --add growroot /boot/initramfs-$(uname -r).img
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ここで行っているのは&lt;em&gt;--add&lt;/em&gt;オプションを使って&lt;em&gt;initramfs-2.6.32-573.18.1.el6.x86_64.img&lt;/em&gt;のイメージファイルにgrowrootモジュールを追加しています。&lt;br&gt;
-2.6.32-573.18.1.el6.x86_64は&lt;code&gt;uname -r&lt;/code&gt;コマンドで取得される値です。&lt;/p&gt;
-
-&lt;p&gt;少し間がありプロンプトが返ってきたら完了です。それではサーバーを再起動します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo reboot
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;hr&gt;
-
-&lt;h2 id="dracutとは"&gt;dracutとは&lt;/h2&gt;
-
-&lt;p&gt;dracutなんて普段見慣れない方が多いかと思います。ということで&lt;a href="https://dracut.wiki.kernel.org/index.php/Main_Page"&gt;Dracut Wiki（by The Linux Kernel Organization）&lt;/a&gt;によると、、、&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;h2 id="dracut"&gt;dracut&lt;/h2&gt;
-
-&lt;p&gt;dracut is an event driven initramfs infrastructure. dracut (the tool) is used to create an initramfs image by copying tools and files from an installed system and combining it with the dracut framework, usually found in /usr/lib/dracut/modules.d. .....&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;つまりは「initramfsを作成するコマンド」みたいです。（かなりざっくりですみません。。。）&lt;br&gt;
-今回の場合&lt;em&gt;--add&lt;/em&gt;オプションでdraucutモジュールのgrowrootをイメージに追加しています。&lt;br&gt;
-&lt;em&gt;--force&lt;/em&gt;オプションはすでに存在しているinitramfsに対して上書きする場合に指定します。&lt;/p&gt;
-
-&lt;p&gt;その他にdracutについて知りたい場合は以下を参考にしてください。&lt;br&gt;
-・&lt;a href="http://linux.die.net/man/8/dracut"&gt;dracut(8) - Linux man page&lt;/a&gt;：コマンドオプションについて色々説明しています。&lt;br&gt;
-・&lt;a href="https://www.kernel.org/pub/linux/utils/boot/dracut/dracut.html"&gt;dracut - www.kernel.org&lt;/a&gt;：利用例などについて説明しています。&lt;/p&gt;
-
-&lt;hr&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
-
-&lt;p&gt;それではボリュームを確認してみます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ df -h
-Filesystem      Size  Used Avail Use% Mounted on
-/dev/xvda1      985G  735M  934G   1% /
-tmpfs           498M     0  498M   0% /dev/shm
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;OSから無事認識されているのが確認できます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ lsblk 
-NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-xvda    202:0    0 1000G  0 disk 
-└─xvda1 202:1    0 1000G  0 part /
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;lsblk&lt;/code&gt;コマンドでもパーティションが割り当てたボリュームまで拡張されているのが確認できました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;p&gt;今回の拡張作業で&lt;code&gt;dracut&lt;/code&gt;コマンドを利用していますが、実際は&lt;code&gt;dracut&lt;/code&gt;コマンドが拡張するコマンドではありません。&lt;br&gt;
-ボリュームの拡張は&lt;code&gt;growpart&lt;/code&gt;によって行われています。それを&lt;code&gt;yum&lt;/code&gt;でインストールし&lt;code&gt;dracut&lt;/code&gt;で追加した&lt;code&gt;growroot&lt;/code&gt;をイメージに追加することで、起動時に&lt;code&gt;growpart&lt;/code&gt;が実行され、パーティションが割り当てたボリュームまで拡張されます。&lt;br&gt;
-また、&lt;code&gt;growpart&lt;/code&gt;コマンドも今回はインストールされていなかったのですが、&lt;code&gt;yum&lt;/code&gt;を使うと&lt;em&gt;dracut-modules-growroot&lt;/em&gt;の依存関係で&lt;em&gt;cloud-utils-growpart&lt;/em&gt;もインストールしてくれるため利用できるようになります。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>ミネラル甘酒講座</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/08/amazakekouza.html"/>
-    <id>http://blog.url.com/2016/07/08/amazakekouza.html</id>
-    <published>2016-07-08T09:00:00+09:00</published>
-    <updated>2016-07-11T10:39:41+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="ミネラル甘酒講座を開催しました！"&gt;ミネラル甘酒講座を開催しました！&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;先日、醸せ師あき先生によるミネラル甘酒講座が開催されました！&lt;br&gt;
-沢山の方にお越し頂き大盛況の講座でした。&lt;br&gt;
-皆様ありがとうございました。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="甘酒講座" src="/images/./2016/0708_amazakekouza/amazakekouza7.jpg" /&gt;&lt;br&gt;
-&lt;img alt="甘酒講座" src="/images/./2016/0708_amazakekouza/amazakekouza4.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;甘酒と言っても、よくお正月に神社で配られている酒粕を使った甘酒ではなく、&lt;br&gt;
-米麹を使った甘酒です！&lt;br&gt;
-もちろんアルコールは入っていないので、小さなお子様でも大丈夫。&lt;/p&gt;
-
-&lt;p&gt;私は以前、甘酒とフルーツを合わせたフルーツ甘酒を頂いたことがあるのですが、&lt;br&gt;
-本当においしかったです！&lt;/p&gt;
-
-&lt;p&gt;今回は試食として、&lt;br&gt;
-・３種の甘酒シャーベット&lt;br&gt;
-・ノンシュガーの発酵スイートポテト&lt;br&gt;
-をあき先生がご用意してくださったそうです。&lt;br&gt;
-とっても美味しそうですね〜〜♪&lt;/p&gt;
-
-&lt;p&gt;わたしも参加したかったです...(涙)&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="甘酒講座" src="/images/./2016/0708_amazakekouza/amazakekouza5.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="甘酒講座" src="/images/./2016/0708_amazakekouza/amazakekouza3.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;次回は9月にお味噌の講座を開催予定です！&lt;br&gt;
-気になる方は是非お問い合わせください〜！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>13本の薬箱講座</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/06/kusuribako.html"/>
-    <id>http://blog.url.com/2016/07/06/kusuribako.html</id>
-    <published>2016-07-06T09:00:00+09:00</published>
-    <updated>2016-07-11T10:39:41+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="植物エッセンスの薬箱®13本講座"&gt;植物エッセンスの薬箱®13本講座&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;先日弊社新宿オフィスにて、あき先生による13本の薬箱講座が開催されました！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0706_kusuribako/kusuribako_02.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;利用するオイルはドテラ社のエッセンシャルオイル♪&lt;br&gt;
-ドテラのエッセンシャルオイルはCPTG（認定純粋セラピー等級）の基準をクリアした、とても質の高いオイルです。&lt;br&gt;
-だからこそ、香る、塗る、飲む色々な方法で活用できます！&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://www.doterraeveryday.jp/training/cptg/"&gt;CPTGとは&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;上記写真のようにドテラのオイルはたくさんあるのですが、&lt;br&gt;
-このたくさんあるオイルの中でもこの講座では使いやすい13本のオイルについてご紹介しています。&lt;br&gt;
-実際にオイルを香ってみたり、塗ってみたり、体験しながら学ぶことができるので、&lt;br&gt;
-これからエッセンシャルオイル使ってみようかな？興味がある、という方にオススメの講座です。&lt;/p&gt;
-
-&lt;p&gt;また自分でお好きな香りを選んで、香るクリームも作れちゃいます！&lt;br&gt;
-たくさんのエッセンシャルオイルの中から自分好みの香りを作り出す...とっても楽しいですよ〜♪&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0706_kusuribako/kusuribako_0629_1.jpg" /&gt;&lt;br&gt;
-&lt;img alt="薬箱講座" src="/images/./2016/0706_kusuribako/kusuribako_0629_2.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;素敵な香りに癒されて、エッセンシャルオイルに魅了されてしまいます！&lt;br&gt;
-今後も定期的に開催予定なので、気になる方はぜひお問い合わせ下さい！&lt;/p&gt;
 </content>
   </entry>
 </feed>
