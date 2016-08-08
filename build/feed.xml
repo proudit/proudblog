@@ -5,16 +5,196 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-08-01T09:00:00+09:00</updated>
+  <updated>2016-08-08T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>LINE BOTとAWS LambdaとAPI Gatewayを使って「オウム返しBOT」を作る。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/08/make-linebot-using-the-aws-lambda-and-the-api-gateway.html"/>
+    <id>http://blog.url.com/2016/08/08/make-linebot-using-the-aws-lambda-and-the-api-gateway.html</id>
+    <published>2016-08-08T09:00:00+09:00</published>
+    <updated>2016-08-08T14:25:09+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;LineのBOT APIとAWSのAPI Gateway、Lambdaを利用してLINE botを作りたいと思います。&lt;br&gt;
+まず、以下がLINEのBOT APIドキュメントの図です。&lt;br&gt;
+&lt;img alt="How BOT API works" src="https://developers.line.me/wp-content/uploads/2016/04/bot_img001.png" /&gt;&lt;br&gt;
+出典：&lt;a href="https://developers.line.me/bot-api/overview#how_bot_works"&gt;LINE developers&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;ここでの「YOUR SYSTEM」というところを「Lambda」と「API Gateway」を使って構築します。&lt;/p&gt;
+
+&lt;p&gt;また、今回必要となる&lt;a href="https://business.line.me/services/products/4/introduction"&gt;LINE BOT API Trial Account&lt;/a&gt;の取得方法については割愛します。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="lambda関数の作成"&gt;Lambda関数の作成&lt;/h1&gt;
+
+&lt;p&gt;それではまず、AWSの管理コンソールから「Lambda」のサービスへ移動します。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="●-create-a-lambda-function"&gt;● Create a Lambda function&lt;/h2&gt;
+
+&lt;p&gt;次に「Create a Lambda function」をクリックします。&lt;br&gt;
+&lt;img alt="amore00_create-lambda01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6e230911-b7b4-7b75-9918-f897c02b6304.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="●-select-blue-print"&gt;● Select blue print&lt;/h2&gt;
+
+&lt;p&gt;ここではとりあえず何も選択せず「Next」をクリックします。&lt;br&gt;
+&lt;img alt="amore00_select-blueprint01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/4579cd07-c77f-1464-3698-bd14b121c5ce.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="●-configure-triggers"&gt;● Configure triggers&lt;/h2&gt;
+
+&lt;p&gt;今のままだとLambdaだけの状態なのでフロントに「API Gateway」を配置します。&lt;br&gt;
+&lt;img alt="amore01_configure-triggers01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a272ada3-31a3-528b-c685-ede6f538c285.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;「API Gateway」を配置したらその設定をここで行いますが、&lt;strong&gt;API name&lt;/strong&gt;と&lt;strong&gt;Resource name&lt;/strong&gt;は任意の名前を設定して大丈夫です。今回は「&lt;em&gt;MyAmore&lt;/em&gt;」と「&lt;em&gt;/myamore&lt;/em&gt;」にしています。&lt;br&gt;
+そして&lt;strong&gt;Method&lt;/strong&gt;は「&lt;em&gt;POST&lt;/em&gt;」を選択し、&lt;strong&gt;Deploymment stage&lt;/strong&gt;は「&lt;em&gt;prod&lt;/em&gt;(デフォルト)」のままで、&lt;strong&gt;Security&lt;/strong&gt;は「&lt;em&gt;Open&lt;/em&gt;」にしておきます。&lt;br&gt;
+入力が完了したら「Next」ボタンをクリックします。&lt;br&gt;
+&lt;img alt="01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6fce3683-d44f-ec25-f94a-c69a1ed08546.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="●-configure-function"&gt;● Configure function&lt;/h2&gt;
+
+&lt;p&gt;それでは関数の設定に移ります。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="--configure-function"&gt;- Configure function&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Name&lt;/strong&gt;と&lt;strong&gt;Description&lt;/strong&gt;に任意の内容を入力します。また&lt;strong&gt;Runtime&lt;/strong&gt;はここでは「&lt;em&gt;Node.js 4.3&lt;/em&gt;」を選択します。&lt;br&gt;
+&lt;img alt="03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ed39297b-ea8a-ccf5-735d-b95d319a180b.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="--lambda-function-code"&gt;- Lambda function code&lt;/h3&gt;
+
+&lt;p&gt;ここはとりあえずこのままにしておきます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="amore01_configure-triggers03_2.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/70e17b7a-9ab9-081f-778d-fc8c02cdd15f.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="--lambda-function-handler-and-role"&gt;- Lambda function handler and role&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Handler&lt;/strong&gt;に「&lt;em&gt;index.handler&lt;/em&gt;」、&lt;strong&gt;Role&lt;/strong&gt;は「&lt;em&gt;Choose an existing role&lt;/em&gt;」を選び&lt;strong&gt;Existing role&lt;/strong&gt;に「&lt;em&gt;lambda_basic_execution&lt;/em&gt;」を指定します。&lt;br&gt;
+&lt;img alt="amore01_configure-triggers03_3.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a0f1069a-b1e1-ca68-b694-10169859d648.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id="--advanced-settings"&gt;- Advanced settings&lt;/h3&gt;
+
+&lt;p&gt;今回はあまり使う予定はないので&lt;strong&gt;Memory(MB)&lt;/strong&gt;は「&lt;em&gt;128&lt;/em&gt;」にしておきます。&lt;br&gt;
+&lt;strong&gt;Timeout&lt;/strong&gt;はデフォルトの「&lt;em&gt;3秒&lt;/em&gt;」です。&lt;br&gt;
+また、&lt;strong&gt;VPC&lt;/strong&gt;は「&lt;em&gt;No VPC&lt;/em&gt;」にしておきます。&lt;br&gt;
+&lt;img alt="amore01_configure-triggers03_4.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/271e53a9-b533-f8b5-8cd5-c56454a36c49.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="●-review"&gt;● Review&lt;/h2&gt;
+
+&lt;p&gt;「Configure function」で設定した内容の確認です。&lt;br&gt;
+問題なさそうなら[Create function]で作成完了です。&lt;br&gt;
+&lt;img alt="02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6e6a3b03-5ca2-c358-9c2d-b2b509c8a6cd.png" /&gt;&lt;br&gt;
+&lt;img alt="03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ed39297b-ea8a-ccf5-735d-b95d319a180b.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;作成が完了すると「API Gateway」のURLが表示されます。&lt;br&gt;
+&lt;img alt="04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/fdd1265d-0627-1699-c34a-143e77141ac9.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ここで表示されたURLを&lt;strong&gt;LINE&lt;/strong&gt;の「&lt;em&gt;Callback URL&lt;/em&gt;」に設定します。&lt;br&gt;
+その際に注意が必要なのが、ポート番号も指定してあげなければならないという点です。&lt;br&gt;
+以下の画像のように、ドメイン末尾に「:443」をつけてあげる必要があります。&lt;br&gt;
+&lt;img alt="05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/781d37da-0d5c-d326-daa5-119de87c6a6c.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上で「YOUR SYSTEM」に該当するフレームが完了しました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="lambda関数の設定"&gt;Lambda関数の設定&lt;/h1&gt;
+
+&lt;p&gt;それでは作成したフレームの中身を設定していきます。&lt;br&gt;
+中身というのは先ほど「とりあえずこのまま」にしていたLambda関数の箇所です。&lt;br&gt;
+「Code」タブをクリックして編集画面を表示します。&lt;br&gt;
+&lt;img alt="07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/35cc41e6-9633-79c0-a551-050fe8b69324.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;そこに以下のソースコードをコピペします。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;var https = require('https');
+
+exports.handler = function(event, context) {
+    console.log('EVENT:', JSON.stringify(event, null, 0));
+    var msg = event.result[0];
+    var data = JSON.stringify({
+      to: [msg.content.from.toString()],
+      toChannel: 1383378250,
+      eventType: "138311608800106203",
+      content: msg.content
+    });
+    var url ='https://trialbot-api.line.me/v1/events';
+    var opts = {
+        host: 'trialbot-api.line.me',
+        path: '/v1/events',
+        headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            "X-Line-ChannelID": "【Channel ID】",
+            "X-Line-ChannelSecret": "【Channel Secret】",
+            "X-Line-Trusted-User-With-ACL": "【MID】"
+        },
+        method: 'POST'
+    };
+    var req = https.request(opts, function(res){
+        res.on('data', function (chunk) {
+            console.log(res.statusCode + chunk.toString());
+        });
+        req.on('error', function(err) {
+          console.log('ERROR: ' + err.message);
+        });
+    });
+    req.write(data);
+    req.end();
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ただその際に、【Channel ID】と【Channel Secret】と【MID】は独自の値を設定する必要があるので「&lt;a href="https://developers.line.me/channels/"&gt;Line developers&lt;/a&gt;」で取得した自分の値と置き換えてください。&lt;br&gt;
+&lt;img alt="06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/87c308e1-2ed4-31fd-d45f-d50d9c83ad10.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;コピペが完了したら「Save」ボタンで保存して完了です。&lt;/p&gt;
+
+&lt;p&gt;え？それじゃ何をしてるのかわからないって？いいんです！まずは完成させることが大事なんです！&lt;br&gt;
+ひとまず何も考えずにコピペしましょう！&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="トーク"&gt;トーク&lt;/h1&gt;
+
+&lt;p&gt;それではいよいよアモーレとの会話です！LINEから何か好きな言葉をささやいてみましょう！&lt;br&gt;
+&lt;img alt="08.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/48bb2b15-2bb9-f322-e475-62c875efc3bb.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;同じ言葉を返してくれます。いわゆる「オウム返し」というやつです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;今回は「とにかく動かす」ことを目的に作りました。&lt;br&gt;
+具体的な処理について説明すると長くなってしまうので、今回はここまでにしたいと思います。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>goofysを使ってAmazon LinuxにS3をマウントする。</title>
     <link rel="alternate" href="http://blog.url.com/2016/08/01/use-the-goofys-to-mount-the-s3-to-amazon-linux.html"/>
     <id>http://blog.url.com/2016/08/01/use-the-goofys-to-mount-the-s3-to-amazon-linux.html</id>
     <published>2016-08-01T09:00:00+09:00</published>
-    <updated>2016-08-01T11:41:11+09:00</updated>
+    <updated>2016-08-01T15:54:16+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -220,8 +400,7 @@ kohei-goofys     1.0P     0  1.0P    0% /home/ec2-user/mount-goofys
 
 &lt;p&gt;とりあえず&lt;strong&gt;&lt;em&gt;goofys&lt;/em&gt;&lt;/strong&gt;がどんな感じかを試したくて行いましたが、導入はとても簡単でした。&lt;br&gt;
 ただ、自動マウント設定の際のアクセス権限周りの挙動を確認するのに少々時間かかったかなという感じです。&lt;br&gt;
-GitHubの&lt;a href="https://github.com/kahing/goofys#benchmark"&gt;Benchmark&lt;/a&gt;ではs3fsよりかなり優秀な感じですが、実際比較はまだしてないのでそっちの方もできたらなと思っています。&lt;br&gt;
-また、実際に利用している方がいましたらそこらへんの情報についてコメントいただけると嬉しいです。&lt;/p&gt;
+GitHubの&lt;a href="https://github.com/kahing/goofys#benchmark"&gt;Benchmark&lt;/a&gt;ではs3fsよりかなり優秀な感じですが、実際比較はまだしてないのでそっちの方も検証できたらなと思っています。&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -734,111 +913,6 @@ CMSは静的サイトと異なり、DBサーバも必要になるので、前述
 
 &lt;p&gt;とは言え、サーバレスも注目されている中でmiddlemanのようなツールを&lt;br&gt;
 使ったサイトはこれからどんどん増えていくかも！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>AmazonLinuxにswapを作成する。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/19/how-to-make-a-swap-for-the-amazonlinux.html"/>
-    <id>http://blog.url.com/2016/07/19/how-to-make-a-swap-for-the-amazonlinux.html</id>
-    <published>2016-07-19T09:00:00+09:00</published>
-    <updated>2016-07-26T12:25:59+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;&lt;em&gt;Amazon Linux&lt;/em&gt;に2048MBのスワップを作成する作業を行います。&lt;/p&gt;
-
-&lt;p&gt;その前にまずスワップとは、&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;スワップとは、ハードディスクなどの補助記憶装置を利用して使用可能なメモリ容量を増やすOSの機能の一つ。－ IT用語辞典(e-Words)より抜粋&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;つまり今回で言うとEBSボリュームの一部をメモリとして扱えるようにした領域のことです。&lt;/p&gt;
-
-&lt;p&gt;ということで作成してみます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="事前確認"&gt;事前確認&lt;/h1&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ free -m
-             total       used       free     shared    buffers     cached
-Mem:           491        353        138          0          8        294
--/+ buffers/cache:         49        442
-Swap:            0          0          0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ swapon -s
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="スワップ領域の作成"&gt;スワップ領域の作成&lt;/h1&gt;
-
-&lt;p&gt;まず、&lt;code&gt;dd&lt;/code&gt;コマンドでスワップ用の領域を確保します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo dd if=/dev/zero of=/swapfile bs=1024 count=2048k
-2097152+0 レコード入力
-2097152+0 レコード出力
-2147483648 バイト (2.1 GB) コピーされました、 32.0676 秒、 67.0 MB/秒
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo chmod 600 /swapfile 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;作成したら&lt;code&gt;mkswap&lt;/code&gt;でスワップを作成します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo mkswap /swapfile 
-mkswap: /swapfile: warning: wiping old swap signature.
-スワップ空間バージョン1を設定します、サイズ = 2097148 KiB
-ラベルはありません, UUID=88c217dc-d8e0-42f9-b2bc-eb814505b5e3
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上で作成が完了しました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="スワップ領域の有効化"&gt;スワップ領域の有効化&lt;/h1&gt;
-
-&lt;p&gt;&lt;code&gt;mkswap&lt;/code&gt;で作成しただけでは利用できません。スワップの作成ができたら&lt;code&gt;swapon&lt;/code&gt;でスワップ領域の有効化をします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo swapon /swapfile 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ free -m
-             total       used       free     shared    buffers     cached
-Mem:           491        485          6          0          4        421
--/+ buffers/cache:         59        432
-Swap:         2047          0       2047
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ swapon -s
-Filename                Type        Size    Used    Priority
-/swapfile                               file    2097148 0   -1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="スワップ領域の無効化"&gt;スワップ領域の無効化&lt;/h1&gt;
-
-&lt;p&gt;スワップ領域の有効化は&lt;code&gt;swapon&lt;/code&gt;ですが、無効化は&lt;code&gt;swapoff&lt;/code&gt;で行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo swapoff /swapfile 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="自動マウント設定"&gt;自動マウント設定&lt;/h1&gt;
-
-&lt;p&gt;毎回コマンドでスワップを有効化するのは大変ですので、起動時に自動マウントするように&lt;em&gt;/etc/fstab&lt;/em&gt;に追記しておきます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo vi /etc/fstab
-/swapfile   none        swap    defaults        0   0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;参考：&lt;a href="https://wiki.archlinuxjp.org/index.php/Fstab"&gt;Arch Linux - fstab&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;以上で完了です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;p&gt;かつての物理サーバでは、コストや仕様などの理由で利用出来るメモリに制限がありました。&lt;br&gt;
-ただ、今ではクラウドを利用することによって&lt;strong&gt;swapを作成するならそれ以上にメモリを積む&lt;/strong&gt;であったり、&lt;strong&gt;一台あたりのパワーを求めるよりスケールアウト&lt;/strong&gt;という発想の方が効率的になってきたこともありswapの利用する場面が少なくなっています。&lt;br&gt;
-とはいえ、&lt;strong&gt;いざという時のswap&lt;/strong&gt;はあっても損じゃないかなと個人的には思います。&lt;/p&gt;
 </content>
   </entry>
 </feed>
