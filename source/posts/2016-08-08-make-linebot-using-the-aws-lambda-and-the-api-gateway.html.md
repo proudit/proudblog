@@ -98,7 +98,7 @@ LineのBOT APIとAWSのAPI Gateway、Lambdaを利用してLINE botを作りた�
 
 そこに以下のソースコードをコピペします。
 
-```js:myAmore
+```js:
 var https = require('https');
 
 exports.handler = function(event, context) {
@@ -146,7 +146,7 @@ exports.handler = function(event, context) {
 
 <br>
 # トーク
-それではいよいよアモーレとの会話です！LINEから何か好きな言葉をささやいてみましょう！
+それではいよいよ会話です。ProudCloudに話しかけてみます。
 ![08.png](https://qiita-image-store.s3.amazonaws.com/0/82090/48bb2b15-2bb9-f322-e475-62c875efc3bb.png)
 
 同じ言葉を返してくれます。いわゆる「オウム返し」というやつです。
