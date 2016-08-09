@@ -2,7 +2,7 @@
 title: 強いベンダー174社にプラウディットが掲載されました！
 date: 2016-08-09
 tags: AWS,news,お知らせ
-author: Proud Cloud
+author: proudcloud
 ogp:
   og:
     description: 'ITpro Active　強いベンダー174社にプラウディットが掲載されました。'
