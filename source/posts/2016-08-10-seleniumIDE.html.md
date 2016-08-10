@@ -78,8 +78,6 @@ _verifyTextPresent:対象である要素のテキストが値(パターン)と�
 
 ![SeleniumIDE](./2016/0810_SeleniumIDE/0810_SeleniumIDE_7.png)
 
-テスト結果は左下に表示されます。
-テスト結果は成功です。
 
 #おわりに
 ---
