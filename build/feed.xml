@@ -5,16 +5,172 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-08-08T09:00:00+09:00</updated>
+  <updated>2016-08-16T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>AWSと他の環境をVPNで繋げる際の「VPN接続」の作成をシェルスクリプトにしてみた。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/16/shell-script-for-aws-vpn.html"/>
+    <id>http://blog.url.com/2016/08/16/shell-script-for-aws-vpn.html</id>
+    <published>2016-08-16T09:00:00+09:00</published>
+    <updated>2016-08-16T12:12:04+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;AWSと他の環境をVPN接続する場合、AWS側では「VPN接続」を作成する必要があります。&lt;br&gt;
+管理画面からポチポチ操作するのは面倒なのでスクリプトを作成しました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="流れ"&gt;流れ&lt;/h1&gt;
+
+&lt;p&gt;スクリプトの大まかな流れです。&lt;/p&gt;
+
+&lt;p&gt;・ 仮想プライベートゲートウェイの作成&lt;br&gt;
+・ 仮想プライベートゲートウェイをVPCへattach&lt;br&gt;
+・ カスタマーゲートウェイの作成&lt;br&gt;
+・ VPN接続の作成&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="スクリプト"&gt;スクリプト&lt;/h1&gt;
+
+&lt;p&gt;以下、スクリプトです。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;#!/bin/bash
+
+# == Check number of arguments. ==================================== #
+if [ $# -ne 2 ]; then
+  echo "ERROR: Please check the number of arguments."
+  echo "   -usage-----------------------------"
+  echo "     $0 [VPC ID] [Counter VPN-IP] "
+  echo "   -----------------------------------"
+  echo ""
+  exit 1
+fi
+
+
+# == Set ENV. ====================================================== #
+VPC_ID="$1"
+PUBLIC_IP="$2"
+TAG_VALUE="VPNConnectTo${PUBLIC_IP}"
+
+
+# == Create VPN ==================================================== #
+# Create VPN Gateway
+echo "==[VGW]======================================="
+echo "Create the VGW."
+VGW_ID=`aws ec2 create-vpn-gateway --type ipsec.1 | jq -r .VpnGateway.VpnGatewayId`
+
+echo "VGW_ID:${VGW_ID}"
+if [ -n "${VGW_ID}" -a "${VGW_ID}" != "null" ]; then
+  echo "SUCCESS: Create the VirtualGateWay."
+else
+  echo "ERROR: Can't create the VirtualGateWay."
+  exit 1
+fi
+echo ""
+
+echo "Tagged to the VGW."
+aws ec2 create-tags --resources ${VGW_ID} --tags Key=Name,Value=${TAG_VALUE}
+
+echo "Attach the VGW to the VPC."
+VGW_STAT=`aws ec2 attach-vpn-gateway --vpn-gateway-id ${VGW_ID} --vpc-id ${VPC_ID} | jq -r .VpcAttachment.State`
+
+if [ "${VGW_STAT}" = "attaching" ]; then
+  echo "SUCCESS: Attaching the VGW to the VPC."
+else
+  echo "ERROR: Can't attach the VGW to the VPC."
+  exit 1
+fi
+echo ""
+echo ""
+
+
+# Create CustomerGateway
+echo "==[CGW]======================================="
+echo "Create the VGW."
+CGW_ID=`aws ec2 create-customer-gateway --type ipsec.1 --public-ip ${PUBLIC_IP} --bgp-asn 65000 | jq -r .CustomerGateway.CustomerGatewayId`
+
+echo "CGW_ID:${CGW_ID}"
+if [ -n "${CGW_ID}" -a "${CGW_ID}" != "null" ]; then
+  echo "SUCCESS: Create the CustomerGateWay."
+else
+  echo "ERROR: Can't create the CustomerGateWay."
+  exit 1
+fi
+echo ""
+
+echo "Tagged to the CGW."
+aws ec2 create-tags --resources ${CGW_ID} --tags Key=Name,Value=${TAG_VALUE}
+echo ""
+echo ""
+
+
+# Create VPN Connection
+echo "==[VPN]======================================="
+echo "Create the VPN."
+VPN_ID=`aws ec2 create-vpn-connection --type ipsec.1 --customer-gateway-id ${CGW_ID} --vpn-gateway-id ${VGW_ID} | jq -r .VpnConnection.VpnConnectionId`
+
+echo "VPN_ID:${VPN_ID}"
+if [ -n "${VPN_ID}" -a "${VPN_ID}" != "null" ]; then
+  echo "SUCCESS: Create the VPN Connection."
+else
+  echo "ERROR: Can't create the VPN Connection."
+  exit 1
+fi
+echo ""
+
+echo "Tagged to the VPN."
+aws ec2 create-tags --resources ${VPN_ID} --tags Key=Name,Value=${TAG_VALUE}
+
+echo ""
+echo ""
+
+echo "--------------------------------------------------"
+echo "COMPLETED: All of the task has been completed."
+
+exit 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="実行"&gt;実行&lt;/h1&gt;
+
+&lt;p&gt;コマンド実行例です。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sh create-vpn.sh vpc-1e1ed97b 210.129.19.42
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="結果"&gt;結果&lt;/h1&gt;
+
+&lt;p&gt;以下、管理画面から見た作成結果です。&lt;/p&gt;
+
+&lt;p&gt;・仮想プライベートゲートウェイ&lt;br&gt;
+&lt;img alt="idcf-vpn_scrip03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/47834725-e13f-8cf9-d3a3-33f1cf51da26.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;・カスタマーゲートウェイ&lt;br&gt;
+&lt;img alt="idcf-vpn_scrip02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ee9a3f30-87a6-a69d-c6ad-6069eeb8928f.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;・VPN接続&lt;br&gt;
+&lt;img alt="idcf-vpn_scrip01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/39290a24-e4ab-22dd-1d50-ec27b4183345.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;スクリプト実行後、「VPN接続」から「設定のダウンロード」をしてそのコンフィグを対抗となるルーターに流し込めばOKです。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>LINE BOTとAWS LambdaとAPI Gatewayを使って「オウム返しBOT」を作る。</title>
     <link rel="alternate" href="http://blog.url.com/2016/08/08/make-linebot-using-the-aws-lambda-and-the-api-gateway.html"/>
     <id>http://blog.url.com/2016/08/08/make-linebot-using-the-aws-lambda-and-the-api-gateway.html</id>
     <published>2016-08-08T09:00:00+09:00</published>
-    <updated>2016-08-08T14:25:09+09:00</updated>
+    <updated>2016-08-08T14:48:22+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -176,7 +332,7 @@ exports.handler = function(event, context) {
 
 &lt;h1 id="トーク"&gt;トーク&lt;/h1&gt;
 
-&lt;p&gt;それではいよいよアモーレとの会話です！LINEから何か好きな言葉をささやいてみましょう！&lt;br&gt;
+&lt;p&gt;それではいよいよ会話です。ProudCloudに話しかけてみます。&lt;br&gt;
 &lt;img alt="08.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/48bb2b15-2bb9-f322-e475-62c875efc3bb.png" /&gt;&lt;/p&gt;
 
 &lt;p&gt;同じ言葉を返してくれます。いわゆる「オウム返し」というやつです。&lt;/p&gt;
@@ -187,6 +343,62 @@ exports.handler = function(event, context) {
 
 &lt;p&gt;今回は「とにかく動かす」ことを目的に作りました。&lt;br&gt;
 具体的な処理について説明すると長くなってしまうので、今回はここまでにしたいと思います。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>13本の薬箱講座&amp;アロマタッチ</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/05/kusuribako-kouza.html"/>
+    <id>http://blog.url.com/2016/08/05/kusuribako-kouza.html</id>
+    <published>2016-08-05T09:00:00+09:00</published>
+    <updated>2016-08-08T14:26:54+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="講座を開催しました！"&gt;講座を開催しました！&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;7月も薬箱講座を開催しました！＠プラウディットオフィス&lt;br&gt;
+今回はお昼の部、夜の部と同日２回に渡り開催しました！&lt;/p&gt;
+
+&lt;p&gt;お昼の部では８名の方にご参加頂き、とても賑やかな講座になりましたよ〜！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0805_kusuribako0727/0727kusuribako_1.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回の講座もみなさんエッセンシャルオイルの世界に魅了され有意義な時間を&lt;br&gt;
+過ごしていただけたようです！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0805_kusuribako0727/0727kusuribako_2.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0805_kusuribako0727/0727kusuribako_3.jpg" /&gt;&lt;br&gt;
+基本の13本のオイルの他にも色々なオイルの香りを試すこともできますよ〜。&lt;/p&gt;
+
+&lt;p&gt;そして、今回は薬箱講座とは別にアロマタッチテクニックの施術も行いました！&lt;br&gt;
+＠プラウディットオフィス&lt;/p&gt;
+
+&lt;h1 id="アロマタッチテクニックとは"&gt;アロマタッチテクニックとは&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;doTERRA社の8種類のエッセンシャルオイルを使い、背中や足に直接エッセンシャルオイルを塗布して行う独自の施術です。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0805_kusuribako0727/0727kusuribako_4.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;異なる特性を持った高品質のオイルを順番に使い、&lt;br&gt;
+ハンドテクニックによって体になじませていくことによって、脊髄神経に作用し、&lt;br&gt;
+体の組織をリラックスさせ、ストレスの緩和、免疫力の向上、&lt;br&gt;
+ホルモンバランスや自律神経の調整など心身の不調の回復をサポートします。&lt;/p&gt;
+
+&lt;p&gt;エッセンシャルオイルの優しい香りに包まれながら心身ともにリラックスし、&lt;br&gt;
+心地よい時間を過ごすことができます。&lt;br&gt;
+強く力を加えるようなマッサージではないのに、体がとーっても軽く&lt;br&gt;
+なるんです。&lt;br&gt;
+そして、施術中気がつくと意識がなくなっていることが多々(笑)&lt;/p&gt;
+
+&lt;p&gt;夏バテで体がスッキリしない、癒されたい、そんな方は&lt;br&gt;
+是非一度アロマタッチを受けてみてくださいね〜！&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://www.proudit.jp/"&gt;お問い合わせはこちら！&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -605,314 +817,6 @@ AWSを使ったことがないって人でも大丈夫！&lt;br&gt;
 &lt;p&gt;※上記の使い方は、CPTG(認定純粋セラピー等級)エッセンシャルオイル純度100%のドテラのオイルを利用した場合の一例です。&lt;/p&gt;
 
 &lt;p&gt;&lt;a href="http://www.doterraeveryday.jp/training/cptg/"&gt;CPTGとは&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>静的ルーティングの設定 - Linux</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/25/static-route.html"/>
-    <id>http://blog.url.com/2016/07/25/static-route.html</id>
-    <published>2016-07-25T09:00:00+09:00</published>
-    <updated>2016-07-26T12:25:59+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;AWSではルートテーブルがあるので設定することはないですが、そう言ったルーティングを管理する機能がない場合は自分で設定を行わなければなりません。&lt;br&gt;
-ということでルーティングの設定についてまとめてみました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="事前確認"&gt;事前確認&lt;/h1&gt;
-
-&lt;p&gt;とりあえず&lt;code&gt;netstat&lt;/code&gt;コマンドで現在のルーティングの状態を確認しておきます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         10.13.0.1       0.0.0.0         UG        0 0          0 eth0
-10.13.0.0       0.0.0.0         255.255.248.0   U         0 0          0 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="ルーティングの追加"&gt;ルーティングの追加&lt;/h1&gt;
-
-&lt;p&gt;ルーティングの追加には一時的または永続的の２通りあります。コマンドでの追加、設定ファイルへ記載しての追加です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="一時的な追加"&gt;一時的な追加&lt;/h2&gt;
-
-&lt;p&gt;一時的な追加はコマンドでの追加となります。ここでは&lt;code&gt;route&lt;/code&gt;コマンドと&lt;code&gt;ip&lt;/code&gt;コマンドの２通りを紹介します。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="routeコマンド"&gt;routeコマンド&lt;/h3&gt;
-
-&lt;h4 id="・networkの追加"&gt;・networkの追加&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -net 172.31.0.0 gw 10.13.0.145 netmask 255.255.0.0 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="・hostの追加"&gt;・hostの追加&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -host 172.31.0.10 gw 10.13.0.145 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;em&gt;network&lt;/em&gt;に比べて&lt;em&gt;host&lt;/em&gt;は&lt;code&gt;-net&lt;/code&gt;が&lt;code&gt;-host&lt;/code&gt;になるのと、&lt;code&gt;netmask&lt;/code&gt;が不要になります。&lt;br&gt;
-また、&lt;code&gt;eth0&lt;/code&gt; は無くても大丈夫です。その場合は任意でルーティングが設定できる&lt;em&gt;eth&lt;/em&gt;で設定されます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="ipコマンド"&gt;ipコマンド&lt;/h3&gt;
-
-&lt;h5 id="・networkの追加"&gt;・networkの追加&lt;/h5&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo ip route add 172.31.0.0/16 via 10.13.0.145 dev eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h5 id="・hostの追加"&gt;・hostの追加&lt;/h5&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo ip route add 172.31.0.10/32 via 10.13.0.145 dev eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ここでの&lt;em&gt;network&lt;/em&gt;と&lt;em&gt;host&lt;/em&gt;の違いは&lt;em&gt;netmask&lt;/em&gt;だけです。&lt;em&gt;host&lt;/em&gt;の場合は&lt;code&gt;/32&lt;/code&gt;にするだけです。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="永続的な追加"&gt;永続的な追加&lt;/h2&gt;
-
-&lt;p&gt;コマンドで一時的に追加しただけではサーバー再起動などをしてしまうと消えてしまいます。&lt;br&gt;
-そこで再起動してもルーティングが消えない設定を紹介します。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="ubuntu-の場合"&gt;Ubuntu の場合&lt;/h3&gt;
-
-&lt;h4 id="・その１"&gt;・その１&lt;/h4&gt;
-
-&lt;p&gt;ひとつ目は&lt;code&gt;/etc/network/if-up.d/static-routes&lt;/code&gt;で設定する方法です。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo vi /etc/network/if-up.d/static-routes
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;#!/bin/sh
-/sbin/route add -net 172.31.0.0 gw 10.13.0.145 netmask 255.255.0.0 dev eth0 // networkの場合
-/sbin/route add -host 172.31.0.10 gw 10.13.0.145 eth0 // hostの場合
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo chmod +x /etc/network/if-up.d/static-routes
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo /etc/network/if-up.d/static-routes
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="・その２"&gt;・その２&lt;/h4&gt;
-
-&lt;p&gt;もう一つの方法は&lt;code&gt;/etc/network/interfaces&lt;/code&gt;に設定する方法です。&lt;br&gt;
-&lt;code&gt;post-up&lt;/code&gt;を使うと任意のコマンドが実行できるようになります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cat /etc/network/interfaces
-# This file describes the network interfaces available on your system
-# and how to activate them. For more information, see interfaces(5).
-
-# The loopback network interface
-auto lo
-iface lo inet loopback
-
-# The primary network interface
-auto eth0
-iface eth0 inet dhcp
-    post-up route add -net 172.31.0.0/16 gw 10.13.0.145  // networkの場合
-    post-up route add -host 172.31.0.10/32 gw 10.13.0.145  // hostの場合
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="centos-の場合"&gt;CentOS の場合&lt;/h3&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ cat /etc/sysconfig/network-scripts/route-eth0 
-# Static route for metadata service
-172.31.0.0/16 via 10.13.0.145 dev eth0 // networkの場合
-172.31.0.10/32 via 10.13.0.145 dev eth0 // hostの場合
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo /etc/init.d/network restart
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;もし&lt;code&gt;route-eth0&lt;/code&gt;の&lt;code&gt;0&lt;/code&gt;の部分は設定したい&lt;em&gt;eth&lt;/em&gt;によって変えてください。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
-
-&lt;p&gt;ということで追加した後の設定は以下の状態になります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         10.13.0.1       0.0.0.0         UG        0 0          0 eth0
-10.13.0.0       0.0.0.0         255.255.248.0   U         0 0          0 eth0
-172.31.0.0      10.13.0.145     255.255.0.0     UG        0 0          0 eth0
-172.31.0.10     10.13.0.145     255.255.255.255 UGH       0 0          0 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="ルーティングの削除"&gt;ルーティングの削除&lt;/h1&gt;
-
-&lt;p&gt;ルーティングの削除にも一時的または永続的の２通りあります。コマンドでの削除は一時的なものですが。永続的に削除をしたい場合は設定ファイルの記載から削除してあげる必要があります。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="一時的な削除"&gt;一時的な削除&lt;/h2&gt;
-
-&lt;p&gt;一時的な削除は追加の時と同じでコマンドで行います。ここでも&lt;code&gt;route&lt;/code&gt;コマンドと&lt;code&gt;ip&lt;/code&gt;コマンドの２通りを紹介します。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="routeコマンド"&gt;routeコマンド&lt;/h3&gt;
-
-&lt;h4 id="・networkの削除"&gt;・networkの削除&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -net 172.31.0.0 gw 10.13.0.145 netmask 255.255.0.0 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="・hostの削除"&gt;・hostの削除&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo route add -host 172.31.0.10 gw 10.13.0.145 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;追加の時と同じで、&lt;em&gt;network&lt;/em&gt;と&lt;em&gt;host&lt;/em&gt;の違いは&lt;code&gt;-net&lt;/code&gt;が&lt;code&gt;-host&lt;/code&gt;になるのと、&lt;code&gt;netmask&lt;/code&gt;が不要になるところです。&lt;code&gt;eth0&lt;/code&gt;の箇所も無くても大丈夫です。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="ipコマンド"&gt;ipコマンド&lt;/h3&gt;
-
-&lt;h4 id="・networkの削除"&gt;・networkの削除&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo ip route del 172.31.0.0/16
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h4 id="・hostの削除"&gt;・hostの削除&lt;/h4&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo ip route del 172.31.0.10/32
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こちらも追加と同じで&lt;em&gt;host&lt;/em&gt;の場合は&lt;em&gt;netmask&lt;/em&gt;を&lt;code&gt;/32&lt;/code&gt;にするだけです。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="永続的な削除"&gt;永続的な削除&lt;/h2&gt;
-
-&lt;p&gt;ただ、追加した箇所を削除するだけですので割愛します。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="確認"&gt;確認&lt;/h2&gt;
-
-&lt;p&gt;永続的な設定の場合も&lt;code&gt;netstat&lt;/code&gt;で確認するとコマンドで追加した場合と同様の状態と取ります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ netstat -nr
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         10.13.0.1       0.0.0.0         UG        0 0          0 eth0
-10.13.0.0       0.0.0.0         255.255.248.0   U         0 0          0 eth0
-172.31.0.0      10.13.0.145     255.255.0.0     UG        0 0          0 eth0
-172.31.0.10     10.13.0.145     255.255.255.255 UGH       0 0          0 eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;p&gt;今までのルーティングの設定は各サーバーに設定しなければならないので、台数が多くなればなるほど大変でした。&lt;br&gt;
-そういった煩雑さを軽くしてくれたAWSのルートテーブルは本当に便利だなと思います。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>OGPの設定 Part2</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/21/facebookSARE3.html"/>
-    <id>http://blog.url.com/2016/07/21/facebookSARE3.html</id>
-    <published>2016-07-21T09:00:00+09:00</published>
-    <updated>2016-07-26T12:25:59+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;前回から引き続きfacebookのOGP設定についてです。&lt;br&gt;
-前回、大方設定したOGP情報が反映されるところまでいきましたが、、&lt;br&gt;
-記事ごとのOGPデータの設定がうまくいかない。という所でつまずきました。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0721_facebookSHARE3/OGP_5.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;今回はなんとかして記事ごとにOGPの取得をしてもらえるように設定したい！&lt;/p&gt;
-
-&lt;h1 id="middleman-ogpを使う"&gt;Middleman-OGPを使う&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;突然ですが、、&lt;br&gt;
-実はこのProudBlog、middlemanのブログ機能を使って作られています。&lt;/p&gt;
-
-&lt;p&gt;そのため、色々と調べてみた結果、今回はMiddleman-OGPというプラグインを利用しました。&lt;br&gt;
-プラグインを入れて、の作業なったので、社長に設定をしてもらいました！&lt;br&gt;
-なので、すみません、、詳細な設定内容は省きます＞＜&lt;br&gt;
-(ここが一番気になりますよね。汗)&lt;/p&gt;
-
-&lt;p&gt;内容についてはこの辺りのサイトを参考にしています。&lt;br&gt;
-&lt;a href="http://whiskers.nukos.kitchen/2015/04/10/middleman-ogp.html"&gt;http://whiskers.nukos.kitchen/2015/04/10/middleman-ogp.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;ただ上記プラグイン導入の他にも色々と手を加えて、加えて、、、&lt;br&gt;
-設定をしてもらい、ようやく理想通りの形ができあがりましたー！！&lt;/p&gt;
-
-&lt;p&gt;肝心な手順部分の内容が薄くなってしまいました...&lt;br&gt;
-せっかくなのでMiddlemanと静的サイトについて備忘録としてまとめておきます。&lt;/p&gt;
-
-&lt;h1 id="middlemanとは"&gt;Middlemanとは&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;&lt;img alt="OGP設定" src="/images/./2016/0721_facebookSHARE3/middleman_1.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Middlemanとはruby製の静的サイトジェネレーター。&lt;br&gt;
-静的なwebサイトを構築する際に便利なコマンドラインツール。&lt;/p&gt;
-
-&lt;p&gt;日本語のドキュメントもあります。&lt;br&gt;
-&lt;a href="https://middlemanapp.com/jp/"&gt;https://middlemanapp.com/jp/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;日本語ドキュメントがあるのはありがたいですね！&lt;/p&gt;
-
-&lt;p&gt;この他にmiddlemanのメリットが書かれたサイトを見つけました。&lt;br&gt;
-&lt;a href="http://www.mdesign-works.com/blog/web/static-site-genareter/"&gt;http://www.mdesign-works.com/blog/web/static-site-genareter/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;・開発用サーバがある&lt;br&gt;
-・共通のレイアウト設定やファイルをパーツ化できる&lt;br&gt;
-・変数が使える&lt;/p&gt;
-
-&lt;p&gt;※上記はサイトから抜粋したものです&lt;/p&gt;
-
-&lt;h2 id="静的サイトジェネレーター（static-site-generator）とは"&gt;静的サイトジェネレーター（Static Site Generator）とは&lt;/h2&gt;
-
-&lt;p&gt;記事を書いたテキストファイルを元に、HTMLを生成してくれる、&lt;br&gt;
-静的サイトを効率的に制作するためのツール。&lt;/p&gt;
-
-&lt;p&gt;middlemanの他にも&lt;br&gt;
-Hugo、jekllyといったものが有名どころのようです。&lt;/p&gt;
-
-&lt;p&gt;静的サイトは、指定したパスに設置してあるhtmlファイルを表示させ、&lt;br&gt;
-何度読み込んでも同じ内容を表示させます。&lt;br&gt;
-まさに動きのない、静的なサイト。&lt;/p&gt;
-
-&lt;p&gt;HTMLファイルを表示させるだけなので、表示速度も高速。&lt;br&gt;
-尚且つサーバ負荷も最小限で済みます。&lt;br&gt;
-構成がシンプルで、更新頻度の少ないサイトには向いています。&lt;/p&gt;
-
-&lt;p&gt;サイトを簡単に作る上で多く利用されているのが、CMS(content management system)。&lt;br&gt;
-なかでもwordpressは代表的なCMS。&lt;br&gt;
-CMSは静的サイトと異なり、DBサーバも必要になるので、前述したようにシンプルな&lt;br&gt;
-構成のサイトは静的サイトで構築するほうが色々とメリットがあるかもしれません。&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;実際に自分がmiddlemanを一から設定する作業をやったわけではないのですが、&lt;br&gt;
-このブログを更新する上で一つ一つの作業はいたってシンプル。&lt;br&gt;
-一定の規則に従って記事を書いてアップするだけ！&lt;br&gt;
-ただ、中の構成がどうなっているのかわからないので、ブログのトップ画像を変えたい、今回のようにfacebookのogp設定をしたいとった時は&lt;br&gt;
-分かる人に聞いたり、やってもらったりしないといけないので、&lt;br&gt;
-社内向け、個人利用が主になってしまうのかな。&lt;br&gt;
-お客さん向けに提供するには難しいかもしれません。&lt;/p&gt;
-
-&lt;p&gt;とは言え、サーバレスも注目されている中でmiddlemanのようなツールを&lt;br&gt;
-使ったサイトはこれからどんどん増えていくかも！&lt;/p&gt;
 </content>
   </entry>
 </feed>
