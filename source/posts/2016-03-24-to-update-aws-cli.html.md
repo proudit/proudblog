@@ -1,7 +1,7 @@
 ---
 title: aws-cliのバージョンをアップグレードする。for MacOS
 date: 2016-03-24
-tags: aws-cli, MacOS
+tags: aws-cli
 author: kohei
 ---
 

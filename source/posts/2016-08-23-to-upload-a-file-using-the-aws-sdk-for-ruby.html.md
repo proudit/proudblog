@@ -1,7 +1,7 @@
 ---
 title: AWS SDK for Ruby バージョン 2 を使用したS3バケットへのオブジェクトアップロード
 date: 2016-08-23
-tags: AWS,ruby
+tags: AWS,Ruby
 author: kohei
 ogp:
   og: 'プログラミングのお勉強をしようと思い、AWS公式ドキュメントにある「AWS SDK for Ruby を使用したオブジェクトのアップロード」を参考にファイルアップロードを行うRubyスクリプトを書いてみました。'
@@ -79,20 +79,20 @@ $ vim upload.ruby
 ただ、その際に**bucketname**、**objectname**、**uploadfile**と**アクセスキーID**と**シークレットアクセスキー**は適宜変更してください。
 また、バケットのリージョンをTokyoにしなかった場合も適切なリージョンに変更する必要があります。
 
-```rb:upload.ruby
+```rb:upload.rb
 #!/usr/bin/env ruby
 
 require 'aws-sdk'
 
-bucketname = "kohei-no-bucket"  // バケット名
-objectname = "ceresso.png"      // アップロード後のファイル名
-uploadfile = "ceresso.png"      // アップロードするファイル名
+bucketname = "kohei-no-bucket"  # バケット名
+objectname = "ceresso.png"      # アップロード後のファイル名
+uploadfile = "ceresso.png"       アップロードするファイル名
 
 Aws.config[:credentials] = Aws::Credentials.new(
-  '********************',                        // アクセスキーID
-  '****************************************',    // シークレットアクセスキー
+  '********************',                        # アクセスキーID
+  '****************************************',    # シークレットアクセスキー
 )
-s3 = Aws::S3::Resource.new(region:'ap-northeast-1')  // Tokyoリージョン
+s3 = Aws::S3::Resource.new(region:'ap-northeast-1')  # Tokyoリージョン
 obj = s3.bucket(bucketname).object(objectname)
 obj.upload_file(uploadfile)
 ```
@@ -100,7 +100,7 @@ obj.upload_file(uploadfile)
 最後に、作成したら実行権限をつけておきましょう。
 
 ```bash:権限追加
-$ chmod +x upload.png
+$ chmod +x upload.rb
 ```
 
 あと、もし*aws-adk*のインストールがまだの場合は以下のコマンドでインストールもしておいてください。
@@ -117,7 +117,7 @@ $ gem install aws-sdk
 それではアップロードしてみます。
 
 ```bash:アップロード
-$ ./upload.ruby
+$ ./upload.rb
 ```
 
 何もエラーなくプロンプトが返って来れば無事アップロード成功です。

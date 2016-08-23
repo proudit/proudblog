@@ -1,7 +1,7 @@
 ---
 title: 第１回 AWSとIDCFをVPN接続する - IDCF準備編（全４回）
 date: 2016-05-02
-tags: IDCFクラウド, AWS, VPN, VyOS, vpc 
+tags: IDCFクラウド, AWS, VPN
 author: kohei
 ---
 

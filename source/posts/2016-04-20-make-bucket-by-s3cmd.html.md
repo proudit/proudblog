@@ -1,7 +1,7 @@
 ---
 title: s3cmdをインストールしてIDCFクラウドのオブジェクトストレージにバケットを作成する。
 date: 2016-04-20
-tags: s3cmd, IDCF
+tags: s3cmd, IDCFクラウド
 author: kohei
 ---
 

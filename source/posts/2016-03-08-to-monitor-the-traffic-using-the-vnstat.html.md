@@ -1,7 +1,7 @@
 ---
 title: vnstatで手軽にtrafiicをモニタリング
 date: 2016-03-08
-tags: Linux,vnstat,vnstati 
+tags: Linux,vnstat
 author: kohei
 ---
 
