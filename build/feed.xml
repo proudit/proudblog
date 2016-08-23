@@ -5,16 +5,215 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-08-16T09:00:00+09:00</updated>
+  <updated>2016-08-23T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>AWS SDK for Ruby バージョン 2 を使用したオブジェクトのアップロード</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html"/>
+    <id>http://blog.url.com/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html</id>
+    <published>2016-08-23T09:00:00+09:00</published>
+    <updated>2016-08-23T10:53:57+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;プログラミングのお勉強をしようと思い、AWS公式ドキュメントにある&lt;a href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/UploadObjSingleOpRuby.html"&gt;「AWS SDK for Ruby を使用したオブジェクトのアップロード」&lt;/a&gt;を参考にファイルアップロードを行うRubyスクリプトを書いてみました。&lt;br&gt;
+とはいえ、そのままだとただのコピペになってしまうので、アップロードするのに必要な権限のみを持つIAMユーザーを作成し、それをスクリプト内で指定してファイルのアップロードを行いたいと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="1.-ファイルアップロード先の準備"&gt;1. ファイルアップロード先の準備&lt;/h1&gt;
+
+&lt;p&gt;「S3」→「バケットを作成」でアップロード先となるバケットを作成します。&lt;br&gt;
+一応、今回はリージョンを「Tokyo」にしています。&lt;br&gt;
+&lt;img alt="1-s301.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/9467a12e-d512-e23a-7c76-f9a541e1eb76.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="1-s302.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/bdc1e8ef-6d6e-6c06-52ab-bc384be83e02.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="2.-アップロードユーザーの用意"&gt;2. アップロードユーザーの用意&lt;/h1&gt;
+
+&lt;p&gt;「IAM」→「ユーザー」→「新規ユーザーの作成」で今回利用するアップロード用のユーザー名を入力し「作成」をクリックします。&lt;br&gt;
+&lt;img alt="2-iam01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/c3fdf8ba-b84a-b1b0-8a24-3a7302a8577b.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ここで、&lt;strong&gt;アクセスキーID&lt;/strong&gt;と&lt;strong&gt;シークレットアクセスキー&lt;/strong&gt;が表示されるので、メモまたはダウンロードをしてから「閉じる」をクリックしてください。後で必要になります。&lt;br&gt;
+&lt;img alt="2-iam02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/2fd87e9f-ccf7-99f9-4e0b-eeefc1f3b80a.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;次に、先ほど作成したユーザーを選択します。&lt;br&gt;
+&lt;img alt="2-iam03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ab0e379b-b43a-82a9-0967-137d41867186.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;「アクセス許可」→「インラインポリシー」→「ここをクリックしてください。」をクリックします。&lt;br&gt;
+&lt;img alt="2-iam04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f769ec9e-7b96-ffc6-64ad-39f656bdbae7.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;「カスタムポリシー」を選んで「選択」をクリックします。&lt;br&gt;
+&lt;img alt="2-iam05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/67481f69-69f8-a042-9449-05cf19e679bf.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;以下のポリシーを適用します。(コピペでOKです。)&lt;/p&gt;
+&lt;pre class="highlight json"&gt;&lt;code&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="nt"&gt;"Version"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"2012-10-17"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="nt"&gt;"Statement"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="w"&gt;
+        &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+            &lt;/span&gt;&lt;span class="nt"&gt;"Sid"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"Stmt1471591778000"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
+            &lt;/span&gt;&lt;span class="nt"&gt;"Effect"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;"Allow"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
+            &lt;/span&gt;&lt;span class="nt"&gt;"Action"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="w"&gt;
+                &lt;/span&gt;&lt;span class="s2"&gt;"s3:PutObject"&lt;/span&gt;&lt;span class="w"&gt;
+            &lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;&lt;span class="w"&gt;
+            &lt;/span&gt;&lt;span class="nt"&gt;"Resource"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="w"&gt;
+                &lt;/span&gt;&lt;span class="s2"&gt;"*"&lt;/span&gt;&lt;span class="w"&gt;
+            &lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
+        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img alt="2-iam06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/f5d54ce1-971c-ead6-2948-f1c791dfb19b.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="2-iam07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/93c5946d-9996-1c5c-864c-01cece33cfca.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上で、ファイルアップロード用ユーザーが作成できました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="3.-スクリプトの作成"&gt;3. スクリプトの作成&lt;/h1&gt;
+
+&lt;p&gt;それではいよいよアップロード用のスクリプトを作成します。&lt;br&gt;
+今回の作業環境はMacで行います。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ vim upload.ruby
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ファイルを開いたら以下のスクリプトをコピペします。&lt;br&gt;
+ただ、その際に&lt;strong&gt;bucketname&lt;/strong&gt;、&lt;strong&gt;objectname&lt;/strong&gt;、&lt;strong&gt;uploadfile&lt;/strong&gt;と&lt;strong&gt;アクセスキーID&lt;/strong&gt;と&lt;strong&gt;シークレットアクセスキー&lt;/strong&gt;は適宜変更してください。&lt;br&gt;
+また、バケットのリージョンをTokyoにしなかった場合も適切なリージョンに変更する必要があります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;#!/usr/bin/env ruby
+
+require 'aws-sdk'
+
+bucketname = "kohei-no-bucket"  // バケット名
+objectname = "ceresso.png"      // アップロード後のファイル名
+uploadfile = "ceresso.png"      // アップロードするファイル名
+
+Aws.config[:credentials] = Aws::Credentials.new(
+  '********************',                        // アクセスキーID
+  '****************************************',    // シークレットアクセスキー
+)
+s3 = Aws::S3::Resource.new(region:'ap-northeast-1')  // Tokyoリージョン
+obj = s3.bucket(bucketname).object(objectname)
+obj.upload_file(uploadfile)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最後に、作成したら実行権限をつけておきましょう。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ chmod +x upload.png
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;あと、もし&lt;em&gt;aws-adk&lt;/em&gt;のインストールがまだの場合は以下のコマンドでインストールもしておいてください。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ gem install aws-sdk
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ということで、すべての準備が整いました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="4.-実践！"&gt;4. 実践！&lt;/h1&gt;
+
+&lt;p&gt;それではアップロードしてみます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ./upload.ruby
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;何もエラーなくプロンプトが返って来れば無事アップロード成功です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="5.-確認"&gt;5. 確認&lt;/h1&gt;
+
+&lt;p&gt;それではバケットを確認してみます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="3-upload01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/62b9865a-e187-ba56-a6f1-a81c4143c754.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;アップロードできているのが確認できました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;今回は同じディレクトリ内にあるファイルをアップロードしました。&lt;br&gt;
+別の場所にあるファイルをアップロードしたい場合は、スクリプト内の&lt;em&gt;uploadfile&lt;/em&gt;をパス指定すればOKです。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>夏の川遊び＆アウトドアにおすすめのエッセンシャルオイル</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/18/summer-vercation.html"/>
+    <id>http://blog.url.com/2016/08/18/summer-vercation.html</id>
+    <published>2016-08-18T09:00:00+09:00</published>
+    <updated>2016-08-23T10:48:59+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="夏の川遊び"&gt;夏の川遊び&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;お盆休みも終わってしまいましたね〜。&lt;br&gt;
+我が家にお盆休みはなかったのですが、週末を利用して&lt;br&gt;
+つい先日秦野市にある&lt;strong&gt;神奈川県立秦野戸川公園&lt;/strong&gt;へ行ってきました！&lt;/p&gt;
+
+&lt;p&gt;とても大きな公園で、丹沢の山から湧き出る水無川(みずなしがわ)が流れています。&lt;br&gt;
+この水無川での川遊びが今回の目的。&lt;br&gt;
+川の流れも穏やかで、水位も浅め、小さい子供の水遊びに最適です。&lt;/p&gt;
+
+&lt;p&gt;今年は、雨が少なかったようで、川の水が干上がりそうなほど水位が浅め。&lt;br&gt;
+息子の足首ほどでした。&lt;/p&gt;
+
+&lt;p&gt;それでもお盆時期の週末、家族連れで賑わっていました！&lt;/p&gt;
+
+&lt;p&gt;息子は川にある石をひたすら集め、工事現場を作っていました(笑)。&lt;br&gt;
+あとはエンドレスでジョーロで水やり。&lt;br&gt;
+計3〜4時間は川で遊んでいました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="play_of_the_summer" src="/images/./2016/0818_play_of_the_summer/togawapark_01.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.kanagawa-park.or.jp/hadanotokawa/"&gt;戸川公園&lt;/a&gt;、おすすめです！！&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="アウトドアにおすすめ!肌に優しい虫除けスプレー"&gt;アウトドアにおすすめ!肌に優しい虫除けスプレー&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;小さなお子さんがいるアウトドアに虫除け対策は必須！&lt;br&gt;
+お肌の弱い小さなお子さんでも安心して使える虫除けスプレーをご紹介！&lt;br&gt;
+今回の川遊びでも活躍しました。&lt;/p&gt;
+
+&lt;p&gt;作り方は以下の材料を遮光瓶に入れて混ぜるだけ。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;・精製水25ml　
+・無水エタノール5ml
+・テラアーマー4〜6滴
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;テラアーマーというエッセンシャルオイル、&lt;br&gt;
+15種類(ユーカリプタス、シトロネラ、レモングラス、他)も&lt;br&gt;
+防虫効果の高いオイルを組み合わせてあり、虫除け、虫退治に効果大！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="play_of_the_summer" src="/images/./2016/0818_play_of_the_summer/terraaumor.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;匂いのきつい印象のある虫除けスプレーですがテラアーマーは優しい&lt;br&gt;
+甘い香り。つけていてとても気分がいいですよ〜！&lt;/p&gt;
+
+&lt;p&gt;我が家はお出かけの時は必ず、この虫除けスプレーをシュシュっとかけています。&lt;br&gt;
+効果もばっちりのナチュラル虫除けスプレーぜひお試しください！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>AWSと他の環境をVPNで繋げる際の「VPN接続」の作成をシェルスクリプトにしてみた。</title>
     <link rel="alternate" href="http://blog.url.com/2016/08/16/shell-script-for-aws-vpn.html"/>
     <id>http://blog.url.com/2016/08/16/shell-script-for-aws-vpn.html</id>
     <published>2016-08-16T09:00:00+09:00</published>
-    <updated>2016-08-16T12:12:04+09:00</updated>
+    <updated>2016-08-16T12:49:35+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -162,7 +361,132 @@ exit 0
 
 &lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
 
-&lt;p&gt;スクリプト実行後、「VPN接続」から「設定のダウンロード」をしてそのコンフィグを対抗となるルーターに流し込めばOKです。&lt;/p&gt;
+&lt;p&gt;スクリプト実行後、「VPN接続」から「設定のダウンロード」をしてそのコンフィグを対向となるルーターに流し込めばOKです。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>システムテスト自動化ツールSeleniumIDE</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/10/seleniumIDE.html"/>
+    <id>http://blog.url.com/2016/08/10/seleniumIDE.html</id>
+    <published>2016-08-10T09:00:00+09:00</published>
+    <updated>2016-08-16T12:14:50+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;システム開発の作業工程の一つである、システムテスト。&lt;br&gt;
+そのテストを自動でできるツールがあるということで、どのようなものか実際に使ってみました。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Seleniumとは：&lt;br&gt;
+webブラウザを使ってwebアプリケーションをテストするツール。&lt;br&gt;
+Seleiumは以下3つのプロダクトで構成されています。&lt;br&gt;
+- Selenium Grid&lt;br&gt;
+- Selenium IDE&lt;br&gt;
+- Selenium RC（Remote Control）&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;※2011年にgoogleで開発していた&lt;strong&gt;Webdriver&lt;/strong&gt;と統合し、&lt;strong&gt;Selenium Webdriver&lt;/strong&gt;としてリリースされました。&lt;/p&gt;
+
+&lt;h1 id="seleniumをダウンロード"&gt;Seleniumをダウンロード&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;今回はSeleniumIDEというfirefoxのアドオンを使います。&lt;/p&gt;
+
+&lt;p&gt;まずはSeleniumの&lt;a href="http://www.seleniumhq.org/download/"&gt;ダウンロードサイトへ&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;※ブラウザはfirefoxを使います。&lt;/p&gt;
+
+&lt;p&gt;ダウンロードページからアドオンのインストールができます。&lt;br&gt;
+&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_1.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_2.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;アドオンへのインストールが完了すると、ブラウザの右上にIDEのアイコンが表示されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_3.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;※googlechromeやIEでもこのIDE利用することができますが、&lt;br&gt;
+firefoxとは異なり、各ブラウザのドライバーやselenium-server-standalone-x.xx.x.jarのインストールも必要です。&lt;br&gt;
+詳細については割愛します。&lt;/p&gt;
+
+&lt;h2 id="・早速テストをためしてみます"&gt;・早速テストをためしてみます&lt;/h2&gt;
+
+&lt;p&gt;インストール後に表示されたIDEのアイコンをクリックすると操作画面のウィンドウが開きます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_4.png" /&gt;&lt;br&gt;
+&lt;a href="http://oss.infoscience.co.jp/seleniumhq/docs/03_selenium_ide.html#id3"&gt;機能説明はこちらを参照してください&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;今回はfacebookログインで、ログイン失敗時に出るエラーメッセージの有無で、&lt;br&gt;
+ログイン動作確認(失敗した時の場合)をしてみます。&lt;br&gt;
+テストはgoogleでfacebookを検索→facebookを開く→ログイン&lt;br&gt;
+という流れで行いました。&lt;/p&gt;
+
+&lt;p&gt;まず、SeleniumIDEで動作の記録を開始(右上の赤丸ボタンをクリック)&lt;br&gt;
+facebookのログインページを開き、ログイン失敗になるように、不正な値を&lt;br&gt;
+入力します。&lt;br&gt;
+&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_5.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;Seleniumの画面を見ると、ブラウザでの操作情報が記録されています。&lt;br&gt;
+ここに、追加のコマンドを挿入。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_6.png" /&gt;&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;コマンド：verifyTextPresent
+対象：入力されたメールアドレスまたは携帯電話番号はアカウントと一致しません。アカウントの登録
+値：入力なし
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;verifyTextPresent:対象である要素のテキストが値(パターン)と一致するか検証する&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;テストを実行します。&lt;br&gt;
+結果は左下に表示されます。&lt;br&gt;
+テスト結果は成功です。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_7.png" /&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;初めて使ってみましたが、ブラウザ上で操作が可能なので抵抗なく使うことができました。&lt;br&gt;
+以前社内システムの開発グループに所属していたことがありますが、&lt;br&gt;
+プログラマーではなかったので、テスト作業をよくやっていました。&lt;br&gt;
+何度も同じテストを繰り返す作業って時間もかかるし、意外に根気の&lt;br&gt;
+いる作業だったりしますよね。&lt;br&gt;
+同じことを何度も繰り返すサイトや、長期継続的にリリースを行うようなサイト&lt;br&gt;
+人でが足りないなんて時には、作業工数を減らすという意味でも使えるツールかもしれません。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>破壊的クラウドSI 強いベンダー174社に掲載されました！</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/09/NEWS-ITPro.html"/>
+    <id>http://blog.url.com/2016/08/09/NEWS-ITPro.html</id>
+    <published>2016-08-09T09:00:00+09:00</published>
+    <updated>2016-08-16T12:14:50+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="強いベンダー174社!!"&gt;強いベンダー174社!!&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;2016年8月4日掲載のITpro Active&lt;br&gt;
+&lt;a href="http://itpro.nikkeibp.co.jp/atclact/active/16/071200076/071200004/?ST=act-cloud&amp;amp;P=1"&gt;破壊的クラウドSI 強いベンダー174社&lt;/a&gt;にAWSとAzureのSIパートナー174社が掲載され、&lt;br&gt;
+AWSコンサルティングパートナーである弊社プラウディットの名前もしっかりと掲載されていました！！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0809_ITProActive/ITpro.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;お客様がベンダー選びをする上での指標ともなるクラウドベンダーのパートナー認定制度。&lt;br&gt;
+弊社は昨年末からAWSのパートナーとなりました。&lt;br&gt;
+こういった記事に名前が載るというのはとても光栄なことですね！&lt;/p&gt;
+
+&lt;p&gt;豊富なAWSのノウハウを活かし、今後もお客様のお力になれるよう、&lt;br&gt;
+一同精進して参ります！&lt;/p&gt;
+
+&lt;p&gt;近々、サービスサイトをリニューアル予定です！&lt;br&gt;
+そちらも楽しみにしていてください！&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -170,7 +494,7 @@ exit 0
     <link rel="alternate" href="http://blog.url.com/2016/08/08/make-linebot-using-the-aws-lambda-and-the-api-gateway.html"/>
     <id>http://blog.url.com/2016/08/08/make-linebot-using-the-aws-lambda-and-the-api-gateway.html</id>
     <published>2016-08-08T09:00:00+09:00</published>
-    <updated>2016-08-08T14:48:22+09:00</updated>
+    <updated>2016-08-16T12:14:50+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -343,480 +667,6 @@ exports.handler = function(event, context) {
 
 &lt;p&gt;今回は「とにかく動かす」ことを目的に作りました。&lt;br&gt;
 具体的な処理について説明すると長くなってしまうので、今回はここまでにしたいと思います。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>13本の薬箱講座&amp;アロマタッチ</title>
-    <link rel="alternate" href="http://blog.url.com/2016/08/05/kusuribako-kouza.html"/>
-    <id>http://blog.url.com/2016/08/05/kusuribako-kouza.html</id>
-    <published>2016-08-05T09:00:00+09:00</published>
-    <updated>2016-08-08T14:26:54+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="講座を開催しました！"&gt;講座を開催しました！&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;7月も薬箱講座を開催しました！＠プラウディットオフィス&lt;br&gt;
-今回はお昼の部、夜の部と同日２回に渡り開催しました！&lt;/p&gt;
-
-&lt;p&gt;お昼の部では８名の方にご参加頂き、とても賑やかな講座になりましたよ〜！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0805_kusuribako0727/0727kusuribako_1.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;今回の講座もみなさんエッセンシャルオイルの世界に魅了され有意義な時間を&lt;br&gt;
-過ごしていただけたようです！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0805_kusuribako0727/0727kusuribako_2.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0805_kusuribako0727/0727kusuribako_3.jpg" /&gt;&lt;br&gt;
-基本の13本のオイルの他にも色々なオイルの香りを試すこともできますよ〜。&lt;/p&gt;
-
-&lt;p&gt;そして、今回は薬箱講座とは別にアロマタッチテクニックの施術も行いました！&lt;br&gt;
-＠プラウディットオフィス&lt;/p&gt;
-
-&lt;h1 id="アロマタッチテクニックとは"&gt;アロマタッチテクニックとは&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;doTERRA社の8種類のエッセンシャルオイルを使い、背中や足に直接エッセンシャルオイルを塗布して行う独自の施術です。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0805_kusuribako0727/0727kusuribako_4.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;異なる特性を持った高品質のオイルを順番に使い、&lt;br&gt;
-ハンドテクニックによって体になじませていくことによって、脊髄神経に作用し、&lt;br&gt;
-体の組織をリラックスさせ、ストレスの緩和、免疫力の向上、&lt;br&gt;
-ホルモンバランスや自律神経の調整など心身の不調の回復をサポートします。&lt;/p&gt;
-
-&lt;p&gt;エッセンシャルオイルの優しい香りに包まれながら心身ともにリラックスし、&lt;br&gt;
-心地よい時間を過ごすことができます。&lt;br&gt;
-強く力を加えるようなマッサージではないのに、体がとーっても軽く&lt;br&gt;
-なるんです。&lt;br&gt;
-そして、施術中気がつくと意識がなくなっていることが多々(笑)&lt;/p&gt;
-
-&lt;p&gt;夏バテで体がスッキリしない、癒されたい、そんな方は&lt;br&gt;
-是非一度アロマタッチを受けてみてくださいね〜！&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="https://www.proudit.jp/"&gt;お問い合わせはこちら！&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>goofysを使ってAmazon LinuxにS3をマウントする。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/08/01/use-the-goofys-to-mount-the-s3-to-amazon-linux.html"/>
-    <id>http://blog.url.com/2016/08/01/use-the-goofys-to-mount-the-s3-to-amazon-linux.html</id>
-    <published>2016-08-01T09:00:00+09:00</published>
-    <updated>2016-08-01T15:54:16+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;AWSを利用していて、S3をサーバーマウントする技術として&lt;code&gt;s3fs&lt;/code&gt;が有名だと思います。&lt;br&gt;
-ですが、&lt;strong&gt;s3fsは遅い&lt;/strong&gt;と感じる人は少なくないかと思います。&lt;br&gt;
-そこで他に何かないかなと思って調べたところ、&lt;strong&gt;&lt;a href="https://github.com/kahing/goofys"&gt;goofys&lt;/a&gt;&lt;/strong&gt;というのがあるみたいです。&lt;/p&gt;
-
-&lt;p&gt;goofysのREADMEに、以下のBenchmarkが載っていました。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="goofys-benchmark" src="https://github.com/kahing/goofys/blob/master/bench/bench.png?raw=true" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ということで、とりあえず&lt;code&gt;goofys&lt;/code&gt;を使ってS3をマウントしたいと思います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="goとfuseのインストール"&gt;goとfuseのインストール&lt;/h1&gt;
-
-&lt;p&gt;まず、goofysを利用するにあたり、goとfuseが必要となるためパッケージをインストールします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo yum install golang fuse
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;em&gt;golang&lt;/em&gt;をインストールする際に依存関係がたくさんあるため&lt;em&gt;yum&lt;/em&gt;で一気にインストールしてしまいましょう。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="aws-cliの設定"&gt;AWS CLIの設定&lt;/h1&gt;
-
-&lt;p&gt;&lt;em&gt;aws cli&lt;/em&gt;環境を設定します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws configure
-AWS Access Key ID [None]: ********************
-AWS Secret Access Key [None]: ****************************************
-Default region name [None]: ap-northeast-1
-Default output format [None]:
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="バケットの作成"&gt;バケットの作成&lt;/h1&gt;
-
-&lt;p&gt;&lt;em&gt;aws cli&lt;/em&gt;環境の設定ができたらマウントするためのバケットを作成します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws s3 mb s3://kohei-goofys
-make_bucket: s3://kohei-goofys/
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws s3 ls s3://kohei-goofys
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;作成したばかりだとバケットには何も無いので&lt;code&gt;aws s3 ls&lt;/code&gt;しても戻り値はありません。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="goofysインストール"&gt;goofysインストール&lt;/h1&gt;
-
-&lt;p&gt;まず、GOPATHを設定します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ export GOPATH=$HOME/go
-$ echo $GOPATH
-/home/ec2-user/go
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;今回は&lt;em&gt;ec2-user&lt;/em&gt;のホームディレクトリにインストールするようにしています。&lt;br&gt;
-設定ができたらインストールです。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ go get github.com/kahing/goofys
-$ go install github.com/kahing/goofys
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;*getもinstallもプロンプトが戻ってくるまでに若干時間がかかる可能性があります。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="s3マウント"&gt;S3マウント&lt;/h1&gt;
-
-&lt;p&gt;インストールができたらいよいよマウントです。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ mkdir ~/mount-goofys
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ./go/bin/goofys kohei-goofys ~/mount-goofys
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;プロンプトが帰ってきたら完了です。&lt;br&gt;
-マウントに成功してもしなくても、何も戻ってこないので実際に確認してみます。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="確認"&gt;確認&lt;/h1&gt;
-
-&lt;p&gt;確認ポイントは幾つかあります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ps auxf |grep goofys
-ec2-user  3030  0.0  0.4 110472  2144 pts/0    S+   03:08   0:00              \_ grep --color=auto goofys
-ec2-user  3022  0.3  2.7 197876 13668 ?        Ssl  03:08   0:00 /home/ec2-user/go/bin/goofys kohei-goofys /home/ec2-user/mount-goofys
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo grep goofys /var/log/messages
-Jul  1 03:08:50 ip-172-31-3-125 /home/ec2-user/go/bin/goofys[3022]: s3.ERROR code=incorrect region, the bucket is not in 'us-west-2' region msg=301 request=#012
-Jul  1 03:08:51 ip-172-31-3-125 /home/ec2-user/go/bin/goofys[3022]: s3.INFO Switching from region 'us-west-2' to 'ap-northeast-1'
-Jul  1 03:08:51 ip-172-31-3-125 /home/ec2-user/go/bin/goofys[3022]: main.INFO File system has been successfully mounted.
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ df -h
-ファイルシス   サイズ  使用  残り 使用% マウント位置
-/dev/xvda1       7.8G  1.6G  6.1G   21% /
-devtmpfs         238M   56K  238M    1% /dev
-tmpfs            246M     0  246M    0% /dev/shm
-kohei-goofys     1.0P     0  1.0P    0% /home/ec2-user/mount-goofys
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;無事マウントができたようです。&lt;br&gt;
-では、ファイルの作成を行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ touch ~/mount-goofys/test
-$ ls ~/mount-goofys/
-test
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;作成できたら&lt;code&gt;aws s3&lt;/code&gt;コマンドでバケット内を直接確認してみます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ aws s3 ls s3://kohei-goofys
-2016-07-01 03:14:44          0 test
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;先ほど作成されたコマンドがこちらからでも確認できました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="自動マウント設定"&gt;自動マウント設定&lt;/h1&gt;
-
-&lt;p&gt;マウントはできるようになりましたが、毎回手動でマウントするのは大変です。&lt;br&gt;
-なので&lt;em&gt;/etc/fstab&lt;/em&gt;にサーバー起動時にマウントされるように設定します。&lt;/p&gt;
-
-&lt;p&gt;ただ、ここでポイントは&lt;strong&gt;サーバー起動時は&lt;em&gt;root&lt;/em&gt;&lt;/strong&gt;で処理が実行されます。&lt;br&gt;
-ということは&lt;em&gt;aws cli&lt;/em&gt;の設定もrootで行う必要があります。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo aws configure
-AWS Access Key ID [None]: ********************
-AWS Secret Access Key [None]: ****************************************
-Default region name [None]: ap-northeast-1
-Default output format [None]:
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;設定ができたら&lt;em&gt;fstab&lt;/em&gt;を修正します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo vi /etc/fstab
-$ cat /etc/fstab
-#
-LABEL=/     /           ext4    defaults,noatime  1   1
-tmpfs       /dev/shm    tmpfs   defaults        0   0
-devpts      /dev/pts    devpts  gid=5,mode=620  0   0
-sysfs       /sys        sysfs   defaults        0   0
-proc        /proc       proc    defaults        0   0
-/home/ec2-user/go/bin/goofys#kohei-goofys /home/ec2-user/mount-goofys fuse _netdev,allow_other,--file-mode=0666,--uid=500,--gid=500 0 0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ここでとても重要なのがオプションで&lt;em&gt;allow_other&lt;/em&gt;が指定されていることです。&lt;br&gt;
-このオプションがないとroot以外のユーザーからは見えなくなってしまいます。&lt;br&gt;
-また、&lt;em&gt;--file-mode&lt;/em&gt;と&lt;em&gt;--uid&lt;/em&gt;、&lt;em&gt;--gid&lt;/em&gt;はファイルやディレクトリが作成された際のデフォルト権限/所有者の設定になります。&lt;/p&gt;
-
-&lt;p&gt;今回の場合は&lt;em&gt;ec2-user&lt;/em&gt;がUID、GIDともに500でした。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ id
-uid=500(ec2-user) gid=500(ec2-user) groups=500(ec2-user),10(wheel)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;修正が完了したら自動マウントを確認します。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sudo mount -a
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ df -h
-ファイルシス   サイズ  使用  残り 使用% マウント位置
-/dev/xvda1       7.8G  1.6G  6.1G   21% /
-devtmpfs         238M   56K  238M    1% /dev
-tmpfs            246M     0  246M    0% /dev/shm
-kohei-goofys     1.0P     0  1.0P    0% /home/ec2-user/mount-goofys
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ちゃんとマウントができたのが確認できます。&lt;br&gt;
-もし、ここでマウントが見えなかったら&lt;code&gt;sudo df -h&lt;/code&gt;を試してみてください。&lt;br&gt;
-それで見える場合は権限周りがうまくできてない可能性があります。&lt;/p&gt;
-
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th style="text-align: left"&gt;オプション&lt;/th&gt;
-&lt;th style="text-align: left"&gt;説明&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td style="text-align: left"&gt;_netdev&lt;/td&gt;
-&lt;td style="text-align: left"&gt;ネットワークが有効になるまでマウントを待つためのオプション。&lt;br&gt;ネットワーク経由のデバイスを起動時にマウントさせたい場合などに指定する。&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="text-align: left"&gt;allow_other&lt;/td&gt;
-&lt;td style="text-align: left"&gt;他のユーザーでも利用できるようにする。&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="text-align: left"&gt;--file-mode&lt;/td&gt;
-&lt;td style="text-align: left"&gt;マウントする際のファイル権限を設定する。&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="text-align: left"&gt;--uid&lt;/td&gt;
-&lt;td style="text-align: left"&gt;マウントするユーザーIDを指定する。&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="text-align: left"&gt;--gid&lt;/td&gt;
-&lt;td style="text-align: left"&gt;マウントするグループIDを指定する。&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
-
-&lt;p&gt;また、上記は今回使ったオプションの説明となるので参考にしてもらえればと思います。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;p&gt;とりあえず&lt;strong&gt;&lt;em&gt;goofys&lt;/em&gt;&lt;/strong&gt;がどんな感じかを試したくて行いましたが、導入はとても簡単でした。&lt;br&gt;
-ただ、自動マウント設定の際のアクセス権限周りの挙動を確認するのに少々時間かかったかなという感じです。&lt;br&gt;
-GitHubの&lt;a href="https://github.com/kahing/goofys#benchmark"&gt;Benchmark&lt;/a&gt;ではs3fsよりかなり優秀な感じですが、実際比較はまだしてないのでそっちの方も検証できたらなと思っています。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>AWS初心者でも簡単にAWSでWordPressが使えます！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/28/AWS-WordPress.html"/>
-    <id>http://blog.url.com/2016/07/28/AWS-WordPress.html</id>
-    <published>2016-07-28T09:00:00+09:00</published>
-    <updated>2016-07-29T12:45:37+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;AWS上でWordPressを使ってみたいなとふと思い立ちました。勉強もかねて。&lt;br&gt;
-とは言え、やっぱり自分でサーバにインストールするのは...&lt;br&gt;
-簡単に素人でもできる方法はないかなと、調べてみると。&lt;br&gt;
-既にWordPressがインストールされたAMIがあるようです！&lt;/p&gt;
-
-&lt;p&gt;インストールする必要がないので、一気にハードルは下がりますね！&lt;br&gt;
-AWSのページにきちんと設定手順もあります！&lt;/p&gt;
-
-&lt;h1 id="手順は？"&gt;手順は？&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;既にアカウントがある場合は、そのままサインアップ。&lt;br&gt;
-まだアカウントを持っていない方はアカウント作成をします。&lt;br&gt;
-12ヶ月間無料利用枠を利用できるお試し枠を利用することができます。&lt;br&gt;
-もちろん無料利用枠内で、WprdPressインストール済みのAMIが使えます。&lt;/p&gt;
-
-&lt;p&gt;サインアップすると、画面上にサービスアイコンがずらり。&lt;br&gt;
-その一番左上AmazonEC2のインスタンスを起動し、インスタンスの作成へ。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_01.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;AWSMarketplaceへ移動し、WordPressで検索をかけると、&lt;br&gt;
-ずらりと出てきます。&lt;br&gt;
-この中からWordPress powered by BitNami (HVM) を選択します。&lt;br&gt;
-&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_02.png" /&gt;&lt;br&gt;
-&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_03.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;次はインスタンスタイプの選択です。&lt;br&gt;
-無料利用枠を利用している方は、t2.maicroを選択。&lt;br&gt;
-今回利用しているアカウントは無料利用枠対象期間は過ぎてしまっているので、一番小さいnanoで。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_04.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;インスタンスの詳細設定。&lt;br&gt;
-特に手を加えることなくそのままそのまま進みます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_05.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;次は、ストレージの設定。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_06.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;インスタンスのタグ付け。&lt;br&gt;
-インスタンスの名前の設定をします。&lt;br&gt;
-値の部分は任意のものを入力。今回はwordpressと入力。確認と作成をポチッと。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_07.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;インスタンス作成の確認を行い、作成。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_08.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;キーペア設定画面が出てきます。&lt;br&gt;
-SSHログインをする際に必要になる設定です。ここではキーペアなしで続行をして、インスタンスの作成へ。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_09.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;インスタンスの作成をしています。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_10.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;無事、インスタンスの作成が完了しました。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_11.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;インスタンスが作成できたら、実際にサーバにインストールされている&lt;br&gt;
-サイトの確認をしてみます。&lt;br&gt;
-作成したインスタンスの情報から、パブリックIPを参照し、サイトにアクセスしてみます。&lt;/p&gt;
-
-&lt;p&gt;サイトのカスタマイズをするため、まずは管理画面へアクセスします。&lt;/p&gt;
-
-&lt;p&gt;管理画面にアクセスするためのパスワードを確認します。&lt;br&gt;
-アクション＞インスタンスの設定＞システムログの取得&lt;br&gt;
-&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_12.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;システムログのウィンドウが出てくるので、下の方までスクロール。&lt;br&gt;
-ハッシュマークで囲まれているので見つけやすいです。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_13.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;管理画面(URL:パブリックIP/admin  ex.54.192.32.144/admin)にアクセスし、username:user/PW:システムログで取得したもの&lt;/p&gt;
-
-&lt;p&gt;を入力するとログインできます！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="AWS_WordPress" src="/images/./2016/0728_WordPress/aws_wp_14.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;デフォルトの設定は英語になっているので、管理画面にログイン後&lt;br&gt;
-Settings＞Site Languageを日本語に変更＞Save ChangesすればOKです。&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;参考にした手順通り、そのままでした。簡単でした。&lt;br&gt;
-AWSを使ったことがないって人でも大丈夫！&lt;br&gt;
-以前、サクラのレンタルサーバでwordpressを利用したことがありますが、その時の設定よりも簡単でした。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="https://aws.amazon.com/jp/getting-started/launch-a-wordpress-website/"&gt;参考サイト：WordPress Webサイトの起動&lt;/a&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>13本の薬箱講座＆体験談</title>
-    <link rel="alternate" href="http://blog.url.com/2016/07/26/kusuribako-syoukai.html"/>
-    <id>http://blog.url.com/2016/07/26/kusuribako-syoukai.html</id>
-    <published>2016-07-26T09:00:00+09:00</published>
-    <updated>2016-07-26T12:25:59+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="植物エッセンスの薬箱®13本講座　13本のオイルはどんなオイル？"&gt;植物エッセンスの薬箱®13本講座　13本のオイルはどんなオイル？&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;先日ご紹介した13本の薬箱講座、内容についてちらっとご紹介。&lt;/p&gt;
-
-&lt;p&gt;講座で使用する13本のエッセンシャルオイルは・・・&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0726_kusuribako/kusuribako_0726_1.jpg" /&gt;&lt;/p&gt;
-
-&lt;h2 id="★シングルオイル"&gt;★シングルオイル&lt;/h2&gt;
-
-&lt;p&gt;ラベンダー&lt;br&gt;
-レモン&lt;br&gt;
-ペパーミント&lt;br&gt;
-ティートゥリー&lt;br&gt;
-オレガノ&lt;br&gt;
-フランキンセンス&lt;br&gt;
-ワイルドオレンジ&lt;/p&gt;
-
-&lt;h2 id="★ブレンドオイル"&gt;★ブレンドオイル&lt;/h2&gt;
-
-&lt;p&gt;イージーエアー&lt;br&gt;
-オンガード&lt;br&gt;
-ディープブルー&lt;br&gt;
-ゼンジェスト&lt;br&gt;
-アースリズム&lt;br&gt;
-アロマタッチ&lt;/p&gt;
-
-&lt;p&gt;どのオイルも手軽に使えることができ、色々な場面で使用することができるので使用頻度がかなり高いオイルばかり。&lt;/p&gt;
-
-&lt;p&gt;香る、飲用、塗布、使い方も色々！&lt;/p&gt;
-
-&lt;p&gt;オイルの特性から、具体的な使い方まで盛り沢山の内容です。講座を受けたらすぐにお家で実践してみたくなります！&lt;/p&gt;
-
-&lt;h1 id="講座を受けて早速実践"&gt;講座を受けて早速実践&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;私が講座を受けて早速実践したのは、子供の汗疹対策にラベンダーとティートゥリー。&lt;/p&gt;
-
-&lt;p&gt;小さな子供なので、ココナッツオイルで希釈して、汗疹でプツプツしている部分に毎日塗り続けました。&lt;/p&gt;
-
-&lt;p&gt;すると、一ヶ月ほどで汗疹は消失。&lt;/p&gt;
-
-&lt;p&gt;今でも予防のために利用しています。&lt;br&gt;
-子供の肌は繊細なので汗疹対策に保湿は大事。&lt;br&gt;
-去年、汗疹で皮膚科を受診した際に、保湿を目的としてヒロドイドをもらって&lt;br&gt;
-塗っていました。&lt;br&gt;
-今は、シアバターとみつろうで、保湿クリームを作りそこにラベンダーとティートゥリー、プラスでフランキンセンスを入れたものを塗り塗りしています！&lt;/p&gt;
-
-&lt;h1 id="ちょっぴり体験談"&gt;ちょっぴり体験談&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;13本のエッセンシャルオイルはどのオイルも本当に活躍の場が多いのですが、&lt;br&gt;
-中でも利用頻度が高いものの一つはペパーミント！&lt;br&gt;
-手の平に一滴オイルを垂らし、こめかみや痛みを感じるところに塗布しています。&lt;br&gt;
-スーッとスッキリして次第に痛みも無くなっていきます★&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="薬箱講座" src="/images/./2016/0726_kusuribako/peppermint.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;以前から偏頭痛もちで、頭痛がある時は決まってロキソニンを服用していました。&lt;br&gt;
-ただ、ロキソニンの服用は消化器系に副作用が伴います。&lt;br&gt;
-病院でロキソニンが処方されると必ずあわせて服用するようにと、胃を守るための胃薬も処方されます。&lt;/p&gt;
-
-&lt;p&gt;これに加えて厚生労働省から、腸閉塞などの重大な副作用のリスクがあると呼びかけがありました。&lt;/p&gt;
-
-&lt;p&gt;薬を全く飲まない、というわけではありませんが、&lt;br&gt;
-薬の代替手段として、&lt;br&gt;
-エッセンシャルオイルの様に副作用のない自然由来のものを&lt;br&gt;
-生活に取り入れることができるといいな、と思います。&lt;/p&gt;
-
-&lt;p&gt;エッセンシャルオイルの活用方法は無限大！&lt;br&gt;
-今後お家のお掃除にもオイルを活用していきたいなと、実践中です。&lt;/p&gt;
-
-&lt;p&gt;※上記の使い方は、CPTG(認定純粋セラピー等級)エッセンシャルオイル純度100%のドテラのオイルを利用した場合の一例です。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://www.doterraeveryday.jp/training/cptg/"&gt;CPTGとは&lt;/a&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>
