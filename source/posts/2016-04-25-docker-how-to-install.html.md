@@ -1,7 +1,7 @@
 ---
 title: dockerのインストール for MacOS
 date: 2016-04-25
-tags: docker, MacOS
+tags: docker
 author: kohei
 ---
 

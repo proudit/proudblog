@@ -1,7 +1,7 @@
 ---
 title: Redmine 3.2をAmazon Linux(release 2015.09)にインストールしてみた。
 date: 2016-01-18
-tags: Redmine, AmazonLinux, EC2, AWS
+tags: Redmine, AWS
 author: kohei
 ---
 
