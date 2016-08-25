@@ -5,16 +5,51 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-08-23T09:00:00+09:00</updated>
+  <updated>2016-08-25T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
   <entry>
-    <title>AWS SDK for Ruby バージョン 2 を使用したオブジェクトのアップロード</title>
+    <title>弊社お客様であるセーフィー様の「Safie LIVE」が「RIZAP KBC オーガスタゴルフトーナメント2016」の定点ネット映像配信に採用されました！！！</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/25/kbc-augusta-golf-tournament-2016.html"/>
+    <id>http://blog.url.com/2016/08/25/kbc-augusta-golf-tournament-2016.html</id>
+    <published>2016-08-25T09:00:00+09:00</published>
+    <updated>2016-08-25T12:57:33+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;弊社のお客様である&lt;strong&gt;&lt;a href="https://safie.link"&gt;セーフィー様&lt;/a&gt;&lt;/strong&gt;が手掛ける&lt;strong&gt;「Safie LIVE」&lt;/strong&gt;が、石川遼選手も参戦する&lt;strong&gt;「&lt;a href="http://www.kbc.co.jp/sports/augusta/"&gt;RIZAP KBC オーガスタゴルフトーナメント&lt;/a&gt;」&lt;/strong&gt;の&lt;strong&gt;定点ネットライブ映像配信&lt;/strong&gt;に採用されました！&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="augusta2016" src="http://www.kbc.co.jp/image/bn_kbc/bn_augusta_live_474x64.gif" /&gt;&lt;/p&gt;
+
+&lt;p&gt;弊社プラウディットではこのシステムの&lt;strong&gt;インフラ部分の設計・構築&lt;/strong&gt;をお手伝いさせていただいております。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;テレビ中継だけでは見ることのできない映像や、自分の見たい特定箇所(スタート１番ホールのティーショット・打撃練習場・上がり18番ホールのグリーン)の映像をスマートフォンやタブレット、パソコンから手軽に視聴いただければと思います！&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;「&lt;a href="http://www.kbc.co.jp/sports/augusta/"&gt;RIZAP KBC オーガスタゴルフトーナメント&lt;/a&gt;」&lt;/strong&gt;は&lt;strong&gt;本日8/25(木)〜28(日)&lt;/strong&gt;の開催ですので、ご興味のある方は是非ご視聴ください！&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;&lt;a href="http://www3.kbc.co.jp/live/augusta/camera_01.html#TopCamera"&gt;Live! 1番ティーショット&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;&lt;a href="http://www3.kbc.co.jp/live/augusta/camera_03.html#TopCamera"&gt;Live! 18番グリーン&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;また、弊社プラウディットへの&lt;strong&gt;お仕事のご依頼やお問い合わせ&lt;/strong&gt;は&lt;strong&gt;&lt;a href="https://www.proudit.jp/#contact"&gt;こちら&lt;/a&gt;&lt;/strong&gt;まで。&lt;/p&gt;
+&lt;/blockquote&gt;
+</content>
+  </entry>
+  <entry>
+    <title>AWS SDK for Ruby バージョン 2 を使用したS3バケットへのオブジェクトアップロード</title>
     <link rel="alternate" href="http://blog.url.com/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html"/>
     <id>http://blog.url.com/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html</id>
     <published>2016-08-23T09:00:00+09:00</published>
-    <updated>2016-08-23T10:53:57+09:00</updated>
+    <updated>2016-08-23T13:15:36+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -92,21 +127,21 @@
 
 require 'aws-sdk'
 
-bucketname = "kohei-no-bucket"  // バケット名
-objectname = "ceresso.png"      // アップロード後のファイル名
-uploadfile = "ceresso.png"      // アップロードするファイル名
+bucketname = "kohei-no-bucket"  # バケット名
+objectname = "ceresso.png"      # アップロード後のファイル名
+uploadfile = "ceresso.png"       アップロードするファイル名
 
 Aws.config[:credentials] = Aws::Credentials.new(
-  '********************',                        // アクセスキーID
-  '****************************************',    // シークレットアクセスキー
+  '********************',                        # アクセスキーID
+  '****************************************',    # シークレットアクセスキー
 )
-s3 = Aws::S3::Resource.new(region:'ap-northeast-1')  // Tokyoリージョン
+s3 = Aws::S3::Resource.new(region:'ap-northeast-1')  # Tokyoリージョン
 obj = s3.bucket(bucketname).object(objectname)
 obj.upload_file(uploadfile)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;最後に、作成したら実行権限をつけておきましょう。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ chmod +x upload.png
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ chmod +x upload.rb
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;あと、もし&lt;em&gt;aws-adk&lt;/em&gt;のインストールがまだの場合は以下のコマンドでインストールもしておいてください。&lt;/p&gt;
@@ -120,7 +155,7 @@ obj.upload_file(uploadfile)
 &lt;h1 id="4.-実践！"&gt;4. 実践！&lt;/h1&gt;
 
 &lt;p&gt;それではアップロードしてみます。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ./upload.ruby
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ./upload.rb
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;何もエラーなくプロンプトが返って来れば無事アップロード成功です。&lt;/p&gt;
@@ -148,7 +183,7 @@ obj.upload_file(uploadfile)
     <link rel="alternate" href="http://blog.url.com/2016/08/18/summer-vercation.html"/>
     <id>http://blog.url.com/2016/08/18/summer-vercation.html</id>
     <published>2016-08-18T09:00:00+09:00</published>
-    <updated>2016-08-23T10:48:59+09:00</updated>
+    <updated>2016-08-23T13:15:36+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -213,7 +248,7 @@ obj.upload_file(uploadfile)
     <link rel="alternate" href="http://blog.url.com/2016/08/16/shell-script-for-aws-vpn.html"/>
     <id>http://blog.url.com/2016/08/16/shell-script-for-aws-vpn.html</id>
     <published>2016-08-16T09:00:00+09:00</published>
-    <updated>2016-08-16T12:49:35+09:00</updated>
+    <updated>2016-08-23T13:15:36+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -487,186 +522,6 @@ AWSコンサルティングパートナーである弊社プラウディット�
 
 &lt;p&gt;近々、サービスサイトをリニューアル予定です！&lt;br&gt;
 そちらも楽しみにしていてください！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>LINE BOTとAWS LambdaとAPI Gatewayを使って「オウム返しBOT」を作る。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/08/08/make-linebot-using-the-aws-lambda-and-the-api-gateway.html"/>
-    <id>http://blog.url.com/2016/08/08/make-linebot-using-the-aws-lambda-and-the-api-gateway.html</id>
-    <published>2016-08-08T09:00:00+09:00</published>
-    <updated>2016-08-16T12:14:50+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;LineのBOT APIとAWSのAPI Gateway、Lambdaを利用してLINE botを作りたいと思います。&lt;br&gt;
-まず、以下がLINEのBOT APIドキュメントの図です。&lt;br&gt;
-&lt;img alt="How BOT API works" src="https://developers.line.me/wp-content/uploads/2016/04/bot_img001.png" /&gt;&lt;br&gt;
-出典：&lt;a href="https://developers.line.me/bot-api/overview#how_bot_works"&gt;LINE developers&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;ここでの「YOUR SYSTEM」というところを「Lambda」と「API Gateway」を使って構築します。&lt;/p&gt;
-
-&lt;p&gt;また、今回必要となる&lt;a href="https://business.line.me/services/products/4/introduction"&gt;LINE BOT API Trial Account&lt;/a&gt;の取得方法については割愛します。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;br&gt;
-&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="lambda関数の作成"&gt;Lambda関数の作成&lt;/h1&gt;
-
-&lt;p&gt;それではまず、AWSの管理コンソールから「Lambda」のサービスへ移動します。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="●-create-a-lambda-function"&gt;● Create a Lambda function&lt;/h2&gt;
-
-&lt;p&gt;次に「Create a Lambda function」をクリックします。&lt;br&gt;
-&lt;img alt="amore00_create-lambda01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6e230911-b7b4-7b75-9918-f897c02b6304.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="●-select-blue-print"&gt;● Select blue print&lt;/h2&gt;
-
-&lt;p&gt;ここではとりあえず何も選択せず「Next」をクリックします。&lt;br&gt;
-&lt;img alt="amore00_select-blueprint01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/4579cd07-c77f-1464-3698-bd14b121c5ce.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="●-configure-triggers"&gt;● Configure triggers&lt;/h2&gt;
-
-&lt;p&gt;今のままだとLambdaだけの状態なのでフロントに「API Gateway」を配置します。&lt;br&gt;
-&lt;img alt="amore01_configure-triggers01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a272ada3-31a3-528b-c685-ede6f538c285.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;「API Gateway」を配置したらその設定をここで行いますが、&lt;strong&gt;API name&lt;/strong&gt;と&lt;strong&gt;Resource name&lt;/strong&gt;は任意の名前を設定して大丈夫です。今回は「&lt;em&gt;MyAmore&lt;/em&gt;」と「&lt;em&gt;/myamore&lt;/em&gt;」にしています。&lt;br&gt;
-そして&lt;strong&gt;Method&lt;/strong&gt;は「&lt;em&gt;POST&lt;/em&gt;」を選択し、&lt;strong&gt;Deploymment stage&lt;/strong&gt;は「&lt;em&gt;prod&lt;/em&gt;(デフォルト)」のままで、&lt;strong&gt;Security&lt;/strong&gt;は「&lt;em&gt;Open&lt;/em&gt;」にしておきます。&lt;br&gt;
-入力が完了したら「Next」ボタンをクリックします。&lt;br&gt;
-&lt;img alt="01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6fce3683-d44f-ec25-f94a-c69a1ed08546.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="●-configure-function"&gt;● Configure function&lt;/h2&gt;
-
-&lt;p&gt;それでは関数の設定に移ります。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="--configure-function"&gt;- Configure function&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;Name&lt;/strong&gt;と&lt;strong&gt;Description&lt;/strong&gt;に任意の内容を入力します。また&lt;strong&gt;Runtime&lt;/strong&gt;はここでは「&lt;em&gt;Node.js 4.3&lt;/em&gt;」を選択します。&lt;br&gt;
-&lt;img alt="03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ed39297b-ea8a-ccf5-735d-b95d319a180b.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="--lambda-function-code"&gt;- Lambda function code&lt;/h3&gt;
-
-&lt;p&gt;ここはとりあえずこのままにしておきます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="amore01_configure-triggers03_2.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/70e17b7a-9ab9-081f-778d-fc8c02cdd15f.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="--lambda-function-handler-and-role"&gt;- Lambda function handler and role&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;Handler&lt;/strong&gt;に「&lt;em&gt;index.handler&lt;/em&gt;」、&lt;strong&gt;Role&lt;/strong&gt;は「&lt;em&gt;Choose an existing role&lt;/em&gt;」を選び&lt;strong&gt;Existing role&lt;/strong&gt;に「&lt;em&gt;lambda_basic_execution&lt;/em&gt;」を指定します。&lt;br&gt;
-&lt;img alt="amore01_configure-triggers03_3.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/a0f1069a-b1e1-ca68-b694-10169859d648.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h3 id="--advanced-settings"&gt;- Advanced settings&lt;/h3&gt;
-
-&lt;p&gt;今回はあまり使う予定はないので&lt;strong&gt;Memory(MB)&lt;/strong&gt;は「&lt;em&gt;128&lt;/em&gt;」にしておきます。&lt;br&gt;
-&lt;strong&gt;Timeout&lt;/strong&gt;はデフォルトの「&lt;em&gt;3秒&lt;/em&gt;」です。&lt;br&gt;
-また、&lt;strong&gt;VPC&lt;/strong&gt;は「&lt;em&gt;No VPC&lt;/em&gt;」にしておきます。&lt;br&gt;
-&lt;img alt="amore01_configure-triggers03_4.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/271e53a9-b533-f8b5-8cd5-c56454a36c49.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id="●-review"&gt;● Review&lt;/h2&gt;
-
-&lt;p&gt;「Configure function」で設定した内容の確認です。&lt;br&gt;
-問題なさそうなら[Create function]で作成完了です。&lt;br&gt;
-&lt;img alt="02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6e6a3b03-5ca2-c358-9c2d-b2b509c8a6cd.png" /&gt;&lt;br&gt;
-&lt;img alt="03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ed39297b-ea8a-ccf5-735d-b95d319a180b.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;作成が完了すると「API Gateway」のURLが表示されます。&lt;br&gt;
-&lt;img alt="04.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/fdd1265d-0627-1699-c34a-143e77141ac9.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;ここで表示されたURLを&lt;strong&gt;LINE&lt;/strong&gt;の「&lt;em&gt;Callback URL&lt;/em&gt;」に設定します。&lt;br&gt;
-その際に注意が必要なのが、ポート番号も指定してあげなければならないという点です。&lt;br&gt;
-以下の画像のように、ドメイン末尾に「:443」をつけてあげる必要があります。&lt;br&gt;
-&lt;img alt="05.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/781d37da-0d5c-d326-daa5-119de87c6a6c.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上で「YOUR SYSTEM」に該当するフレームが完了しました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="lambda関数の設定"&gt;Lambda関数の設定&lt;/h1&gt;
-
-&lt;p&gt;それでは作成したフレームの中身を設定していきます。&lt;br&gt;
-中身というのは先ほど「とりあえずこのまま」にしていたLambda関数の箇所です。&lt;br&gt;
-「Code」タブをクリックして編集画面を表示します。&lt;br&gt;
-&lt;img alt="07.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/35cc41e6-9633-79c0-a551-050fe8b69324.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;そこに以下のソースコードをコピペします。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;var https = require('https');
-
-exports.handler = function(event, context) {
-    console.log('EVENT:', JSON.stringify(event, null, 0));
-    var msg = event.result[0];
-    var data = JSON.stringify({
-      to: [msg.content.from.toString()],
-      toChannel: 1383378250,
-      eventType: "138311608800106203",
-      content: msg.content
-    });
-    var url ='https://trialbot-api.line.me/v1/events';
-    var opts = {
-        host: 'trialbot-api.line.me',
-        path: '/v1/events',
-        headers: {
-            "Content-type": "application/json; charset=UTF-8",
-            "X-Line-ChannelID": "【Channel ID】",
-            "X-Line-ChannelSecret": "【Channel Secret】",
-            "X-Line-Trusted-User-With-ACL": "【MID】"
-        },
-        method: 'POST'
-    };
-    var req = https.request(opts, function(res){
-        res.on('data', function (chunk) {
-            console.log(res.statusCode + chunk.toString());
-        });
-        req.on('error', function(err) {
-          console.log('ERROR: ' + err.message);
-        });
-    });
-    req.write(data);
-    req.end();
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ただその際に、【Channel ID】と【Channel Secret】と【MID】は独自の値を設定する必要があるので「&lt;a href="https://developers.line.me/channels/"&gt;Line developers&lt;/a&gt;」で取得した自分の値と置き換えてください。&lt;br&gt;
-&lt;img alt="06.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/87c308e1-2ed4-31fd-d45f-d50d9c83ad10.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;コピペが完了したら「Save」ボタンで保存して完了です。&lt;/p&gt;
-
-&lt;p&gt;え？それじゃ何をしてるのかわからないって？いいんです！まずは完成させることが大事なんです！&lt;br&gt;
-ひとまず何も考えずにコピペしましょう！&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="トーク"&gt;トーク&lt;/h1&gt;
-
-&lt;p&gt;それではいよいよ会話です。ProudCloudに話しかけてみます。&lt;br&gt;
-&lt;img alt="08.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/48bb2b15-2bb9-f322-e475-62c875efc3bb.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;同じ言葉を返してくれます。いわゆる「オウム返し」というやつです。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;p&gt;今回は「とにかく動かす」ことを目的に作りました。&lt;br&gt;
-具体的な処理について説明すると長くなってしまうので、今回はここまでにしたいと思います。&lt;/p&gt;
 </content>
   </entry>
 </feed>
