@@ -1,5 +1,5 @@
 ---
-title: wordpress初期設定
+title: 必ずやっておきたいwordpress初期設定
 date: 2016-08-26
 tags: wordpress,
 author: ayako
@@ -14,6 +14,7 @@ wordpressインストール後、サイトの中身をカスタマイズする�
 今後のサイト管理をしやすくするためにもまずはじめに設定しましょう。
 
 基本的にはメニューバー下部にある、設定メニュー部分にある６項目。
+今回は★印の部分の設定をおこないました。
 
 ![wordpress_setting](./2016/0826_wordpress_setting/setting_00.png)
 
@@ -68,15 +69,11 @@ wordpressアドレスは、誤ったものを入力してしまうとそもそ�
 ```
 
 パーマリンクについては基本設定のままの場合、
-
-http://blog.abc.com/?p=123
-
-のように、記事部分を示す値が数字と記号の組み合わせとなってしまいます。
+記事部分を示す値が数字と記号の組み合わせとなってしまいます。
 
 ![wordpress_setting](./2016/0826_wordpress_setting/setting_02.png)
 
-ここをなぜ変更する必要があるかというと、
-SEO対策としての意味合いが大きいようです。
+ここをなぜ変更する必要があるかというと、SEO対策としての意味合いが大きいようです。
 そして、googleの推奨する[シンプルなURL構造を維持する](https://support.google.com/webmasters/answer/76329?hl=ja)という文面にも
 **可能な場合は ID ではなく意味のある単語を使用して**とあります。
 
