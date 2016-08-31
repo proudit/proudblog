@@ -115,10 +115,14 @@ https://kohei-no-bucket.s3-ap-northeast-1.amazonaws.com/ceresso.png?X-Amz-Algori
 # おまけ
 そこについても試してみました。
 
+●ちょうど１週間(604800秒)の場合
+
 ```bash:ちょうど1週間(604800秒)の場合
 $ ./presigned_url.rb 
 https://kohei-no-bucket.s3-ap-northeast-1.amazonaws.com/ceresso.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=********************%2F20160825%2Fap-northeast-1%2Fs3%2Faws4_request&X-Amz-Date=20160825T021333Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=709a0de7cf14bd002a9b7953da5e5c9433104ccf9743bb7fda0332bd17830043
 ```
+
+●1週間+1秒(604801秒)の場合
 
 ```bash:1週間+1秒(604801秒)の場合
 $ ./presigned_url.rb 
