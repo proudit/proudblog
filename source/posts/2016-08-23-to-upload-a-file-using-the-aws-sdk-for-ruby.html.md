@@ -72,7 +72,7 @@ ogp:
 今回の作業環境はMacで行います。
 
 ```bash:ファイル作成
-$ vim upload.ruby
+$ vim upload.rb
 ```
 
 ファイルを開いたら以下のスクリプトをコピペします。
