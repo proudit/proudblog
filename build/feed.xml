@@ -5,16 +5,246 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-08-25T09:00:00+09:00</updated>
+  <updated>2016-08-31T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>AWS SDK for Ruby バージョン 2 で期限付きURLの発行</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/31/issu-of-time-limited-url-in-the-aws-sdk-for-ruby-version-2.html"/>
+    <id>http://blog.url.com/2016/08/31/issu-of-time-limited-url-in-the-aws-sdk-for-ruby-version-2.html</id>
+    <published>2016-08-31T09:00:00+09:00</published>
+    <updated>2016-08-31T11:44:55+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;p&gt;前回、&lt;a href="http://blog.proudit.jp/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html"&gt;「AWS SDK for Ruby バージョン 2 を使用したS3バケットへのオブジェクトアップロード」&lt;/a&gt;でS3へオブジェクトのアップロードを行いました。&lt;br&gt;
+でも、このままではアップロードしただけで、誰もアップしたオブジェクトにアクセスができないですね。。。&lt;br&gt;
+ということで、今回はアップロードしたファイルをブラウザからアクセスできるように&lt;strong&gt;期限付きURLの発行&lt;/strong&gt;をしてみたいと思います。&lt;br&gt;
+ちなみに&lt;strong&gt;期限付きURL&lt;/strong&gt;とはその名の通り、URLを発行してから１0分だったり3日だったり１週間だったりと、利用できる&lt;strong&gt;期限&lt;/strong&gt;を持たせたURLです。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="1.-アクセス先の準備"&gt;1. アクセス先の準備&lt;/h1&gt;
+
+&lt;p&gt;前回、&lt;a href="http://blog.proudit.jp/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html#1.-ファイルアップロード先の準備"&gt;「AWS SDK for Ruby バージョン 2 を使用したS3バケットへのオブジェクトアップロード」&lt;/a&gt;で作成したバケットを利用するので今回は省略します。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="2.-アクセスユーザーの用意"&gt;2. アクセスユーザーの用意&lt;/h1&gt;
+
+&lt;p&gt;まずは、バケットへアクセスできるユーザーを準備しますが、&lt;a href="http://blog.proudit.jp/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html#2.-アップロードユーザーの用意"&gt;前回作成&lt;/a&gt;した&lt;em&gt;kohei-no-iam&lt;/em&gt;を利用したいと思います。&lt;/p&gt;
+
+&lt;p&gt;まずは「アクセス許可」→「ポリシーのアタッチ」をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="4-iam01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6a324b60-8cfd-05c8-a9ea-3a6450c39f25.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は &lt;strong&gt;AmazonS3ReadOnlyAccess&lt;/strong&gt; をアタッチするだけでOKです。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="4-iam02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/3d1435a3-6637-f5f9-ef80-6ba87388d897.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="4-iam03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/b6d48db2-01be-4bfb-0b9b-20cb21f7ff70.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上でユーザーの用意は完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="3.-スクリプトの作成"&gt;3. スクリプトの作成&lt;/h1&gt;
+
+&lt;p&gt;それではスクリプトを作成します。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ vim presigned_url.rb
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ファイルを開いたら以下の内容をコピペします。&lt;br&gt;
+また、その際に&lt;strong&gt;bucketname&lt;/strong&gt;、&lt;strong&gt;objectname&lt;/strong&gt;、&lt;strong&gt;uploadfile&lt;/strong&gt;と&lt;strong&gt;アクセスキーID&lt;/strong&gt;と&lt;strong&gt;シークレットアクセスキー&lt;/strong&gt;は適宜変更してください。&lt;br&gt;
+バケットのリージョンをTokyoにしなかった場合も適切なリージョンに変更する必要があります。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;#!/usr/bin/env ruby
+
+require 'aws-sdk'
+
+bucketname = "kohei-no-bucket"    # バケット名
+objectname = "ceresso.png"        # オブジェクト名
+
+Aws.config[:credentials] = Aws::Credentials.new(
+  '********************',                      # アクセスキーID
+  '****************************************',  # シークレットアクセスキー
+)
+s3 = Aws::S3::Resource.new(region:'ap-northeast-1')  # Tokyoリージョン
+obj = s3.bucket(bucketname).object(objectname)
+puts obj.presigned_url(:get, expires_in:60)   # expires_in:有効期限(秒)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;実行権限を追加しておきます。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ chmod +x presigned_url.rb
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上で準備完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="4.-実践！"&gt;4. 実践！&lt;/h1&gt;
+
+&lt;p&gt;その前に、一応現在のバケットの設定が&lt;strong&gt;「ウェブサイトのホスティングを有効にしない」&lt;/strong&gt;となっているのを確認しておきます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="5-test01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/18fb2061-a1fc-f7d5-fee6-0f8e7b15e7b8.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;それでは実行です。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ./presigned_url.rb
+https://kohei-no-bucket.s3-ap-northeast-1.amazonaws.com/ceresso.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;X-Amz-Credential=＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊%2F20160824%2Fap-northeast-1%2Fs3%2Faws4_request&amp;amp;X-Amz-Date=20160824T061832Z&amp;amp;X-Amz-Expires=60&amp;amp;X-Amz-SignedHeaders=host&amp;amp;X-Amz-Signature=26eddaaad67a9f0e5d011b110ee34e271557c5f9f8bac82c9da655d58956245e
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;発行されたURLにアクセスしてみます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="5-test02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/6d3642fe-2325-e9f2-54b3-d093f67a472b.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;画像が表示されました。&lt;br&gt;
+それでは60秒過ぎてからもう一度アクセスしてみます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="5-test03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/0a7cf754-86eb-631e-0de4-2b20b78e389f.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;アクセスができなくなっているのが確認できました。&lt;br&gt;
+以上で期限付きURLの発行の完了です。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;「期限付きURL」が発行できることによって、一時的なファイル共有が可能になるのでこれはとても便利なんじゃないかなと個人的には思います。&lt;br&gt;
+ただ、&lt;a href="http://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Object.html#presigned_url-instance_method"&gt;ドキュメント&lt;/a&gt;によるとこの期限付きURLは「１週間」を超える設定にはできないことです。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Raises:&lt;br&gt;
+(ArgumentError) — Raised if :expires_in exceeds one week (604800 seconds).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おまけ"&gt;おまけ&lt;/h1&gt;
+
+&lt;p&gt;そこについても試してみました。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ./presigned_url.rb 
+https://kohei-no-bucket.s3-ap-northeast-1.amazonaws.com/ceresso.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;X-Amz-Credential=********************%2F20160825%2Fap-northeast-1%2Fs3%2Faws4_request&amp;amp;X-Amz-Date=20160825T021333Z&amp;amp;X-Amz-Expires=604800&amp;amp;X-Amz-SignedHeaders=host&amp;amp;X-Amz-Signature=709a0de7cf14bd002a9b7953da5e5c9433104ccf9743bb7fda0332bd17830043
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ ./presigned_url.rb 
+/Library/Ruby/Gems/2.0.0/gems/aws-sdk-core-2.5.4/lib/aws-sdk-core/s3/presigner.rb:68:in `expires_in': expires_in value of 604801 exceeds one-week maximum (ArgumentError)
+    from /Library/Ruby/Gems/2.0.0/gems/aws-sdk-core-2.5.4/lib/aws-sdk-core/s3/presigner.rb:50:in `presigned_url'
+    from /Library/Ruby/Gems/2.0.0/gems/aws-sdk-resources-2.5.4/lib/aws-sdk-resources/services/s3/object.rb:189:in `presigned_url'
+    from ./presigned_url.rb:14:in `&amp;lt;main&amp;gt;'
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;期限付きURLも期限付きだったんですねw&lt;/p&gt;
+
+&lt;p&gt;参考：&lt;a href="http://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Object.html#presigned_url-instance_method"&gt;&lt;strong&gt;AWS SDK for Ruby - presigned_url&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>必ずやっておきたいwordpress初期設定</title>
+    <link rel="alternate" href="http://blog.url.com/2016/08/26/wordpress-how-to-get-started.html"/>
+    <id>http://blog.url.com/2016/08/26/wordpress-how-to-get-started.html</id>
+    <published>2016-08-26T09:00:00+09:00</published>
+    <updated>2016-08-31T11:33:25+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;wordpressインストール後、サイトの中身をカスタマイズする前に、まずやっておくべき初期設定。&lt;br&gt;
+今後のサイト管理をしやすくするためにもまずはじめに設定しましょう。&lt;/p&gt;
+
+&lt;p&gt;基本的にはメニューバー下部にある、設定メニュー部分にある６項目。&lt;br&gt;
+今回は★印の部分の設定をおこないました。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="wordpress_setting" src="/images/./2016/0826_wordpress_setting/setting_00.png" /&gt;&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;・一般 ★
+・投稿設定
+・表示設定
+・ディスカッション
+・メディア
+・パーマリンク設定　★
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id="一般設定★"&gt;一般設定★&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;サイトタイトル、キャッチフレーズを入力。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;キャッチフレーズについてはテンプレートによって、タイトルタグや見出しタグにはいってしまい、&lt;br&gt;
+SEO的に好ましくない設定になっているものもあるようなので、&lt;br&gt;
+空白にした方が良い場合もあるようです。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;wordpressアドレス、サイトアドレスを入力。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;wordpressアドレス：実際にwordpressがインストールされているパスを入力します。&lt;/p&gt;
+
+&lt;p&gt;サイトアドレス：ブラウザ上で表示されるサイトのトップページとなるURL&lt;/p&gt;
+
+&lt;p&gt;�ここで注意！&lt;br&gt;
+wordpressアドレスは、誤ったものを入力してしまうとそもそもサイト自体にアクセスできなくなってしまいます！&lt;/p&gt;
+
+&lt;p&gt;今回これに引っかかってしまいました&amp;gt;&amp;lt;&lt;/p&gt;
+
+&lt;p&gt;解決方法は2つ。&lt;/p&gt;
+
+&lt;p&gt;・定数を定義する&lt;br&gt;
+・MysQLデータの書き換え&lt;/p&gt;
+
+&lt;p&gt;このいずれかで復旧できます！でもやはり手間なので、wordpressアドレスは&lt;br&gt;
+安易に触らないことをおすすめします。&lt;/p&gt;
+
+&lt;p&gt;また言語設定もこの一般設定からできます。&lt;br&gt;
+インストール後、英語表示になっている場合はここで日本語表示へ変更&lt;br&gt;
+しましょう。&lt;/p&gt;
+
+&lt;h2 id="パーマリンク設定"&gt;パーマリンク設定&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href="https://wpdocs.osdn.jp/%E3%83%91%E3%83%BC%E3%83%9E%E3%83%AA%E3%83%B3%E3%82%AF%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9"&gt;パーマリンクとは？&lt;/a&gt;&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;パーマリンクとは、ブログの個々の投稿、
+カテゴリーなどの投稿一覧ページへの恒久的（半永久的）な URL です。
+(引用：wordpress codex　日本語版より)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;パーマリンクについては基本設定のままの場合、&lt;br&gt;
+記事部分を示す値が数字と記号の組み合わせとなってしまいます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="wordpress_setting" src="/images/./2016/0826_wordpress_setting/setting_02.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ここをなぜ変更する必要があるかというと、SEO対策としての意味合いが大きいようです。&lt;br&gt;
+そして、googleの推奨する&lt;a href="https://support.google.com/webmasters/answer/76329?hl=ja"&gt;シンプルなURL構造を維持する&lt;/a&gt;という文面にも&lt;br&gt;
+&lt;strong&gt;可能な場合は ID ではなく意味のある単語を使用して&lt;/strong&gt;とあります。&lt;/p&gt;
+
+&lt;p&gt;また、URLを一目見て、どんな記事かが分かるようなURLにするとユーザビリティも良くなるのではないでしょうか。&lt;/p&gt;
+
+&lt;p&gt;パーマリンクのおすすめを紹介しているサイトもありますが、&lt;br&gt;
+運用の仕方に合わせて検討するのがよいかと思います。&lt;/p&gt;
+
+&lt;p&gt;ただし、パーマリンクは日本語ではなく英語設定をおすすめします。&lt;br&gt;
+理由は、リンクをコピーしてテキストに貼り付けた場合、リンクが長くなってしまうのです。&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="wordpress_setting" src="/images/./2016/0826_wordpress_setting/setting_03.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;そして、このパーマリンクの構成は必ず初期設定の段階でしっかり取り決めを&lt;br&gt;
+することが必要です。&lt;br&gt;
+なぜなら、途中でこのパーマリンクを変更しようとすると、今まで投稿した記事&lt;br&gt;
+のリンクも全て変更されてしまうのです。&lt;/p&gt;
+
+&lt;p&gt;リンク変更に伴い、&lt;br&gt;
+リダイレクト設定に手間がかかる、SEO評価やSNSのシェア回数もリセットされて&lt;br&gt;
+しまうので、結構なダメージを受ける可能性大です。&lt;br&gt;
+安易に変更することはできないので、初期の段階でしっかりと設定をしておきましょう！&lt;/p&gt;
+
+&lt;p&gt;この次はテーマの設定です。&lt;br&gt;
+長くなったので、別記事にまとめます！&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>弊社お客様であるセーフィー様の「Safie LIVE」が「RIZAP KBC オーガスタゴルフトーナメント2016」の定点ネット映像配信に採用されました！！！</title>
     <link rel="alternate" href="http://blog.url.com/2016/08/25/kbc-augusta-golf-tournament-2016.html"/>
     <id>http://blog.url.com/2016/08/25/kbc-augusta-golf-tournament-2016.html</id>
     <published>2016-08-25T09:00:00+09:00</published>
-    <updated>2016-08-25T12:57:33+09:00</updated>
+    <updated>2016-08-31T11:33:25+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -49,7 +279,7 @@
     <link rel="alternate" href="http://blog.url.com/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html"/>
     <id>http://blog.url.com/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html</id>
     <published>2016-08-23T09:00:00+09:00</published>
-    <updated>2016-08-23T13:15:36+09:00</updated>
+    <updated>2016-08-31T13:10:58+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -117,7 +347,7 @@
 
 &lt;p&gt;それではいよいよアップロード用のスクリプトを作成します。&lt;br&gt;
 今回の作業環境はMacで行います。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ vim upload.ruby
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ vim upload.rb
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ファイルを開いたら以下のスクリプトをコピペします。&lt;br&gt;
@@ -397,131 +627,6 @@ exit 0
 &lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
 
 &lt;p&gt;スクリプト実行後、「VPN接続」から「設定のダウンロード」をしてそのコンフィグを対向となるルーターに流し込めばOKです。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>システムテスト自動化ツールSeleniumIDE</title>
-    <link rel="alternate" href="http://blog.url.com/2016/08/10/seleniumIDE.html"/>
-    <id>http://blog.url.com/2016/08/10/seleniumIDE.html</id>
-    <published>2016-08-10T09:00:00+09:00</published>
-    <updated>2016-08-16T12:14:50+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;システム開発の作業工程の一つである、システムテスト。&lt;br&gt;
-そのテストを自動でできるツールがあるということで、どのようなものか実際に使ってみました。&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Seleniumとは：&lt;br&gt;
-webブラウザを使ってwebアプリケーションをテストするツール。&lt;br&gt;
-Seleiumは以下3つのプロダクトで構成されています。&lt;br&gt;
-- Selenium Grid&lt;br&gt;
-- Selenium IDE&lt;br&gt;
-- Selenium RC（Remote Control）&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;※2011年にgoogleで開発していた&lt;strong&gt;Webdriver&lt;/strong&gt;と統合し、&lt;strong&gt;Selenium Webdriver&lt;/strong&gt;としてリリースされました。&lt;/p&gt;
-
-&lt;h1 id="seleniumをダウンロード"&gt;Seleniumをダウンロード&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;今回はSeleniumIDEというfirefoxのアドオンを使います。&lt;/p&gt;
-
-&lt;p&gt;まずはSeleniumの&lt;a href="http://www.seleniumhq.org/download/"&gt;ダウンロードサイトへ&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;※ブラウザはfirefoxを使います。&lt;/p&gt;
-
-&lt;p&gt;ダウンロードページからアドオンのインストールができます。&lt;br&gt;
-&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_1.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_2.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;アドオンへのインストールが完了すると、ブラウザの右上にIDEのアイコンが表示されます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_3.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;※googlechromeやIEでもこのIDE利用することができますが、&lt;br&gt;
-firefoxとは異なり、各ブラウザのドライバーやselenium-server-standalone-x.xx.x.jarのインストールも必要です。&lt;br&gt;
-詳細については割愛します。&lt;/p&gt;
-
-&lt;h2 id="・早速テストをためしてみます"&gt;・早速テストをためしてみます&lt;/h2&gt;
-
-&lt;p&gt;インストール後に表示されたIDEのアイコンをクリックすると操作画面のウィンドウが開きます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_4.png" /&gt;&lt;br&gt;
-&lt;a href="http://oss.infoscience.co.jp/seleniumhq/docs/03_selenium_ide.html#id3"&gt;機能説明はこちらを参照してください&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;今回はfacebookログインで、ログイン失敗時に出るエラーメッセージの有無で、&lt;br&gt;
-ログイン動作確認(失敗した時の場合)をしてみます。&lt;br&gt;
-テストはgoogleでfacebookを検索→facebookを開く→ログイン&lt;br&gt;
-という流れで行いました。&lt;/p&gt;
-
-&lt;p&gt;まず、SeleniumIDEで動作の記録を開始(右上の赤丸ボタンをクリック)&lt;br&gt;
-facebookのログインページを開き、ログイン失敗になるように、不正な値を&lt;br&gt;
-入力します。&lt;br&gt;
-&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_5.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Seleniumの画面を見ると、ブラウザでの操作情報が記録されています。&lt;br&gt;
-ここに、追加のコマンドを挿入。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_6.png" /&gt;&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;コマンド：verifyTextPresent
-対象：入力されたメールアドレスまたは携帯電話番号はアカウントと一致しません。アカウントの登録
-値：入力なし
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;em&gt;verifyTextPresent:対象である要素のテキストが値(パターン)と一致するか検証する&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;テストを実行します。&lt;br&gt;
-結果は左下に表示されます。&lt;br&gt;
-テスト結果は成功です。&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0810_SeleniumIDE/0810_SeleniumIDE_7.png" /&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;初めて使ってみましたが、ブラウザ上で操作が可能なので抵抗なく使うことができました。&lt;br&gt;
-以前社内システムの開発グループに所属していたことがありますが、&lt;br&gt;
-プログラマーではなかったので、テスト作業をよくやっていました。&lt;br&gt;
-何度も同じテストを繰り返す作業って時間もかかるし、意外に根気の&lt;br&gt;
-いる作業だったりしますよね。&lt;br&gt;
-同じことを何度も繰り返すサイトや、長期継続的にリリースを行うようなサイト&lt;br&gt;
-人でが足りないなんて時には、作業工数を減らすという意味でも使えるツールかもしれません。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>破壊的クラウドSI 強いベンダー174社に掲載されました！</title>
-    <link rel="alternate" href="http://blog.url.com/2016/08/09/NEWS-ITPro.html"/>
-    <id>http://blog.url.com/2016/08/09/NEWS-ITPro.html</id>
-    <published>2016-08-09T09:00:00+09:00</published>
-    <updated>2016-08-16T12:14:50+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="強いベンダー174社!!"&gt;強いベンダー174社!!&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;2016年8月4日掲載のITpro Active&lt;br&gt;
-&lt;a href="http://itpro.nikkeibp.co.jp/atclact/active/16/071200076/071200004/?ST=act-cloud&amp;amp;P=1"&gt;破壊的クラウドSI 強いベンダー174社&lt;/a&gt;にAWSとAzureのSIパートナー174社が掲載され、&lt;br&gt;
-AWSコンサルティングパートナーである弊社プラウディットの名前もしっかりと掲載されていました！！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="SeleniumIDE" src="/images/./2016/0809_ITProActive/ITpro.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;お客様がベンダー選びをする上での指標ともなるクラウドベンダーのパートナー認定制度。&lt;br&gt;
-弊社は昨年末からAWSのパートナーとなりました。&lt;br&gt;
-こういった記事に名前が載るというのはとても光栄なことですね！&lt;/p&gt;
-
-&lt;p&gt;豊富なAWSのノウハウを活かし、今後もお客様のお力になれるよう、&lt;br&gt;
-一同精進して参ります！&lt;/p&gt;
-
-&lt;p&gt;近々、サービスサイトをリニューアル予定です！&lt;br&gt;
-そちらも楽しみにしていてください！&lt;/p&gt;
 </content>
   </entry>
 </feed>
