@@ -1,6 +1,6 @@
 ---
 title: モダールウィンドウの設定
-date: 2016-09-00
+date: 2016-09-06
 tags: jQuery,
 author: ayako
 ogp:
