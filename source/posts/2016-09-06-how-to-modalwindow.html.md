@@ -5,7 +5,7 @@ tags: jQuery,JavaScript
 author: ayako
 ogp:
   og:
-    description: ' remodalというjQueryのライブラリを使って、モーダルウィンドウを設置してみました。'
+    description: ' remodalというjQueryのプラウグインを使って、モーダルウィンドウを設置してみました。'
 ---
 
 #はじめに
