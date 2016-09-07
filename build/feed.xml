@@ -5,16 +5,218 @@
   <id>http://blog.url.com/</id>
   <link href="http://blog.url.com/"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2016-08-31T09:00:00+09:00</updated>
+  <updated>2016-09-07T09:00:00+09:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>GCP NEXT Tokyo 2016に行ってきた。</title>
+    <link rel="alternate" href="http://blog.url.com/2016/09/07/about-gcp-next-tokyo-2016.html"/>
+    <id>http://blog.url.com/2016/09/07/about-gcp-next-tokyo-2016.html</id>
+    <published>2016-09-07T09:00:00+09:00</published>
+    <updated>2016-09-07T15:55:27+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;&lt;img alt="GPCNEXT" src="/images/./2016/0907_about_GCP_NEXT_Tokyo_2016/gcp_next_tokyo_2016.jpg" /&gt;&lt;br&gt;
+昨日(2016年9月6日)、芝公園にあるザ・プリンスタワー東京で&lt;strong&gt;GCP NEXT | World Tour | Tokyo 2016&lt;/strong&gt;が開催されたので行ってきました。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="gcp-nextとは？"&gt;GCP NEXTとは？&lt;/h1&gt;
+
+&lt;p&gt;Google Cloud Platformに関する最新クラウドテクノロジーについての発表や活用事例を発表するイベントです。&lt;br&gt;
+その他にGCP導入企業との交流やハンズオントレーニングも行えます。&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="どんな企業が参加しているの？"&gt;どんな企業が参加しているの？&lt;/h1&gt;
+
+&lt;p&gt;&lt;img alt="GoogleApps" src="/images/./2016/0907_about_GCP_NEXT_Tokyo_2016/GoogleApps.jpg" /&gt;&lt;br&gt;
+GCPでシステム構築・運用などを行うMSPの企業やGCPをベースに構築したサービスを提供する企業、CDNなどのGCPと組み合わせて利用できるサービスなどを展開する企業など様々でした。&lt;/p&gt;
+
+&lt;p&gt;今回ブース出展していた協賛パートナーは以下です。(※アルファベット順)&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://www.accenture.com/jp-ja/"&gt;accenture&lt;/a&gt;&lt;br&gt;
+コンサルティング会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="http://www.brainpad.co.jp"&gt;BrainPad&lt;/a&gt;&lt;br&gt;
+ビッグデータを活用した解析や機械学習、AIなどに力を入れている会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://www.cloud-ace.jp"&gt;Cloud Ace&lt;/a&gt;&lt;br&gt;
+Google Cloud Platformの導入・運用をワンストップでサポートするMSPサービスです。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="http://cross-rendering.jp"&gt;Cross&lt;/a&gt;&lt;br&gt;
+Googleのクラウドコンピューティングでレンダーファームサービスを提供している会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="http://www.equinix.co.jp/locations/japan-colocation/tokyo-data-centers/?ls=Advertising%20-%20Web&amp;amp;lsd=16q2_enterprise_people__google_cpc_jp-jp&amp;amp;utm_campaign=people&amp;amp;utm_medium=cpc&amp;amp;utm_source=google&amp;amp;utm_term=equinix&amp;amp;gclid=CNmSxpHE_M4CFQpwvAodAesP0g"&gt;EQUINIX&lt;/a&gt;&lt;br&gt;
+データセンター事業を展開する会社です。ビットアイルを買収したことでも有名ですね。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://www.fastly.com"&gt;fastly&lt;/a&gt;&lt;br&gt;
+CDNサービスを提供する会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="http://www.grasys.io"&gt;grasys&lt;/a&gt;&lt;br&gt;
+システム設計・構築・運用保守を行うMSPの会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="http://www.groovenauts.jp"&gt;Groovenauts&lt;/a&gt;&lt;br&gt;
+画面上のブロックを配置して複雑なクラウド機能をつなぎあわせる「BLOCKS」というサービスを提供している会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="http://www.inter.it/jp/hp"&gt;intel&lt;/a&gt;&lt;br&gt;
+CoreプロセッサなどのCPUを製造している半導体メーカーです。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://www.isao.co.jp"&gt;ISAO&lt;/a&gt;&lt;br&gt;
+クラウドマネージメントの「くらまね」をサービスとして提供している会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://www.jig-saw.com"&gt;JIG-SAW&lt;/a&gt;&lt;br&gt;
+システム設計・構築・運用保守を行うMSPの会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://www.jsol.co.jp"&gt;JSOL&lt;/a&gt;&lt;br&gt;
+ITコンサルティング会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://mackerel.io"&gt;mackerel&lt;/a&gt;&lt;br&gt;
+モニタリングプラットフォームを提供する会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://nhn-techorus.com"&gt;TECHORUS&lt;/a&gt;&lt;br&gt;
+ITインフラを提案・構築・運用支援などを行う会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="http://www.tokai-com.co.jp"&gt;TOKAIコミュニケーション&lt;/a&gt;&lt;br&gt;
+ネットワーク・データセンター・システム開発を三位一体で展開する会社です。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://www.topgate.co.jp"&gt;TOP GATE&lt;/a&gt;&lt;br&gt;
+Googleの技術をコアとした開発やコンサルティングを行う、Google技術者集団です。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img alt="GDC" src="/images/./2016/0907_about_GCP_NEXT_Tokyo_2016/gdc.jpg" /&gt;&lt;br&gt;
+&lt;img alt="GCP" src="/images/./2016/0907_about_GCP_NEXT_Tokyo_2016/gcp.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="どんな内容が聞けるの？"&gt;どんな内容が聞けるの？&lt;/h1&gt;
+
+&lt;p&gt;午前中は基調講演です。お昼を挟んで午後からは「事例紹介」や「各種サービスの技術」についてA・B・Cの３会場に分かれて講演が行われました。&lt;br&gt;
+&lt;a href="https://cloudplatformonline.com/NEXT2016-Tokyo-Agenda.html"&gt;アジェンダ&lt;/a&gt;&lt;br&gt;
+どのセッションもほぼ満席みたいでしたが、特にゲーム系のセッションが開場前から行列だったので人気があったのかなと感じました。&lt;br&gt;
+&lt;img alt="schedule" src="/images/./2016/0907_about_GCP_NEXT_Tokyo_2016/gcp-schedule.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="今回気になったサービス"&gt;今回気になったサービス&lt;/h1&gt;
+
+&lt;h2 id="●stackdriver"&gt;●STACKDRIVER&lt;/h2&gt;
+
+&lt;p&gt;なんと言っても&lt;a href="http://www.stackdriver.com"&gt;&lt;strong&gt;Stackdriver&lt;/strong&gt;&lt;/a&gt;ですね。&lt;br&gt;
+マルチクラウド管理に対応したモニタリングツールで、「&lt;strong&gt;モニタリング、ロギング、デバッグ、トレース、エラーレポーティング&lt;/strong&gt;」と言ったことが行えます。&lt;br&gt;
+しかもAWSにも対応(というかテクノロジーパートナーですw)しているので両方のパブリッククラウドを利用している企業などは一元管理できるのでとても便利なのではないかなと思います。&lt;br&gt;
+現在、β版で無料で利用できるので今のうちにもっと試して使い勝手などを検証したいと思います。&lt;br&gt;
+&lt;img alt="stackdriver" src="/images/./2016/0907_about_GCP_NEXT_Tokyo_2016/stackdriver.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h2 id="●gae"&gt;●GAE&lt;/h2&gt;
+
+&lt;p&gt;個人的に&lt;a href="https://cloud.google.com/appengine/?hl=ja&amp;amp;utm_source=google&amp;amp;utm_medium=cpc&amp;amp;utm_campaign=2015-q1-cloud-japac-jp-gae-bkws-freetrial-jap&amp;amp;utm_term=gae&amp;amp;gclid=CKGltMq8_M4CFYWUvQodkFcI4A"&gt;&lt;strong&gt;GAE(Google App Engine)&lt;/strong&gt;&lt;/a&gt;も良いです。&lt;br&gt;
+でもGAEは昔からある成熟したサービスだと言われました。。。勉強不足。。。&lt;br&gt;
+とはいえ、せっかくなのでGAEについて!&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://cloud.google.com/appengine/docs/whatisgoogleappengine?hl=ja"&gt;GAE&lt;/a&gt;とはGoogleのインフラの上でアプリケーションを作り、実行できるようにする「&lt;strong&gt;Paas&lt;/strong&gt;」です。利用者はただ、アプリケーションをGAEへアップロードするだけで実行できます。ランタイム環境としては現在「Java、Python、PHP、Go」をサポートしているみたいです。&lt;br&gt;
+無料枠もあるみたいで&lt;strong&gt;1日28時間までサポート&lt;/strong&gt;されています。つまり１台動かす分には無料ということです。&lt;br&gt;
+しかも&lt;strong&gt;使った分だけ課金&lt;/strong&gt;になるので、アップロードしてもアクセスがない場合は課金されません。良いですね！&lt;br&gt;
+逆に負荷が高くなった場合、自動でオートスケーリングしてくれます。ここで気になったのが、上限値は設定できるんですかね？できるはずですよね？そこ重要ですよね！？要チェックや。。。&lt;br&gt;
+また、聴講していて他にいいなと思ったポイントはバージョン管理機能みたいなのがあるらしく、&lt;br&gt;
+アップロードした内容がOKであれば管理画面上で切り替えることができるんだそうです。いわゆる&lt;strong&gt;blue/greenデプロイみたいなことが可能&lt;/strong&gt;との事です。&lt;br&gt;
+昔からあるサービスなだけあって、GAEは「ザ・GCP」と言った感じですね。&lt;br&gt;
+&lt;img alt="GAE" src="http://23.251.145.25/wordpress/wp-content/uploads/2014/03/gae_image.jpg" /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;p&gt;パブリッククラウドと言ったらAWSというのはまだまだ拭えないですが、東京リージョンもついにやってくるとの事で、ここからのGoogleの追い上げに注目です。&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>モダールウィンドウの設定</title>
+    <link rel="alternate" href="http://blog.url.com/2016/09/06/how-to-modalwindow.html"/>
+    <id>http://blog.url.com/2016/09/06/how-to-modalwindow.html</id>
+    <published>2016-09-06T09:00:00+09:00</published>
+    <updated>2016-09-07T13:48:31+09:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;モーダルウィンドウとはなんでしょう？&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;モーダルウィンドウとは、操作が完了するまで親ウィンドウへの操作を受け付けなくさせるタイプのウィンドウのことである。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;引用元：&lt;a href="http://www.sophia-it.com/content/%E3%83%A2%E3%83%BC%E3%83%80%E3%83%AB%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6"&gt;IT用語辞典&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="modalwindow" src="/images/./2016/0906_modalwindow_setting/modalwindow_01.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;ページ遷移すること無く、もとのページがグレーアウトした状態で、子ウィンドウをオーバレイする状態で表示させることができます。&lt;/p&gt;
+
+&lt;p&gt;画面遷移せずに同ページ内で別コンテンツを開くことができるという利点がある一方で、&lt;br&gt;
+モダールウィンドウであることがユーザーに認識されづらく、&lt;br&gt;
+ユーザビリティが欠落してしまうケースや、スマートフォンのような小さな画面ではウィンドウを閉じる場合、&lt;br&gt;
+操作性が悪い等、、デメリットも多くあるのです。&lt;/p&gt;
+
+&lt;p&gt;設置の際はそういった点も考慮する必要がありそうです。&lt;/p&gt;
+
+&lt;p&gt;前置きが長くなりましたが、早速実践してみましょう！&lt;/p&gt;
+
+&lt;h1 id="モーダルウィンドウの設置"&gt;モーダルウィンドウの設置&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;このモダールウィンドウ設置のために利用したのは&lt;strong&gt;remodal&lt;/strong&gt;というプラグイン。&lt;br&gt;
+軽量かつシンプル。&lt;br&gt;
+ギャラリー機能は無く、テキスト表示のみ対応です。&lt;br&gt;
+今回はテキスト表示が目的なので、こちらを選びましたが、&lt;br&gt;
+モダールウィンドウのプラグインはこの他にも多くあるので、用途に合わせて&lt;br&gt;
+使い分けしてみてください。&lt;/p&gt;
+
+&lt;p&gt;まずはremodalのファイルをダウンロード。&lt;br&gt;
+ダウンロードした以下ファイルを任意のフォルダに設置し、読み込みます。&lt;/p&gt;
+
+&lt;p&gt;・remodal.js&lt;br&gt;
+・remodal-default-theme.css&lt;br&gt;
+・remodal.css&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;&amp;lt;script src="../js/remodal.js"&amp;gt;&amp;lt;/script&amp;gt;
+
+&amp;lt;link rel="stylesheet" href="css/remodal.css"&amp;gt;
+&amp;lt;link rel="stylesheet" href="css/remodal-default-theme.css"&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ソースコードの記述。&lt;/p&gt;
+&lt;pre class="highlight plaintext"&gt;&lt;code&gt;&amp;lt;!-- 呼び出し用ボタン --&amp;gt;
+&amp;lt;a href="#modal" class="btn btn-default"&amp;gt;Modalデモ&amp;lt;/a&amp;gt;
+
+&amp;lt;!-- Modal本体 --&amp;gt;
+&amp;lt;!-- ボタンが押されると呼び出される --&amp;gt;
+&amp;lt;div class="remodal" data-remodal-id="modal"&amp;gt;
+&amp;lt;!-- クローズボタン --&amp;gt;
+&amp;lt;button data-remodal-action="close" class="remodal-close"&amp;gt;&amp;lt;/button&amp;gt;
+&amp;lt;h1&amp;gt;Remodal&amp;lt;/h1&amp;gt;
+&amp;lt;!-- your content --&amp;gt;
+&amp;lt;p&amp;gt; Remodalテスト &amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt; Write something. &amp;lt;/p&amp;gt;
+&amp;lt;br&amp;gt;
+&amp;lt;!-- キャンセルボタン --&amp;gt;
+&amp;lt;button data-remodal-action="cancel" class="remodal-cancel"&amp;gt;Cancel&amp;lt;/button&amp;gt;
+&amp;lt;!-- サブミットボタン --&amp;gt;
+&amp;lt;button data-remodal-action="confirm" class="remodal-confirm"&amp;gt;OK&amp;lt;/button&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上です！&lt;br&gt;
+とっても簡単ですよね！&lt;/p&gt;
+
+&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;プラグインを利用したので、スムーズに設置することができました。&lt;br&gt;
+が、今回テキスト表示のみのプラグインを利用したので、カスタマイズはしづらいです。&lt;br&gt;
+テキスト表示といっても長文テキストを仕込んだので、その分コードが&lt;br&gt;
+長くなってしまいました・・・&lt;/p&gt;
+
+&lt;p&gt;ここをなんとかシンプルにまとめる方法はないかな、と今後改善したいと思っています。&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>AWS SDK for Ruby バージョン 2 で期限付きURLの発行</title>
     <link rel="alternate" href="http://blog.url.com/2016/08/31/issu-of-time-limited-url-in-the-aws-sdk-for-ruby-version-2.html"/>
     <id>http://blog.url.com/2016/08/31/issu-of-time-limited-url-in-the-aws-sdk-for-ruby-version-2.html</id>
     <published>2016-08-31T09:00:00+09:00</published>
-    <updated>2016-08-31T14:48:03+09:00</updated>
+    <updated>2016-08-31T21:55:38+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -283,7 +485,7 @@ wordpressアドレスは、誤ったものを入力してしまうとそもそ�
     <link rel="alternate" href="http://blog.url.com/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html"/>
     <id>http://blog.url.com/2016/08/23/to-upload-a-file-using-the-aws-sdk-for-ruby.html</id>
     <published>2016-08-23T09:00:00+09:00</published>
-    <updated>2016-08-31T13:10:58+09:00</updated>
+    <updated>2016-08-31T21:55:38+09:00</updated>
     <author>
       <name>Article Author</name>
     </author>
@@ -410,227 +612,6 @@ obj.upload_file(uploadfile)
 
 &lt;p&gt;今回は同じディレクトリ内にあるファイルをアップロードしました。&lt;br&gt;
 別の場所にあるファイルをアップロードしたい場合は、スクリプト内の&lt;em&gt;uploadfile&lt;/em&gt;をパス指定すればOKです。&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>夏の川遊び＆アウトドアにおすすめのエッセンシャルオイル</title>
-    <link rel="alternate" href="http://blog.url.com/2016/08/18/summer-vercation.html"/>
-    <id>http://blog.url.com/2016/08/18/summer-vercation.html</id>
-    <published>2016-08-18T09:00:00+09:00</published>
-    <updated>2016-08-23T13:15:36+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="夏の川遊び"&gt;夏の川遊び&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;お盆休みも終わってしまいましたね〜。&lt;br&gt;
-我が家にお盆休みはなかったのですが、週末を利用して&lt;br&gt;
-つい先日秦野市にある&lt;strong&gt;神奈川県立秦野戸川公園&lt;/strong&gt;へ行ってきました！&lt;/p&gt;
-
-&lt;p&gt;とても大きな公園で、丹沢の山から湧き出る水無川(みずなしがわ)が流れています。&lt;br&gt;
-この水無川での川遊びが今回の目的。&lt;br&gt;
-川の流れも穏やかで、水位も浅め、小さい子供の水遊びに最適です。&lt;/p&gt;
-
-&lt;p&gt;今年は、雨が少なかったようで、川の水が干上がりそうなほど水位が浅め。&lt;br&gt;
-息子の足首ほどでした。&lt;/p&gt;
-
-&lt;p&gt;それでもお盆時期の週末、家族連れで賑わっていました！&lt;/p&gt;
-
-&lt;p&gt;息子は川にある石をひたすら集め、工事現場を作っていました(笑)。&lt;br&gt;
-あとはエンドレスでジョーロで水やり。&lt;br&gt;
-計3〜4時間は川で遊んでいました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="play_of_the_summer" src="/images/./2016/0818_play_of_the_summer/togawapark_01.jpg" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href="http://www.kanagawa-park.or.jp/hadanotokawa/"&gt;戸川公園&lt;/a&gt;、おすすめです！！&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="アウトドアにおすすめ!肌に優しい虫除けスプレー"&gt;アウトドアにおすすめ!肌に優しい虫除けスプレー&lt;/h1&gt;
-
-&lt;hr&gt;
-
-&lt;p&gt;小さなお子さんがいるアウトドアに虫除け対策は必須！&lt;br&gt;
-お肌の弱い小さなお子さんでも安心して使える虫除けスプレーをご紹介！&lt;br&gt;
-今回の川遊びでも活躍しました。&lt;/p&gt;
-
-&lt;p&gt;作り方は以下の材料を遮光瓶に入れて混ぜるだけ。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;・精製水25ml　
-・無水エタノール5ml
-・テラアーマー4〜6滴
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;テラアーマーというエッセンシャルオイル、&lt;br&gt;
-15種類(ユーカリプタス、シトロネラ、レモングラス、他)も&lt;br&gt;
-防虫効果の高いオイルを組み合わせてあり、虫除け、虫退治に効果大！&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="play_of_the_summer" src="/images/./2016/0818_play_of_the_summer/terraaumor.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;匂いのきつい印象のある虫除けスプレーですがテラアーマーは優しい&lt;br&gt;
-甘い香り。つけていてとても気分がいいですよ〜！&lt;/p&gt;
-
-&lt;p&gt;我が家はお出かけの時は必ず、この虫除けスプレーをシュシュっとかけています。&lt;br&gt;
-効果もばっちりのナチュラル虫除けスプレーぜひお試しください！&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>AWSと他の環境をVPNで繋げる際の「VPN接続」の作成をシェルスクリプトにしてみた。</title>
-    <link rel="alternate" href="http://blog.url.com/2016/08/16/shell-script-for-aws-vpn.html"/>
-    <id>http://blog.url.com/2016/08/16/shell-script-for-aws-vpn.html</id>
-    <published>2016-08-16T09:00:00+09:00</published>
-    <updated>2016-08-23T13:15:36+09:00</updated>
-    <author>
-      <name>Article Author</name>
-    </author>
-    <content type="html">&lt;h1 id="はじめに"&gt;はじめに&lt;/h1&gt;
-
-&lt;p&gt;AWSと他の環境をVPN接続する場合、AWS側では「VPN接続」を作成する必要があります。&lt;br&gt;
-管理画面からポチポチ操作するのは面倒なのでスクリプトを作成しました。&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="流れ"&gt;流れ&lt;/h1&gt;
-
-&lt;p&gt;スクリプトの大まかな流れです。&lt;/p&gt;
-
-&lt;p&gt;・ 仮想プライベートゲートウェイの作成&lt;br&gt;
-・ 仮想プライベートゲートウェイをVPCへattach&lt;br&gt;
-・ カスタマーゲートウェイの作成&lt;br&gt;
-・ VPN接続の作成&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="スクリプト"&gt;スクリプト&lt;/h1&gt;
-
-&lt;p&gt;以下、スクリプトです。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;#!/bin/bash
-
-# == Check number of arguments. ==================================== #
-if [ $# -ne 2 ]; then
-  echo "ERROR: Please check the number of arguments."
-  echo "   -usage-----------------------------"
-  echo "     $0 [VPC ID] [Counter VPN-IP] "
-  echo "   -----------------------------------"
-  echo ""
-  exit 1
-fi
-
-
-# == Set ENV. ====================================================== #
-VPC_ID="$1"
-PUBLIC_IP="$2"
-TAG_VALUE="VPNConnectTo${PUBLIC_IP}"
-
-
-# == Create VPN ==================================================== #
-# Create VPN Gateway
-echo "==[VGW]======================================="
-echo "Create the VGW."
-VGW_ID=`aws ec2 create-vpn-gateway --type ipsec.1 | jq -r .VpnGateway.VpnGatewayId`
-
-echo "VGW_ID:${VGW_ID}"
-if [ -n "${VGW_ID}" -a "${VGW_ID}" != "null" ]; then
-  echo "SUCCESS: Create the VirtualGateWay."
-else
-  echo "ERROR: Can't create the VirtualGateWay."
-  exit 1
-fi
-echo ""
-
-echo "Tagged to the VGW."
-aws ec2 create-tags --resources ${VGW_ID} --tags Key=Name,Value=${TAG_VALUE}
-
-echo "Attach the VGW to the VPC."
-VGW_STAT=`aws ec2 attach-vpn-gateway --vpn-gateway-id ${VGW_ID} --vpc-id ${VPC_ID} | jq -r .VpcAttachment.State`
-
-if [ "${VGW_STAT}" = "attaching" ]; then
-  echo "SUCCESS: Attaching the VGW to the VPC."
-else
-  echo "ERROR: Can't attach the VGW to the VPC."
-  exit 1
-fi
-echo ""
-echo ""
-
-
-# Create CustomerGateway
-echo "==[CGW]======================================="
-echo "Create the VGW."
-CGW_ID=`aws ec2 create-customer-gateway --type ipsec.1 --public-ip ${PUBLIC_IP} --bgp-asn 65000 | jq -r .CustomerGateway.CustomerGatewayId`
-
-echo "CGW_ID:${CGW_ID}"
-if [ -n "${CGW_ID}" -a "${CGW_ID}" != "null" ]; then
-  echo "SUCCESS: Create the CustomerGateWay."
-else
-  echo "ERROR: Can't create the CustomerGateWay."
-  exit 1
-fi
-echo ""
-
-echo "Tagged to the CGW."
-aws ec2 create-tags --resources ${CGW_ID} --tags Key=Name,Value=${TAG_VALUE}
-echo ""
-echo ""
-
-
-# Create VPN Connection
-echo "==[VPN]======================================="
-echo "Create the VPN."
-VPN_ID=`aws ec2 create-vpn-connection --type ipsec.1 --customer-gateway-id ${CGW_ID} --vpn-gateway-id ${VGW_ID} | jq -r .VpnConnection.VpnConnectionId`
-
-echo "VPN_ID:${VPN_ID}"
-if [ -n "${VPN_ID}" -a "${VPN_ID}" != "null" ]; then
-  echo "SUCCESS: Create the VPN Connection."
-else
-  echo "ERROR: Can't create the VPN Connection."
-  exit 1
-fi
-echo ""
-
-echo "Tagged to the VPN."
-aws ec2 create-tags --resources ${VPN_ID} --tags Key=Name,Value=${TAG_VALUE}
-
-echo ""
-echo ""
-
-echo "--------------------------------------------------"
-echo "COMPLETED: All of the task has been completed."
-
-exit 0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="実行"&gt;実行&lt;/h1&gt;
-
-&lt;p&gt;コマンド実行例です。&lt;/p&gt;
-&lt;pre class="highlight plaintext"&gt;&lt;code&gt;$ sh create-vpn.sh vpc-1e1ed97b 210.129.19.42
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="結果"&gt;結果&lt;/h1&gt;
-
-&lt;p&gt;以下、管理画面から見た作成結果です。&lt;/p&gt;
-
-&lt;p&gt;・仮想プライベートゲートウェイ&lt;br&gt;
-&lt;img alt="idcf-vpn_scrip03.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/47834725-e13f-8cf9-d3a3-33f1cf51da26.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;・カスタマーゲートウェイ&lt;br&gt;
-&lt;img alt="idcf-vpn_scrip02.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/ee9a3f30-87a6-a69d-c6ad-6069eeb8928f.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;・VPN接続&lt;br&gt;
-&lt;img alt="idcf-vpn_scrip01.png" src="https://qiita-image-store.s3.amazonaws.com/0/82090/39290a24-e4ab-22dd-1d50-ec27b4183345.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h1 id="おわりに"&gt;おわりに&lt;/h1&gt;
-
-&lt;p&gt;スクリプト実行後、「VPN接続」から「設定のダウンロード」をしてそのコンフィグを対向となるルーターに流し込めばOKです。&lt;/p&gt;
 </content>
   </entry>
 </feed>
