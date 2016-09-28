@@ -1,5 +1,5 @@
 ---
-title: 「お客様特有」もサポートする「手ぶら」なインフラサービス「ProudCloud」提供開始
+title:「お客様特有」もサポートする「手ぶら」なインフラサービス「ProudCloud」提供開始
 date: 2016-09-28
 tags: お知らせ,リリース
 author: proudcloud
