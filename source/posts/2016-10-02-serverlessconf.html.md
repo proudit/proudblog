@@ -509,7 +509,13 @@ A 慎吾さん。
 ![IMG_1567.jpg](https://qiita-image-store.s3.amazonaws.com/0/89940/bba5cd2c-ed33-1b59-6a6f-d45d57ced919.jpeg)
 
 
+最後に、
+
+主催者 Section-9の吉田慎吾さんをはじめ、スピーカーの皆様、スタッフの皆様、盛り上げた参加者の皆様にこの場を借りて御礼を申し上げます。
+
 以上です。
+
+
 
 
 
