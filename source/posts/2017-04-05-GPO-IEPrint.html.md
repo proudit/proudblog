@@ -1,5 +1,5 @@
 ---
-title: グループポリシーの設定でIEの印刷をむこうにする方法(WindowsServer 2008R2)
+title: ［ActiveDirectory］グループポリシーの設定でIEの印刷を無効にする方法(WindowsServer 2008R2)
 date: 2017-04-05
 tags: ActiveDirectory,
 author: ayako
@@ -12,6 +12,7 @@ ogp:
 ---
 
 グループポリシーとは。
+
 ```
 グループ ポリシーは、ユーザーおよびコンピューターに対する特定の構成の実装を可能にするインフラストラクチャです。
 引用元:http://www.atmarkit.co.jp/ait/articles/1501/29/news032.html
@@ -90,9 +91,11 @@ WindowsServer 2008R2
 
 以上で、グループポリシーの作成と有効化が完了しました。
 が、クライアントに反映されるまで時間がかかるよようなので、強制的に有効化を行いたい場合は、コマンドで実行。
+
 ```
 gpupdate /force
 ```
+
 ![dsadd](./2017/0405_GPO/GPO-12.png)
 
 #実際にポリシー適用をテスト
