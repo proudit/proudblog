@@ -10,6 +10,8 @@ ogp:
 # はじめに
 Amazon RDS では、 _[mysql.rds_set_configuration](http://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/mysql_rds_set_configuration.html)_ ストアドプロシージャを使用してバイナリログの保持時間を指定することができます。
 
+
+<br>
 # 設定
 それでは保持時間について確認してみます。
 
@@ -67,11 +69,13 @@ Query OK, 0 rows affected (0.00 sec)
 デフォルト値に変更されました。
 
 
+<br>
 # 注意事項
 - _binlog retention hours_ の最大値はMySQLの場合は168時間(7日)、Amazon Aurora DBの場合は720時間(30日)です。
 - 利用可能なMySQLのバージョンは5.6および5.7です。(2017年4月25日現在)
 
 
+<br>
 # おわりに
 バイナリログの保持期間を設定した場合、バイナリログに必要以上の容量を使用されないよう、ストレージ使用状況をモニタリングするようにしましょう。
 
