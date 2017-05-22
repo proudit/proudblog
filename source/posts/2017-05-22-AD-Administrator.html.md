@@ -1,5 +1,5 @@
 ---
-title: [ActiveDirectory]ADアカウントユーザにデフォルトでローカルユーザの管理権限を設定する方法
+title: ADアカウントユーザにデフォルトでローカルユーザの管理権限を設定する方法。
 date: 2017-05-22
 tags: ActiveDirectory,
 author: ayako
@@ -7,6 +7,7 @@ ogp:
   og:
     description: ''
 ---
+
 
 #はじめに
 ---
