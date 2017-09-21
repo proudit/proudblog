@@ -5,7 +5,7 @@ locale:
 site_name: 'Proud Blog'
 description: '株式会社プラウディットの公式Blogページ'
 image:
-  '': 'http://blog.proudit.jp/images/OGPimage0522.JPG'
+  '': 'http://blog.proudit.jp/images/OGPimage0921.JPG'
   type: image/jpg
   width: 400
   height: 300
