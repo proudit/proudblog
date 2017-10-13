@@ -1,5 +1,5 @@
 ---
-title: [AWS Organizations]アカウントの統合とaccount nameの編集方法
+title:[AWS Organizations]アカウントの統合とaccount nameの編集方法
 date: 2017-10-13
 tags: AWS,
 author: ayako
