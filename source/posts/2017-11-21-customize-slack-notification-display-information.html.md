@@ -1,6 +1,6 @@
 ---
 title: "Slack通知の表示情報をカスタマイズする。"
-date: 2017-11-20
+date: 2017-11-21
 tags: Slack
 author: kohei
 ogp:
@@ -8,7 +8,7 @@ ogp:
 ---
 
 # はじめに
-この前、「[CloudWatchアラームでSlackへ通知を行う。](https://qiita.com/kooohei/items/848eeb4cbb19c83b0b6d)」を行いました。
+この前、「[CloudWatchアラームでSlackへ通知を行う。](https://blog.proudit.jp/2017/10/27/notify-slack-from-cloudwatch.html)」を行いました。
 
 その際はとりあえず通知されることを目的としていたので、デフォルトの Display icon が表示されるようになってました。
 ![](https://camo.qiitausercontent.com/97f1de1e103134f4fb4f00b59cb8d906570f07af/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f38323039302f32653566373862392d663366652d633065382d396266302d6630373839323339653838632e706e67)
