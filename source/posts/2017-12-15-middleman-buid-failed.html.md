@@ -4,7 +4,7 @@ date: 2017-12-15
 tags: middleman
 author: kohei
 ogp:
-  og: ''
+  og: 'middlemanでbuildを行おうとしたら突然エラーで実行できなくなった。。。最近、MacのOSをHigh Sierraにアップデートしたからそのせいっぽい。。'
 ---
 
 # はじめに
@@ -14,6 +14,7 @@ middlemanでbuildを行おうとしたら突然エラーで実行できなくな
 あんまよくわからないけど、gonyogonyoいじったらbuildできるようになったのでその時の対応したことをまとめます。
 余計なところもあったかもですがそこはご容赦くださいm(__)m
 
+<br>
 # 対応したこと
 とりあえず以下のようにmiddleman buildしてエラーが出ました。
 
@@ -127,7 +128,7 @@ $ bundle exec middleman build
 
 無事build成功！
 
-
+<br>
 # おわりに
 色々調べたところ以下の記事を見つけました。
 [Apple、macOS High Sierra 1st BetaにRuby v2.3.3およびPHP v7.1.4をデフォルトで同梱。](https://applech2.com/archives/20170618-macos-10-13-high-sierra-update-ruby-and-php.html)
